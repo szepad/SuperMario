@@ -66,12 +66,14 @@ namespace Mario2
 
         private void Load()
         {
+            Assets.Load("../../../res");
             _virtualScreen = Raylib.LoadRenderTexture(Width, Height);
-            LoadScene(new TitleScene());
+            LoadScene(new GameScene());
         }
 
         private void Unload()
         {
+            Assets.Unload();
             Raylib.UnloadRenderTexture(_virtualScreen);
             LoadScene(null);
         }
