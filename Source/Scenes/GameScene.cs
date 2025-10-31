@@ -2,9 +2,11 @@
 {
     public class GameScene : Scene
     {
+        private readonly Player _player = new();
+
         protected override void OnLoad()
         {
-
+            _player.Position.X = 100;
         }
 
         protected override void OnUnload()
@@ -18,14 +20,14 @@
             {
                 Game.Instance.LoadScene(new TitleScene());
             }
+
+            _player.Update();
         }
 
         public override void Draw()
         {
             Raylib.ClearBackground(Color.SkyBlue);
-            Text.Draw("Game", Game.Width / 2, 5, 10, Color.White, Pivot.Top);
-
-            Raylib.DrawTexture(Assets.GetTex("players"), 0, 0, Color.White);
+            _player.Draw();
         }
     }
 }

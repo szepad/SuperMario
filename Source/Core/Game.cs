@@ -61,7 +61,9 @@ namespace Mario2
             Raylib.InitWindow(Width * 4, Height * 4, Title);
             Raylib.InitAudioDevice();
             Raylib.SetExitKey(KeyboardKey.Null);
-            Raylib.SetTargetFPS(60);
+
+            Raylib.SetWindowState(ConfigFlags.VSyncHint);
+            Raylib.SetTargetFPS(0);
         }
 
         private void Load()

@@ -6,6 +6,7 @@
         private static Texture2D _placeHolderTex;
 
         private static readonly string[] ImageFormats = [".png"];
+        private const string IgnoreFolder = ".ignore";
 
         public static void Load(string root)
         {
@@ -22,7 +23,6 @@
             }
 
             List<string> assetFiles = SearchDir(root);
-
             foreach (string file in assetFiles)
             {
                 string name = Path.GetFileNameWithoutExtension(file);
@@ -42,7 +42,10 @@
             {
                 if (File.GetAttributes(entry).HasFlag(FileAttributes.Directory))
                 {
-                    files.AddRange(SearchDir(entry));
+                    if (Path.GetFileName(entry) != IgnoreFolder)
+                    {
+                        files.AddRange(SearchDir(entry));
+                    }
                 }
                 else
                 {
