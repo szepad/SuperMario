@@ -24,6 +24,8 @@
         {
             Raylib.ClearBackground(Color.SkyBlue);
             Text.Draw("Game", Game.Width / 2, 5, 10, Color.White, Pivot.Top);
+
+            Raylib.DrawTexture(Assets.GetTex("players"), 0, 0, Color.White);
         }
     }
 }
