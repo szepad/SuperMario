@@ -4,13 +4,13 @@
     {
         public static float TimeScale { get; set; } = 1f;
 
-        public static float UnscaledDelta { get; private set; }
-        public static float Delta { get; private set; }
+        public static float UnscaledDeltaTime { get; private set; }
+        public static float DeltaTime { get; private set; }
 
         public static void Progress()
         {
-            UnscaledDelta = Raylib.GetFrameTime();
-            Delta = UnscaledDelta * TimeScale;
+            UnscaledDeltaTime = Raylib.GetFrameTime();
+            DeltaTime = UnscaledDeltaTime * TimeScale;
         }
     }
 }
