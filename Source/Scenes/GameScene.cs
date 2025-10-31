@@ -2,11 +2,11 @@
 {
     public class GameScene : Scene
     {
-        private readonly Player _player = new();
+        private readonly World _world = new();
 
         protected override void OnLoad()
         {
-            _player.Position.X = 100;
+
         }
 
         protected override void OnUnload()
@@ -21,13 +21,13 @@
                 Game.Instance.LoadScene(new TitleScene());
             }
 
-            _player.Update();
+            _world.Update();
         }
 
         public override void Draw()
         {
             Raylib.ClearBackground(Color.SkyBlue);
-            _player.Draw();
+            _world.Draw();
         }
     }
 }

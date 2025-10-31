@@ -17,6 +17,8 @@
         public Vector2 Origin { get; set; } = Vector2.Zero;
         public Color Color { get; set; } = Color.White;
         public float Scale { get; set; } = 1f;
+        public bool FlipX { get; set; }
+        public bool FlipY { get; set; }
 
         public string CurrentAnimationName { get; private set; } = string.Empty;
         public Animation? CurrentAnimation { get; private set; }
@@ -94,7 +96,8 @@
             return new Rectangle(
                 CurrentAnimation.FrameWidth * CurrentFrame,
                 CurrentAnimation.Y,
-                CurrentAnimation.FrameWidth, CurrentAnimation.FrameHeight);
+                FlipX ? -CurrentAnimation.FrameWidth : CurrentAnimation.FrameWidth,
+                FlipY ? -CurrentAnimation.FrameHeight : CurrentAnimation.FrameHeight);
         }
 
         public void Draw(Vector2 position)

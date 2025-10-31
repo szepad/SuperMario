@@ -9,6 +9,8 @@ namespace Mario2
         public const int Height = 224;
         public const string Title = "Mario 2";
 
+        public bool IsDevMode { get; private set; }
+
         private bool _hasExited;
 
         private Scene? _activeScene;
@@ -82,6 +84,20 @@ namespace Mario2
 
         private void Update()
         {
+#if DEBUG
+            if (Input.IsKeyPressed(KeyboardKey.F10))
+            {
+                IsDevMode = !IsDevMode;
+            }
+
+            if (Input.IsKeyPressed(KeyboardKey.Grave)) Time.TimeScale = 0f;
+            else if (Input.IsKeyPressed(KeyboardKey.One)) Time.TimeScale = 1f;
+            else if (Input.IsKeyPressed(KeyboardKey.Two)) Time.TimeScale = 0.5f;
+            else if (Input.IsKeyPressed(KeyboardKey.Three)) Time.TimeScale = 1f / 3f;
+            else if (Input.IsKeyPressed(KeyboardKey.Four)) Time.TimeScale = 1f / 10f;
+            else if (Input.IsKeyPressed(KeyboardKey.Five)) Time.TimeScale = 1f / 50f;
+#endif
+
             Time.Progress();
             _activeScene?.Update();
         }
