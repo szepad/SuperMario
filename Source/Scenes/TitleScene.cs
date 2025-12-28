@@ -23,6 +23,11 @@
             {
                 Game.Instance.LoadScene(new GameScene());
             }
+
+            if (Input.IsKeyPressed(KeyboardKey.E))
+            {
+                Game.Instance.LoadScene(new EditorScene());
+            }
         }
 
         public override void Draw()

@@ -32,9 +32,9 @@
 
         private void HandleCollisions(bool horizontal)
         {
-            for (int y = 0; y < World.TileCountY; y++)
+            for (int y = 0; y < World.Rows; y++)
             {
-                for (int x = 0; x < World.TileCountX; x++)
+                for (int x = 0; x < World.Cols; x++)
                 {
                     Tile tile = World.Tiles[y, x];
                     if (!tile.IsCollidable)
