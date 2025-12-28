@@ -2,7 +2,7 @@
 {
     public abstract class Tile(bool isCollidable)
     {
-        public const int Size = 16;
+        public const int Size = 16 * Game.TexScale;
 
         public bool IsCollidable { get; set; } = isCollidable;
 

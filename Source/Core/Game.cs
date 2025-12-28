@@ -5,8 +5,9 @@ namespace Mario2
 {
     public class Game
     {
-        public const int Width = 256;
-        public const int Height = 224;
+        public const int Width = 1280;//256;
+        public const int Height = 720;//224;
+        public const int TexScale = 4;
         public const string Title = "Mario 2";
 
         public bool IsDevMode { get; private set; }
@@ -60,7 +61,7 @@ namespace Mario2
         {
             Raylib.SetTraceLogLevel(TraceLogLevel.Warning);
             Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
-            Raylib.InitWindow(Width * 4, Height * 4, Title);
+            Raylib.InitWindow(Width, Height, Title);
             Raylib.InitAudioDevice();
             Raylib.SetExitKey(KeyboardKey.Null);
 
@@ -72,7 +73,7 @@ namespace Mario2
         {
             Assets.Load("../../../res");
             _virtualScreen = Raylib.LoadRenderTexture(Width, Height);
-            LoadScene(new GameScene());
+            LoadScene(new EditorScene());
         }
 
         private void Unload()
@@ -104,6 +105,12 @@ namespace Mario2
 
         private void Draw()
         {
+            if (_activeScene is EditorScene)
+            {
+                _activeScene.Draw();
+                return;
+            }
+
             _activeScene?.PreDraw();
 
             Raylib.BeginTextureMode(_virtualScreen);
