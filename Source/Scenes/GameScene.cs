@@ -26,7 +26,7 @@
 
         public override void Draw()
         {
-            Raylib.ClearBackground(Color.SkyBlue);
+            Raylib.ClearBackground(_world.BackgroundColor);
             _world.Draw();
         }
     }

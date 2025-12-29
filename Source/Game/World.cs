@@ -1,9 +1,21 @@
-﻿namespace Mario2
+﻿using System.Xml.Schema;
+
+namespace Mario2
 {
+    public enum WorldBackground
+    {
+        Sky,
+        Underground,
+        Castle,
+        Water,
+        Night
+    }
+
     public class World
     {
         public int Cols { get; private set; } = 16;
         public int Rows { get; private set; } = 14;
+        public WorldBackground Background { get; set; } = WorldBackground.Sky;
 
         private readonly Player _player;
 
@@ -105,7 +117,7 @@
             _player.Update();
         }
 
-        public void Draw()
+        public void Draw(bool editor = false)
         {
             for (int y = 0; y < Rows; y++)
             {
@@ -115,11 +127,24 @@
                     if (tile == SimpleTile.Air) 
                         continue;
 
-                    tile.Draw(x, y);
+                    if (editor)
+                    {
+                        tile.Draw(x, y, tile.IsCollidable ? 1f : 0.5f);
+                    }
+                    else
+                    {
+                        tile.Draw(x, y);
+                    }
                 }
             }
 
             _player.Draw();
         }
+
+        public Color BackgroundColor => Background switch
+        {
+            WorldBackground.Sky => new Color(92, 148, 252, 255),
+            _ => Color.Black
+        };
     }
 }

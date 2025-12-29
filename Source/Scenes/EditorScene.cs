@@ -1,41 +1,46 @@
-﻿using RlImGui = rlImGui_cs.rlImGui;
-using Gui = ImGuiNET.ImGui;
-using ImGuiNET;
+﻿using Mario2.Editor;
 
 namespace Mario2
 {
     public class EditorScene : Scene
     {
-        private Camera2D _camera = new(Vector2.Zero, Vector2.Zero, 0f, 1f);
-        private World _world = new();
+        public World World { get; } = new();
+        public EditorOptions Options { get; } = new();
+
+        public EditorMenuBar MenuBar { get; private set; }
+        public WorldWindow WorldWindow { get; private set; }
+        public TileWindow TileWindow { get; private set; }
+        public PropertyWindow PropertyWindow { get; private set; }
+
+        private readonly List<EditorWindow> _windowRenderQueue = [];
+
         private bool _exitToTitle;
 
-        private static bool _showGrid = true;
-
-        private bool _isPanning;
-        private Vector2 _panStartPos;
-
-        private Vector2 _editorWindowPos;
-        private RenderTexture2D _editorWindowContent;
-        private bool _editorWindowHovered;
-
-        private int _selectedTile = 0;
-        private float _tileSizeScale = 1f;
-
-        private int _colsInputVal = 0;
-
-        private const string DefaultLayout = "default.ini";
+        public const string DefaultLayout = "default.ini";
         private bool _loadLayout;
         private string _nextLayoutPath = string.Empty;
 
+        public EditorScene()
+        {
+            MenuBar = new EditorMenuBar(this);
+
+            WorldWindow = new WorldWindow(this);
+            TileWindow = new TileWindow(this);
+            PropertyWindow = new PropertyWindow(this);
+
+            _windowRenderQueue.Add(WorldWindow);
+            _windowRenderQueue.Add(TileWindow);
+            _windowRenderQueue.Add(PropertyWindow);
+        }
+
         protected override void OnLoad()
         {
-            _world = new World();
-            _editorWindowContent = Raylib.LoadRenderTexture(
-                Raylib.GetMonitorWidth(Raylib.GetCurrentMonitor()), 
+            WorldWindow.WorldContentTex = Raylib.LoadRenderTexture(
+                Raylib.GetMonitorWidth(Raylib.GetCurrentMonitor()),
                 Raylib.GetMonitorHeight(Raylib.GetCurrentMonitor()));
 
             RlImGui.Setup(enableDocking: true);
+            EditorThemeManager.ApplyDefault();
 
             if (!File.Exists("imgui.ini"))
             {
@@ -45,28 +50,35 @@ namespace Mario2
 
         protected override void OnUnload()
         {
-            Raylib.UnloadRenderTexture(_editorWindowContent);
+            Raylib.UnloadRenderTexture(WorldWindow.WorldContentTex);
             RlImGui.Shutdown();
         }
 
-        private Vector2 GetMousePositionInsideEditor() 
-            => Raylib.GetMousePosition() - _editorWindowPos;
+        public void QueueTitleScene()
+        {
+            _exitToTitle = true;
+        }
 
-        private Vector2 ScreenToWorld(Vector2 screenPos)
-            => (screenPos + _camera.Target * _camera.Zoom) / _camera.Zoom;
+        public void QueueLoadLayout(string path)
+        {
+            _loadLayout = true;
+            _nextLayoutPath = path;
+        }
 
         public override void Update()
         {
-            HandleGeneralControls();
-            HandleZooming();
-            HandlePanning();
-            HandleEditing();
-
             if (_loadLayout)
             {
                 LoadNextLayout();
                 _loadLayout = false;
             }
+            
+            HandleGeneralControls();
+            foreach (EditorWindow window in _windowRenderQueue)
+            {
+                window.Update();
+            }
+
 
             if (_exitToTitle)
             {
@@ -74,82 +86,19 @@ namespace Mario2
             }
         }
 
+        private void LoadNextLayout()
+        {
+            if (!File.Exists(_nextLayoutPath))
+                return;
+
+            Gui.LoadIniSettingsFromDisk(_nextLayoutPath);
+        }
+
         private void HandleGeneralControls()
         {
             if (Input.IsKeyPressed(KeyboardKey.Escape))
             {
-                QueueLoadTitleScene();
-            }
-        }
-
-        private void QueueLoadTitleScene()
-        {
-            _exitToTitle = true;
-        }
-
-        private void HandleZooming()
-        {
-            if (!_editorWindowHovered)
-                return;
-
-            float scroll = Raylib.GetMouseWheelMove();
-            Vector2 mousePos = GetMousePositionInsideEditor();
-            
-            if (scroll != 0)
-            {
-                float prevZoom = _camera.Zoom;
-
-                _camera.Zoom += (_camera.Zoom / 5f) * scroll;
-                _camera.Zoom = Helper.Clamp(_camera.Zoom, 0.1f, 25f);
-
-                Vector2 prevNormalPos = (mousePos + _camera.Target * prevZoom) / prevZoom;
-                Vector2 currNormalPos = (mousePos + _camera.Target * _camera.Zoom) / _camera.Zoom;
-                Vector2 diff = currNormalPos - prevNormalPos;
-                _camera.Target -= diff;
-            }
-        }
-
-        private void HandlePanning()
-        {
-            if (!_editorWindowHovered)
-                _isPanning = false;
-
-            if (Raylib.IsMouseButtonPressed(MouseButton.Middle))
-            {
-                _panStartPos = GetMousePositionInsideEditor();
-                _isPanning = true;
-            }
-
-            if (Raylib.IsMouseButtonDown(MouseButton.Middle) && _isPanning)
-            {
-                Vector2 mousePos = GetMousePositionInsideEditor();
-                _camera.Target += (_panStartPos - mousePos) / _camera.Zoom;
-                _panStartPos = mousePos;
-            }
-
-            if (Raylib.IsMouseButtonReleased(MouseButton.Middle))
-            {
-                _isPanning = false;
-            }
-        }
-
-        private void HandleEditing()
-        {
-            if (!_editorWindowHovered)
-                return;
-
-            Vector2 screenPos = ScreenToWorld(GetMousePositionInsideEditor());
-            int tx = (int)(screenPos.X / Tile.Size);
-            int ty = (int)(screenPos.Y / Tile.Size);
-            
-            if (Raylib.IsMouseButtonDown(MouseButton.Left))
-            {
-                _world.SetTile(tx, ty, new SimpleTile(_selectedTile, false));
-            }
-
-            if (Raylib.IsMouseButtonDown(MouseButton.Right))
-            {
-                _world.SetTile(tx, ty, SimpleTile.Air);
+                QueueTitleScene();
             }
         }
 
@@ -157,260 +106,39 @@ namespace Mario2
         {
             Raylib.BeginDrawing();
 
-            Raylib.BeginTextureMode(_editorWindowContent);
-            DrawEditorWindowContent();
-            Raylib.EndTextureMode();
+            WorldWindow.RenderWorld();
 
             RlImGui.Begin();
 
-            Gui.PushStyleColor(ImGuiCol.TitleBg, new Vector4(0, 0, 0, 1));
-            Gui.PushStyleColor(ImGuiCol.TitleBgActive, new Vector4(0, 0, 0, 1));
-            Gui.PushStyleColor(ImGuiCol.TitleBgCollapsed, new Vector4(0, 0, 0, 1));
-            Gui.PushStyleColor(ImGuiCol.TabDimmed, new Vector4(0, 0, 0, 1));
-            Gui.PushStyleColor(ImGuiCol.TabDimmedSelected, new Vector4(0, 0, 0, 1));
-            Gui.PushStyleColor(ImGuiCol.TabDimmedSelectedOverline, new Vector4(0, 0, 0, 1));
-            Gui.PushStyleColor(ImGuiCol.Tab, new Vector4(0, 0, 0, 1));
-            Gui.PushStyleColor(ImGuiCol.TabSelected, new Vector4(0, 0, 0, 1));
-            Gui.PushStyleColor(ImGuiCol.TabSelectedOverline, new Vector4(0, 0, 0, 1));
+            Vector4 tabCol = new(35 / 255f, 67 / 255f, 108 / 255f, 1f);
+            Vector4 tabColDarker = new(tabCol.X * 0.67f, tabCol.Y * 0.67f, tabCol.Z * 0.67f, tabCol.W);
+            Vector4 titleCol = new(tabCol.X * 0.33f, tabCol.Y * 0.33f, tabCol.Z * 0.33f, tabCol.W);
+            
+            Gui.PushStyleColor(ImGuiCol.TitleBg, titleCol);
+            Gui.PushStyleColor(ImGuiCol.TitleBgActive, titleCol);
+            Gui.PushStyleColor(ImGuiCol.TitleBgCollapsed, titleCol);
+
+            Gui.PushStyleColor(ImGuiCol.Tab, tabColDarker);
+            Gui.PushStyleColor(ImGuiCol.TabDimmed, tabColDarker);
+            Gui.PushStyleColor(ImGuiCol.TabSelected, tabCol);
+            Gui.PushStyleColor(ImGuiCol.TabDimmedSelected, tabCol);
+
+            Gui.PushStyleColor(ImGuiCol.TabDimmedSelectedOverline, Vector4.Zero);
+            Gui.PushStyleColor(ImGuiCol.TabSelectedOverline, Vector4.Zero);
 
             Gui.DockSpaceOverViewport();
             Gui.ShowDemoWindow();
-            
-            DrawMenuBar();
-            DrawEditorWindow();
-            DrawTilesetWindow();
-            DrawPropertiesWindow();
-            DrawEntitiesWindow();
+
+            MenuBar.Render();
+            foreach (EditorWindow window in _windowRenderQueue)
+            {
+                window.Render();
+            }
 
             Gui.PopStyleColor(9);
 
             RlImGui.End();
             Raylib.EndDrawing();
-        }
-
-        private void DrawEditorWindowContent()
-        {
-            Raylib.ClearBackground(Color.Black);
-
-            Raylib.BeginMode2D(_camera);
-            _world.Draw();
-            if (_showGrid) DrawGrid();
-            Raylib.EndMode2D();
-        }
-
-        private void DrawGrid()
-        {
-            for (int row = 0; row <= _world.Rows; row++)
-            {
-                int y = row * Tile.Size;
-                Raylib.DrawLine(0, y, _world.Cols * Tile.Size, y, Color.Gray);
-            }
-
-            for (int col = 0; col <= _world.Cols; col++)
-            {
-                int x = col * Tile.Size;
-                Raylib.DrawLine(x, 0, x, _world.Rows * Tile.Size, Color.Gray);
-            }
-        }
-
-        private void DrawMenuBar()
-        {
-            Gui.BeginMainMenuBar();
-
-            if (Gui.BeginMenu("File"))
-            {
-                if (Gui.MenuItem("New", "Ctrl+N"))
-                {
-
-                }
-                if (Gui.MenuItem("Open", "Ctrl+O"))
-                {
-
-                }
-                if (Gui.MenuItem("Save", "Ctrl+S"))
-                {
-
-                }
-                if (Gui.MenuItem("Save As", "Ctrl+Shift+S"))
-                {
-
-                }
-
-                Gui.Separator();
-                if (Gui.MenuItem("Back", "Escape"))
-                {
-                    QueueLoadTitleScene();
-                }
-                if (Gui.MenuItem("Exit", "Alt+F4"))
-                {
-                    Game.Instance.Exit();
-                }
-
-                Gui.EndMenu();
-            }
-            if (Gui.BeginMenu("View"))
-            {
-                Gui.MenuItem("Show Grid", string.Empty, ref _showGrid);
-                Gui.SeparatorText("Layout Presets");
-
-                if (Gui.MenuItem("Default"))
-                {
-                    QueueLoadLayout(DefaultLayout);
-                }
-
-                Gui.EndMenu();
-            }
-
-            Gui.EndMainMenuBar();
-        }
-
-        private void DrawEditorWindow()
-        {
-            Gui.Begin("Editor", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
-            _editorWindowHovered = Gui.IsWindowHovered();
-            _editorWindowPos = Gui.GetWindowPos() + Gui.GetCursorPos();
-            RlImGui.ImageRenderTexture(_editorWindowContent);
-            Gui.End();
-        }
-        
-        private void DrawTilesetWindow()
-        {
-            Texture2D tileset = Assets.GetTex("tileset");
-            const int TileCount = 120;
-            const int TileSizePx = 16;
-
-            Gui.Begin("Tileset");
-
-            Gui.SetNextItemWidth(64f);
-            Gui.SliderFloat("Zoom", ref _tileSizeScale, 1f, 3f, "");
-
-            int itemSize = (int)(32f * _tileSizeScale);
-            int cols = (int)(Gui.GetWindowWidth() / (itemSize + 9));
-            if (cols <= 0) cols = 1;
-            int rows = (int)MathF.Ceiling(TileCount / (float)cols);
-            int itemIndex = 0;
-
-            if (Gui.BeginTable("tiles", cols, ImGuiTableFlags.ScrollY
-                | ImGuiTableFlags.NoPadInnerX))
-            {
-                for (int row = 0; row < rows; row++)
-                {
-                    Gui.TableNextRow();
-                    for (int col = 0; col < cols; col++)
-                    {
-                        Gui.TableSetColumnIndex(col);
-
-                        if (itemIndex >= TileCount)
-                            break;
-
-                        if (_selectedTile == itemIndex)
-                        {
-                            Gui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 0, 0, 1));
-                            Gui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(1, 0, 0, 1));
-                            Gui.PushStyleColor(ImGuiCol.ButtonActive, new Vector4(1, 0, 0, 1));
-                            DrawTileButton(itemIndex, itemSize, TileSizePx, tileset);
-                            Gui.PopStyleColor(3);
-                        }
-                        else
-                        {
-                            Gui.PushStyleColor(ImGuiCol.Button, new Vector4(1, 0, 0, 0));
-                            DrawTileButton(itemIndex, itemSize, TileSizePx, tileset);
-                            Gui.PopStyleColor(1);
-                        }
-
-                        itemIndex++;
-                    }
-                }
-
-                Gui.EndTable();
-            }
-
-            Gui.End();
-        }
-
-        private void DrawTileButton(int index, int displaySize, int tileSizePx, Texture2D tileset)
-        {
-            int cols = (tileset.Width / tileSizePx);
-            int col = index % cols;
-            int row = index / cols;
-
-            Rectangle src = new(col * tileSizePx, row * tileSizePx, tileSizePx, tileSizePx);
-            Vector2 uv0 = new(src.X / tileset.Width, src.Y / tileset.Height);
-            Vector2 uv1 = uv0 + new Vector2(1f / (tileset.Width / src.Width), 1f / (tileset.Height / src.Height));
-
-            if (Gui.ImageButton($"tile,{col},{row}", (nint)tileset.Id, new Vector2(displaySize), uv0, uv1))
-            {
-                _selectedTile = index;
-            }
-        }
-
-        private void DrawPropertiesWindow()
-        {
-            Gui.Begin("Properties");
-
-            Gui.SeparatorText("World");
-            Gui.SetNextItemWidth(100f);
-
-            Gui.Text($"Cols: {_world.Cols}");
-            Gui.SameLine();
-            if (Gui.Button("Change"))
-            {
-                _colsInputVal = _world.Cols;
-                Gui.OpenPopup("Change Columns");
-            }
-
-            Vector2 center = Gui.GetMainViewport().GetCenter();
-            Gui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f));
-            if (Gui.BeginPopupModal("Change Columns"))
-            {
-                Gui.InputInt("##1", ref _colsInputVal);
-                if (Gui.Button("Apply"))
-                {
-                    _world.SetCols(_colsInputVal);
-                    Gui.CloseCurrentPopup();
-                }
-
-                Gui.SameLine();
-                if (Gui.Button("Cancel")) Gui.CloseCurrentPopup();
-
-                Gui.EndPopup();
-            }
-
-            Gui.Text($"Rows: {_world.Rows}");
-            Gui.SameLine();
-            Gui.BeginDisabled();
-            Gui.Button("Change##2");
-            Gui.EndDisabled();
-
-            Gui.Dummy(new Vector2(0f, 20f));
-            Gui.SeparatorText("Tile");
-            bool a = false;
-            Gui.Checkbox("Collidable", ref a);
-
-            Gui.End();
-        }
-
-        private void DrawEntitiesWindow()
-        {
-            Gui.Begin("Entities");
-            Gui.End();
-        }
-
-        private void QueueLoadLayout(string path)
-        {
-            if (!File.Exists(path))
-                return;
-
-            _loadLayout = true;
-            _nextLayoutPath = path;
-        }
-        
-        private void LoadNextLayout()
-        {
-            if (!File.Exists(_nextLayoutPath))
-                return;
-
-            Gui.LoadIniSettingsFromDisk(_nextLayoutPath);
         }
     }
 }

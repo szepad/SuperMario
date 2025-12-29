@@ -1,5 +1,8 @@
 ﻿global using System.Numerics;
 global using Raylib_cs;
+global using RlImGui = rlImGui_cs.rlImGui;
+global using Gui = ImGuiNET.ImGui;
+global using ImGuiNET;
 
 namespace Mario2
 {
