@@ -7,6 +7,6 @@
         public bool IsCollidable { get; set; } = isCollidable;
 
         public abstract void Update();
-        public abstract void Draw(int col, int row);
+        public abstract void Draw(int col, int row, float opacity = 1f);
     }
 }

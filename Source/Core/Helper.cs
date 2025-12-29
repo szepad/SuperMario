@@ -1,6 +1,4 @@
-﻿using Gui = ImGuiNET.ImGui;
-
-namespace Mario2
+﻿namespace Mario2
 {
     public static class Helper
     {
@@ -17,6 +15,11 @@ namespace Mario2
             bool result = Gui.Button(label);
             if (disabled) Gui.EndDisabled();
             return result;
+        }
+        
+        public static Color Alpha(this Color color, float opacity)
+        {
+            return new Color(color.R, color.G, color.B, (byte)(255f * opacity));
         }
     }
 }
