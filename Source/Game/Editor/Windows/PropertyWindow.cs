@@ -23,6 +23,8 @@
         {
             // Cols
             Gui.SeparatorText("World");
+            Gui.Text(Editor.FileName == string.Empty ? "unnamed" : Editor.FileName);
+            Gui.Dummy(new Vector2(0f, 2f));
             Gui.Text($"Cols: {Editor.World.Cols}");
             Gui.SameLine();
             if (Gui.Button("Change"))

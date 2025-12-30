@@ -5,15 +5,18 @@
         public Vector2 RenderTexDrawPosition { get; private set; }
         public RenderTexture2D WorldContentTex { get; set; }
 
-        private Camera2D _camera = new(Vector2.Zero, Vector2.Zero, 0f, 1f);
+        private Camera2D _camera = new(Vector2.Zero, Vector2.Zero, 0f, 0.4f);
 
         private bool _isPanning;
         private Vector2 _panStartPos;
+
+        private bool _firstRender = true;
 
         public WorldWindow(EditorScene editor)
             : base(editor, "Editor")
         {
             Flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse;
+            AssignRuleTileRefs();
         }
 
         public Vector2 GetMousePositionInsideEditor()
@@ -27,6 +30,9 @@
             HandleZooming();
             HandlePanning();
             HandleEditing();
+
+            if (Editor.IsFileDirty) Flags |= ImGuiWindowFlags.UnsavedDocument;
+            else Flags &= ~ImGuiWindowFlags.UnsavedDocument;
         }
 
         private void HandleZooming()
@@ -86,14 +92,54 @@
 
             if (Raylib.IsMouseButtonDown(MouseButton.Left))
             {
-                Editor.World.SetTile(tx, ty, new SimpleTile(
-                    Editor.TileWindow.SelectedTile, Editor.PropertyWindow.IsTileCollidable));
+                Editor.World.SetTile(tx, ty, Editor.TileWindow.GetSelected(Editor.World, tx, ty));
+                UpdateRule(Editor.World, tx, ty);
             }
 
             if (Raylib.IsMouseButtonDown(MouseButton.Right))
             {
                 Editor.World.SetTile(tx, ty, SimpleTile.Air);
+                UpdateRule(Editor.World, tx, ty);
             }
+        }
+
+        public void AssignRuleTileRefs()
+        {
+            World world = Editor.World;
+            for (int row = 0; row < world.Rows; row++)
+            {
+                for (int col = 0; col < world.Cols; col++)
+                {
+                    if (!world.GetTile(col, row, out Tile tile) || tile is not SimpleTile st)
+                        continue;
+
+                    foreach (TileObject selectable in TileWindow.Selectables)
+                    {
+                        if (selectable is RuleTile ruleTile
+                            && ruleTile.Rules.ContainsValue(st.Id))
+                        {
+                            tile.Rule = ruleTile;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void UpdateRule(World world, int col, int row)
+        {
+            void Update(int x, int y)
+            {
+                if (world.GetTile(x, y, out Tile tile) && tile.Rule is not null)
+                {
+                    world.SetTile(x, y, tile.Rule.OnPlace(world, x, y));
+                }
+            };
+
+            Update(col, row - 1);
+            Update(col + 1, row);
+            Update(col, row + 1);
+            Update(col - 1, row);
         }
 
         public void RenderWorld()
@@ -102,10 +148,13 @@
 
             Raylib.ClearBackground(Editor.World.BackgroundColor);
 
-            Raylib.BeginMode2D(_camera);
-            if (Editor.Options.ShowGrid) DrawGrid();
-            Editor.World.Draw(editor: true);
-            Raylib.EndMode2D();
+            if (!_firstRender)
+            {
+                Raylib.BeginMode2D(_camera);
+                if (Editor.Options.ShowGrid) DrawGrid();
+                Editor.World.Draw(editor: true);
+                Raylib.EndMode2D();
+            }
 
             Raylib.EndTextureMode();
         }
@@ -127,6 +176,13 @@
 
         protected override void OnRender()
         {
+            if (_firstRender)
+            {
+                _camera.Target.Y = -Tile.Size * 2f;
+                _camera.Target.X = -Tile.Size * 4f;
+                _firstRender = false;
+            }
+
             RenderTexDrawPosition = Gui.GetWindowPos() + Gui.GetCursorPos();
             RlImGui.ImageRenderTexture(WorldContentTex);
         }

@@ -1,4 +1,5 @@
 ﻿using Mario2.Editor;
+using NativeFileDialogSharp;
 
 namespace Mario2
 {
@@ -6,11 +7,15 @@ namespace Mario2
     {
         public World World { get; } = new();
         public EditorOptions Options { get; } = new();
+        public EditorFileManager FileManager { get; }
 
         public EditorMenuBar MenuBar { get; private set; }
         public WorldWindow WorldWindow { get; private set; }
         public TileWindow TileWindow { get; private set; }
         public PropertyWindow PropertyWindow { get; private set; }
+
+        public string FileName { get; private set; } = string.Empty;
+        public bool IsFileDirty { get; set; }
 
         private readonly List<EditorWindow> _windowRenderQueue = [];
 
@@ -20,8 +25,12 @@ namespace Mario2
         private bool _loadLayout;
         private string _nextLayoutPath = string.Empty;
 
+        private bool _askSave;
+        private Action? _askSaveAction;
+
         public EditorScene()
         {
+            FileManager = new(this);
             MenuBar = new EditorMenuBar(this);
 
             WorldWindow = new WorldWindow(this);
@@ -52,6 +61,12 @@ namespace Mario2
         {
             Raylib.UnloadRenderTexture(WorldWindow.WorldContentTex);
             RlImGui.Shutdown();
+        }
+
+        public void AskSave(Action? afterSaving)
+        {
+            _askSave = true;
+            _askSaveAction = afterSaving;
         }
 
         public void QueueTitleScene()
@@ -137,8 +152,58 @@ namespace Mario2
 
             Gui.PopStyleColor(9);
 
+            HandleAskSave();
+
             RlImGui.End();
             Raylib.EndDrawing();
+        }
+
+        private void HandleAskSave()
+        {
+            if (_askSave)
+            {
+                Gui.OpenPopup("Unsaved Level");
+                _askSave = false;
+            }
+
+            bool cancel = false;
+            bool closed = false;
+            Vector2 center = Gui.GetMainViewport().GetCenter();
+            Gui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f));
+            if (Gui.BeginPopupModal("Unsaved Level", ImGuiWindowFlags.NoResize))
+            {
+                Gui.TextWrapped("Would you like to save before moving on?");
+
+                if (Gui.Button("Save"))
+                {
+                    Gui.CloseCurrentPopup();
+                    FileManager.Save();
+                    closed = true;
+                }
+
+                Gui.SameLine();
+                if (Gui.Button("Discard"))
+                {
+                    Gui.CloseCurrentPopup();
+                    closed = true;
+                }
+
+                Gui.SameLine();
+                if (Gui.Button("Cancel"))
+                {
+                    Gui.CloseCurrentPopup();
+                    closed = true;
+                    cancel = true;
+                }
+
+                Gui.EndPopup();
+            }
+            
+            if (closed && !cancel)
+            {
+                _askSaveAction?.Invoke();
+                _askSaveAction = null;
+            }
         }
     }
 }

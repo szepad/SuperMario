@@ -3,11 +3,6 @@
     public class EditorMenuBar(EditorScene editor)
     {
         public EditorScene Editor { get; } = editor;
-        private readonly EditorMenuBarAction _actions = new(editor);
-
-        private string _popupId = string.Empty;
-        private bool _popupOpened;
-        private Action? _popupLogic;
 
         public void Render()
         {
@@ -17,16 +12,14 @@
             Menu("View", ViewMenu);
 
             Gui.EndMainMenuBar();
-
-            HandlePopupLogic();
         }
 
         private void FileMenu()
         {
-            Item("New", "Ctrl+N", () => Popup("New", _actions.New));
-            Item("Open", "Ctrl+O", () => Popup("Open", _actions.Open));
-            Item("Save", "Ctrl+S", () => Popup("Save", _actions.Save));
-            Item("Save As", "Ctrl+Shift+S", () => Popup("Save As", _actions.SaveAs));
+            Item("New", "Ctrl+N", Editor.FileManager.New);
+            Item("Open", "Ctrl+O", Editor.FileManager.Open);
+            Item("Save", "Ctrl+S", Editor.FileManager.Save);
+            Item("Save As", "Ctrl+Shift+S", Editor.FileManager.SaveAs);
 
             Gui.Separator();
             Item("Back", "Escape", Editor.QueueTitleScene);
@@ -39,17 +32,6 @@
 
             Gui.SeparatorText("Layout Presets");
             Item("Default", () => Editor.QueueLoadLayout(EditorScene.DefaultLayout));
-        }
-
-        private void HandlePopupLogic()
-        {
-            if (_popupOpened)
-            {
-                Gui.OpenPopup(_popupId);
-                _popupOpened = false;
-            }
-
-            _popupLogic?.Invoke();
         }
 
         private static void Menu(string label, Action items)
@@ -74,13 +56,6 @@
         private static void Item(string label, string shortcut, ref bool selected)
         {
             Gui.MenuItem(label, shortcut, ref selected);
-        }
-        
-        private void Popup(string id, Action<string> popupLogic)
-        {
-            _popupOpened = true;
-            _popupId = id;
-            _popupLogic = () => popupLogic(id);
         }
     }
 }
