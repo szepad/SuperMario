@@ -73,12 +73,14 @@ namespace Mario2
             }
         }
 
-        public Tile GetTile(int col, int row)
+        public bool GetTile(int col, int row, out Tile tile)
         {
+            tile = SimpleTile.Air;
             if (col < 0 || col >= Cols || row < 0 || row >= Rows)
-                return SimpleTile.Air;
+                return false;
 
-            return _tiles[row, col];
+            tile = _tiles[row, col];
+            return true;
         }
 
         public void SetTile(int col, int row, Tile tile)
