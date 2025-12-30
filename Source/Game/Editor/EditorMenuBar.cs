@@ -18,12 +18,11 @@
         {
             Item("New", "Ctrl+N", Editor.FileManager.New);
             Item("Open", "Ctrl+O", Editor.FileManager.Open);
-            Item("Save", "Ctrl+S", Editor.FileManager.Save);
-            Item("Save As", "Ctrl+Shift+S", Editor.FileManager.SaveAs);
+            Item("Save", "Ctrl+S", () => Editor.FileManager.Save());
+            Item("Save As", "Ctrl+Shift+S", () => Editor.FileManager.SaveAs());
 
             Gui.Separator();
-            Item("Back", "Escape", Editor.QueueTitleScene);
-            Item("Exit", "Alt+F4", Game.Instance.Exit);
+            Item("Exit", "Escape", Editor.QueueTitleScene);
         }
 
         private void ViewMenu()

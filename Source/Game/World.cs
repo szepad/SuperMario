@@ -1,6 +1,4 @@
-﻿using System.Xml.Schema;
-
-namespace Mario2
+﻿namespace Mario2
 {
     public enum WorldBackground
     {
@@ -13,27 +11,11 @@ namespace Mario2
 
     public class World
     {
-        public int Cols { get; private set; } = 16;
-        public int Rows { get; private set; } = 14;
+        public int Cols { get; private set; } = 100;
+        public const int Rows = 14;
         public WorldBackground Background { get; set; } = WorldBackground.Sky;
 
         private readonly Player _player;
-
-        private const string Map =
-            "................" +
-            "................" +
-            "................" +
-            "................" +
-            "................" +
-            ".........1......" +
-            "................" +
-            "................" +
-            "................" +
-            "................" +
-            "................" +
-            "................" +
-            "................" +
-            "..011111111112..";
 
         public Tile[,] Tiles => _tiles;
         private Tile[,] _tiles;
@@ -45,24 +27,10 @@ namespace Mario2
 
             _tiles = new Tile[Rows, Cols];
             Clear(_tiles);
-            for (int y = 0; y < Rows; y++)
-            {
-                for (int x = 0; x < Cols; x++)
-                {
-                    if (int.TryParse(Map[y * Cols + x].ToString(), out int id))
-                    {
-                        _tiles[y, x] = new SimpleTile(id, true);
-                    }
-                    else
-                    {
-                        _tiles[y, x] = SimpleTile.Air;
-                    }
-                }
-            }
         }
 
         public void Clear() => Clear(_tiles);
-        public void Clear(Tile[,] tiles)
+        public static void Clear(Tile[,] tiles)
         {
             for (int row = 0; row < tiles.GetLength(0); row++)
             {

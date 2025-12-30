@@ -5,7 +5,7 @@ namespace Mario2
 {
     public class EditorScene : Scene
     {
-        public World World { get; } = new();
+        public World World { get; set; } = new();
         public EditorOptions Options { get; } = new();
         public EditorFileManager FileManager { get; }
 
@@ -14,8 +14,8 @@ namespace Mario2
         public TileWindow TileWindow { get; private set; }
         public PropertyWindow PropertyWindow { get; private set; }
 
-        public string FileName { get; private set; } = string.Empty;
-        public bool IsFileDirty { get; set; }
+        public string FilePath { get; set; } = string.Empty;
+        public bool IsFileDirty { get; private set; }
 
         private readonly List<EditorWindow> _windowRenderQueue = [];
 
@@ -26,7 +26,11 @@ namespace Mario2
         private string _nextLayoutPath = string.Empty;
 
         private bool _askSave;
+        private bool _executeSaveAction;
         private Action? _askSaveAction;
+
+        private bool _showError;
+        private string _errorMessage = string.Empty;
 
         public EditorScene()
         {
@@ -63,10 +67,33 @@ namespace Mario2
             RlImGui.Shutdown();
         }
 
+        public void Dirty()
+        {
+            IsFileDirty = true;
+        }
+
+        public void CleanDirty()
+        {
+            IsFileDirty = false;
+        }
+
         public void AskSave(Action? afterSaving)
         {
+            if (!IsFileDirty)
+            {
+                afterSaving?.Invoke();
+                return;
+            }
+
             _askSave = true;
+            _executeSaveAction = false;
             _askSaveAction = afterSaving;
+        }
+
+        public void ShowError(string message)
+        {
+            _showError = true;
+            _errorMessage = message;
         }
 
         public void QueueTitleScene()
@@ -97,7 +124,15 @@ namespace Mario2
 
             if (_exitToTitle)
             {
-                Game.Instance.LoadScene(new TitleScene());
+                AskSave(() => Game.Instance.LoadScene(new TitleScene()));
+                _exitToTitle = false;
+            }
+
+            if (_executeSaveAction)
+            {
+                _askSaveAction?.Invoke();
+                _askSaveAction = null;
+                _executeSaveAction = false;
             }
         }
 
@@ -111,9 +146,36 @@ namespace Mario2
 
         private void HandleGeneralControls()
         {
+            // TODO: Disable when modal popup is active (ask save / error)
+
             if (Input.IsKeyPressed(KeyboardKey.Escape))
             {
                 QueueTitleScene();
+            }
+
+            if (Input.IsKeyDown(KeyboardKey.LeftControl))
+            {
+                if (Input.IsKeyPressed(KeyboardKey.N))
+                {
+                    FileManager.New();
+                }
+
+                if (Input.IsKeyPressed(KeyboardKey.O))
+                {
+                    FileManager.Open();
+                }
+
+                if (Input.IsKeyPressed(KeyboardKey.S))
+                {
+                    if (Input.IsKeyDown(KeyboardKey.LeftShift))
+                    {
+                        FileManager.SaveAs();
+                    }
+                    else
+                    {
+                        FileManager.Save();
+                    }
+                }
             }
         }
 
@@ -153,6 +215,7 @@ namespace Mario2
             Gui.PopStyleColor(9);
 
             HandleAskSave();
+            HandleError();
 
             RlImGui.End();
             Raylib.EndDrawing();
@@ -170,15 +233,18 @@ namespace Mario2
             bool closed = false;
             Vector2 center = Gui.GetMainViewport().GetCenter();
             Gui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f));
-            if (Gui.BeginPopupModal("Unsaved Level", ImGuiWindowFlags.NoResize))
+            if (Gui.BeginPopupModal("Unsaved Level", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoSavedSettings))
             {
-                Gui.TextWrapped("Would you like to save before moving on?");
+                Gui.Text("Would you like to save before moving on?");
 
                 if (Gui.Button("Save"))
                 {
                     Gui.CloseCurrentPopup();
-                    FileManager.Save();
                     closed = true;
+                    if (!FileManager.Save())
+                    {
+                        cancel = true;
+                    }
                 }
 
                 Gui.SameLine();
@@ -198,12 +264,36 @@ namespace Mario2
 
                 Gui.EndPopup();
             }
-            
+
             if (closed && !cancel)
             {
-                _askSaveAction?.Invoke();
-                _askSaveAction = null;
+                _executeSaveAction = true;
             }
+        }
+
+        private void HandleError()
+        {
+            if (_showError)
+            {
+                Gui.OpenPopup("Error!");
+                _showError = false;
+            }
+
+            Vector2 center = Gui.GetMainViewport().GetCenter();
+            Gui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f));
+            if (Gui.BeginPopupModal("Error!", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoSavedSettings))
+            {
+                Gui.Text(_errorMessage);
+
+                if (Gui.Button("Ok"))
+                {
+                    Gui.CloseCurrentPopup();
+                }
+
+                Gui.EndPopup();
+            }
+
+            //Gui.PopStyleVar(1);
         }
     }
 }
