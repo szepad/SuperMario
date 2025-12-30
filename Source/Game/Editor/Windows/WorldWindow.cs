@@ -94,19 +94,21 @@
             {
                 Editor.World.SetTile(tx, ty, Editor.TileWindow.GetSelected(Editor.World, tx, ty));
                 UpdateRule(Editor.World, tx, ty);
+                Editor.Dirty();
             }
 
             if (Raylib.IsMouseButtonDown(MouseButton.Right))
             {
                 Editor.World.SetTile(tx, ty, SimpleTile.Air);
                 UpdateRule(Editor.World, tx, ty);
+                Editor.Dirty();
             }
         }
 
         public void AssignRuleTileRefs()
         {
             World world = Editor.World;
-            for (int row = 0; row < world.Rows; row++)
+            for (int row = 0; row < World.Rows; row++)
             {
                 for (int col = 0; col < world.Cols; col++)
                 {
@@ -161,7 +163,7 @@
 
         private void DrawGrid()
         {
-            for (int row = 0; row <= Editor.World.Rows; row++)
+            for (int row = 0; row <= World.Rows; row++)
             {
                 int y = row * Tile.Size;
                 Raylib.DrawLine(0, y, Editor.World.Cols * Tile.Size, y, Color.Gray);
@@ -170,7 +172,7 @@
             for (int col = 0; col <= Editor.World.Cols; col++)
             {
                 int x = col * Tile.Size;
-                Raylib.DrawLine(x, 0, x, Editor.World.Rows * Tile.Size, Color.Gray);
+                Raylib.DrawLine(x, 0, x, World.Rows * Tile.Size, Color.Gray);
             }
         }
 

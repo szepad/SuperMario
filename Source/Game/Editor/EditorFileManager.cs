@@ -8,22 +8,14 @@ namespace Mario2.Editor
 
         public void New()
         {
-            if (Editor.IsFileDirty)
-            {
-                Editor.AskSave(DoNew);
-            }
-            else
-            {
-                DoNew();
-            }
+            Editor.AskSave(DoNew);
         }
 
         private void DoNew()
         {
-            Editor.World.SetCols(100);
-            Editor.World.Clear();
-            Editor.World.Background = WorldBackground.Sky;
-            Editor.IsFileDirty = false;
+            Editor.World = new();
+            Editor.FilePath = string.Empty;
+            Editor.CleanDirty();
         }
 
         public void Open()
@@ -31,32 +23,50 @@ namespace Mario2.Editor
             DialogResult result = Dialog.FileOpen("lvl");
             if (result.IsOk)
             {
-                // Deserialize()
-                Editor.WorldWindow.AssignRuleTileRefs();
+                Editor.AskSave(() => DoOpen(result.Path));
             }
         }
 
-        public void Save()
+        private void DoOpen(string path)
         {
-            if (Editor.FileName == string.Empty)
+            World? world = WorldLoader.Deserialize(path, out Exception? failEx);
+            if (world is not null)
             {
-                SaveAs();
+                Editor.World = world;
+                Editor.WorldWindow.AssignRuleTileRefs();
+                Editor.FilePath = path;
+                Editor.CleanDirty();
+            }
+            else if (failEx is not null)
+            {
+                Editor.ShowError(string.Join("\n", $"'{path}' is corrupted.", failEx.Message, failEx.StackTrace));
+            }
+        }
+
+        public bool Save()
+        {
+            if (Editor.FilePath == string.Empty)
+            {
+                return SaveAs();
             }
             else
             {
-                // Serialize()
-                Editor.IsFileDirty = false;
+                WorldLoader.Serialize(Editor.World, Editor.FilePath);
+                Editor.CleanDirty();
+                return true;
             }
         }
 
-        public void SaveAs()
+        public bool SaveAs()
         {
             DialogResult result = Dialog.FileSave("lvl");
             if (result.IsOk)
             {
-                // Serialize()
-                Editor.IsFileDirty = false;
+                Editor.FilePath = result.Path;
+                return Save();
             }
+
+            return false;
         }
     }
 }

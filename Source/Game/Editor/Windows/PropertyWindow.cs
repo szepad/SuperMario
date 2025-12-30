@@ -21,10 +21,11 @@
 
         private void WorldProperties()
         {
-            // Cols
             Gui.SeparatorText("World");
-            Gui.Text(Editor.FileName == string.Empty ? "unnamed" : Editor.FileName);
+            Gui.Text(Editor.FilePath == string.Empty ? "unnamed" : Path.GetFileName(Editor.FilePath));
             Gui.Dummy(new Vector2(0f, 2f));
+            
+            // Cols
             Gui.Text($"Cols: {Editor.World.Cols}");
             Gui.SameLine();
             if (Gui.Button("Change"))
@@ -36,7 +37,7 @@
             ChangeColPopup();
 
             // Rows
-            Gui.Text($"Rows: {Editor.World.Rows}");
+            Gui.Text($"Rows: {World.Rows}");
             Gui.SameLine();
             Gui.BeginDisabled();
             Gui.Button("Change##2");
@@ -50,6 +51,7 @@
             if (Gui.Combo("##combo_bg", ref _bgVal, choices, choices.Length))
             {
                 Editor.World.Background = (WorldBackground)_bgVal;
+                Editor.Dirty();
             }
 
             // Spacing
@@ -66,6 +68,7 @@
                 if (Gui.Button("Apply"))
                 {
                     Editor.World.SetCols(_colsInputVal);
+                    Editor.Dirty();
                     Gui.CloseCurrentPopup();
                 }
 
