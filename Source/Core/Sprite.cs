@@ -107,7 +107,7 @@
 
             Raylib.DrawTexturePro(SpriteSheet, GetSourceRectangle(),
                 new Rectangle(position,
-                new Vector2(CurrentAnimation.FrameWidth, CurrentAnimation.FrameHeight) * Scale),
+                new Vector2(CurrentAnimation.FrameWidth, CurrentAnimation.FrameHeight).Scale() * Scale),
                 Origin, 0f, Color);
         }
     }

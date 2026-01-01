@@ -15,21 +15,19 @@
         public const int Rows = 14;
         public WorldBackground Background { get; set; } = WorldBackground.Sky;
 
-        private readonly Player _player;
-
-        public Tile[,] Tiles => _tiles;
-        private Tile[,] _tiles;
+        public Player Player { get; }
+        public Tile[,] Tiles { get; private set; }
 
         public World()
         {
-            _player = new Player(this);
-            _player.Position.X = 50;
+            Player = new Player(this);
+            Player.Position.X = 50;
 
-            _tiles = new Tile[Rows, Cols];
-            Clear(_tiles);
+            Tiles = new Tile[Rows, Cols];
+            Clear(Tiles);
         }
 
-        public void Clear() => Clear(_tiles);
+        public void Clear() => Clear(Tiles);
         public static void Clear(Tile[,] tiles)
         {
             for (int row = 0; row < tiles.GetLength(0); row++)
@@ -47,7 +45,7 @@
             if (col < 0 || col >= Cols || row < 0 || row >= Rows)
                 return false;
 
-            tile = _tiles[row, col];
+            tile = Tiles[row, col];
             return true;
         }
 
@@ -56,7 +54,7 @@
             if (col < 0 || col >= Cols || row < 0 || row >= Rows)
                 return;
 
-            _tiles[row, col] = tile;
+            Tiles[row, col] = tile;
         }
 
         public void SetCols(int newCols)
@@ -74,17 +72,17 @@
 
                 for (int row = 0; row < Rows; row++)
                 {
-                    newMtx[row, col] = _tiles[row, col];
+                    newMtx[row, col] = Tiles[row, col];
                 }
             }
 
             Cols = newCols;
-            _tiles = newMtx;
+            Tiles = newMtx;
         }
 
         public void Update()
         {
-            _player.Update();
+            Player.Update();
         }
 
         public void Draw(bool editor = false)
@@ -93,7 +91,7 @@
             {
                 for (int x = 0; x < Cols; x++)
                 {
-                    Tile tile = _tiles[y, x];
+                    Tile tile = Tiles[y, x];
                     if (tile == SimpleTile.Air) 
                         continue;
 
@@ -108,7 +106,7 @@
                 }
             }
 
-            _player.Draw();
+            Player.Draw();
         }
 
         public Color BackgroundColor => Background switch

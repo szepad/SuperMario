@@ -2,13 +2,13 @@
 {
     public class Player : Entity
     {
-        private const float MoveSpeed = 120f;
-        private const float JumpForce = 225f;
+        private const float MoveSpeed = 120f * Game.TextureScale;
+        private const float JumpForce = 225f * Game.TextureScale;
 
         public Player(World world) : base(world)
         {
-            Size = new Vector2(8f, 14f);
-            SpriteOffset = new Vector2(4f, 2f);
+            Size = new Vector2(8f, 14f).Scale();
+            SpriteOffset = new Vector2(4f, 2f).Scale();
 
             Sprite.SetSheet("mario");
             Sprite.Add("idle", new Animation(1, 16, 16, 0, 1f));

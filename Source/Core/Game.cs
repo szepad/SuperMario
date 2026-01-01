@@ -3,7 +3,6 @@ global using Raylib_cs;
 global using System.Numerics;
 global using Gui = ImGuiNET.ImGui;
 global using RlImGui = rlImGui_cs.rlImGui;
-using System.Xml.Linq;
 
 namespace Mario2
 {
@@ -11,9 +10,10 @@ namespace Mario2
     {
         public const int Width = 1280;//256;
         public const int Height = 720;//224;
-        public const int TexScale = 4;
+        public const int TextureScale = 3;
         public const string Title = "Mario 2";
 
+        public bool AllowDevMode { get; private set; } = true;
         public bool IsDevMode { get; private set; }
 
         private bool _hasExited;
@@ -75,9 +75,9 @@ namespace Mario2
 
         private void Load()
         {
-            Assets.Load("../../../res");
+            Assets.Load("res");
             _virtualScreen = Raylib.LoadRenderTexture(Width, Height);
-            LoadScene(new EditorScene());
+            LoadScene(new GameScene());
         }
 
         private void Unload()
@@ -89,19 +89,20 @@ namespace Mario2
 
         private void Update()
         {
-#if DEBUG
-            if (Input.IsKeyPressed(KeyboardKey.F10))
+            if (AllowDevMode)
             {
-                IsDevMode = !IsDevMode;
-            }
+                if (Input.IsKeyPressed(KeyboardKey.F10))
+                {
+                    IsDevMode = !IsDevMode;
+                }
 
-            if (Input.IsKeyPressed(KeyboardKey.Grave)) Time.TimeScale = 0f;
-            else if (Input.IsKeyPressed(KeyboardKey.One)) Time.TimeScale = 1f;
-            else if (Input.IsKeyPressed(KeyboardKey.Two)) Time.TimeScale = 0.5f;
-            else if (Input.IsKeyPressed(KeyboardKey.Three)) Time.TimeScale = 1f / 3f;
-            else if (Input.IsKeyPressed(KeyboardKey.Four)) Time.TimeScale = 1f / 10f;
-            else if (Input.IsKeyPressed(KeyboardKey.Five)) Time.TimeScale = 1f / 50f;
-#endif
+                if (Input.IsKeyPressed(KeyboardKey.Grave)) Time.DebugTimeScale = 0f;
+                else if (Input.IsKeyPressed(KeyboardKey.One)) Time.DebugTimeScale = 1f;
+                else if (Input.IsKeyPressed(KeyboardKey.Two)) Time.DebugTimeScale = 0.5f;
+                else if (Input.IsKeyPressed(KeyboardKey.Three)) Time.DebugTimeScale = 1f / 3f;
+                else if (Input.IsKeyPressed(KeyboardKey.Four)) Time.DebugTimeScale = 1f / 10f;
+                else if (Input.IsKeyPressed(KeyboardKey.Five)) Time.DebugTimeScale = 1f / 50f;
+            }
 
             Time.Progress();
             _activeScene?.Update();

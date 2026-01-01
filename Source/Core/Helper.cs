@@ -21,5 +21,10 @@
         {
             return new Color(color.R, color.G, color.B, (byte)(255f * opacity));
         }
+
+        public static Vector2 Scale(this Vector2 vec2)
+        {
+            return vec2 * Game.TextureScale;
+        }
     }
 }

@@ -4,7 +4,7 @@ namespace Mario2
 {
     public abstract class Tile(bool isCollidable)
     {
-        public const int Size = 16 * Game.TexScale;
+        public const int Size = 16 * Game.TextureScale;
 
         public bool IsCollidable { get; set; } = isCollidable;
         public RuleTile? Rule { get; set; } = null;
