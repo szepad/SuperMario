@@ -147,7 +147,6 @@ namespace Mario2
         private void HandleGeneralControls()
         {
             // TODO: Disable when modal popup is active (ask save / error)
-
             if (Input.IsKeyPressed(KeyboardKey.Escape))
             {
                 QueueTitleScene();

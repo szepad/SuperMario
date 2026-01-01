@@ -10,7 +10,7 @@
         public Vector2 Size;
         public Vector2 SpriteOffset;
 
-        public const float DefaultGravity = 500f;
+        public const float DefaultGravity = 500f * Game.TextureScale;
         public float Gravity { get; set; } = DefaultGravity;
 
         public Sprite Sprite { get; set; } = new();
