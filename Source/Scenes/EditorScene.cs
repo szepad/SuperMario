@@ -28,6 +28,7 @@ namespace Mario2
         private bool _askSave;
         private bool _executeSaveAction;
         private Action? _askSaveAction;
+        private bool _askSaveCanDiscard;
 
         private bool _showError;
         private string _errorMessage = string.Empty;
@@ -77,7 +78,7 @@ namespace Mario2
             IsFileDirty = false;
         }
 
-        public void AskSave(Action? afterSaving)
+        public void AskSave(Action? afterSaving, bool canDiscard = true)
         {
             if (!IsFileDirty)
             {
@@ -88,6 +89,7 @@ namespace Mario2
             _askSave = true;
             _executeSaveAction = false;
             _askSaveAction = afterSaving;
+            _askSaveCanDiscard = canDiscard;
         }
 
         public void ShowError(string message)
@@ -107,7 +109,7 @@ namespace Mario2
             _nextLayoutPath = path;
         }
 
-        public override void Update()
+        protected override void OnUpdate()
         {
             if (_loadLayout)
             {
@@ -115,7 +117,6 @@ namespace Mario2
                 _loadLayout = false;
             }
             
-            HandleGeneralControls();
             foreach (EditorWindow window in _windowRenderQueue)
             {
                 window.Update();
@@ -134,6 +135,8 @@ namespace Mario2
                 _askSaveAction = null;
                 _executeSaveAction = false;
             }
+
+            HandleGeneralControls();
         }
 
         private void LoadNextLayout()
@@ -176,9 +179,19 @@ namespace Mario2
                     }
                 }
             }
+
+            if (Input.IsKeyPressed(KeyboardKey.Enter))
+            {
+                if (FilePath == string.Empty && !IsFileDirty)
+                {
+                    Dirty();
+                }
+                
+                AskSave(() => LoadSubScene(new GameScene(FilePath)), canDiscard: false);
+            }
         }
 
-        public override void Draw()
+        protected override void OnDraw()
         {
             Raylib.BeginDrawing();
 
@@ -246,11 +259,14 @@ namespace Mario2
                     }
                 }
 
-                Gui.SameLine();
-                if (Gui.Button("Discard"))
+                if (_askSaveCanDiscard)
                 {
-                    Gui.CloseCurrentPopup();
-                    closed = true;
+                    Gui.SameLine();
+                    if (Gui.Button("Discard"))
+                    {
+                        Gui.CloseCurrentPopup();
+                        closed = true;
+                    }
                 }
 
                 Gui.SameLine();
