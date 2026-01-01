@@ -12,7 +12,7 @@
 
         }
 
-        public override void Update()
+        protected override void OnUpdate()
         {
             if (Input.IsKeyPressed(KeyboardKey.Escape))
             {
@@ -30,7 +30,7 @@
             }
         }
 
-        public override void Draw()
+        protected override void OnDraw()
         {
             Raylib.ClearBackground(Color.Black);
             Text.Draw("Title", Game.Width / 2, 5, 10, Color.White, Pivot.Top);

@@ -110,8 +110,9 @@ namespace Mario2
 
         private void Draw()
         {
-            if (_activeScene is EditorScene)
+            if (_activeScene is EditorScene && _activeScene.SubScene is null)
             {
+                _activeScene.PreDraw();
                 _activeScene.Draw();
                 return;
             }
