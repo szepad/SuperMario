@@ -58,7 +58,7 @@
             // Meta
             int[] meta = [..reader.ReadLine()!.Split(";").Select(int.Parse)];
             world.SetCols(meta[0]);
-            world.Background = (WorldBackground)meta[1];
+            world.SetBackground((WorldBackground)meta[1]);
 
             // Tiles
             for (int row = 0; row < World.Rows; row++)

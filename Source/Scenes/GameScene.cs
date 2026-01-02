@@ -53,6 +53,7 @@
 
             const float HalfX = Game.Width / 2f;
             _camera.Target.X = Helper.Clamp(_world.Player.Position.X, HalfX, _world.Cols * Tile.Size - HalfX);
+            _world.UpdateParallax(_camera);
 
             if (Input.IsKeyPressed(KeyboardKey.Escape))
             {
@@ -63,7 +64,7 @@
 
         protected override void OnDraw()
         {
-            Raylib.ClearBackground(_world.BackgroundColor);
+            Raylib.ClearBackground(_world.Parallax.ClearColor);
             Raylib.BeginMode2D(_camera);
             _world.Draw();
             Raylib.EndMode2D();
