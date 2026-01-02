@@ -10,6 +10,8 @@
 
         protected override void OnLoad()
         {
+            Raylib.HideCursor();
+
             _camera.Offset.X = Game.Width / 2f;
             _camera.Offset.Y = Game.Height - World.Rows * Tile.Size + Tile.Size;
 

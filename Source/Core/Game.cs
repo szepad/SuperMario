@@ -8,13 +8,19 @@ namespace Mario2
 {
     public class Game
     {
-        public const int Width = /*1280;*/256 * TextureScale;
-        public const int Height = /*720;*/224 * TextureScale;
-        public const int TextureScale = 3;
         public const string Title = "Mario 2";
+        public const int Width = 256 * TextureScale;
+        public const int Height = 224 * TextureScale;
 
-        public bool AllowDevMode { get; private set; } = true;
+        public const int TextureScale = 4;
+
+        public bool AllowDevMode { get; private set; }
         public bool IsDevMode { get; private set; }
+
+        public Color LetterBoxColor { get; set; } = Color.Black;
+        public StretchMode StretchMode { get; set; }
+
+        public GameSettings Settings { get; } = new();
 
         private bool _hasExited;
 
@@ -46,7 +52,6 @@ namespace Mario2
             }
 
             Unload();
-            Raylib.CloseWindow();
         }
 
         public void Exit()
@@ -71,20 +76,35 @@ namespace Mario2
 
             Raylib.SetWindowState(ConfigFlags.VSyncHint);
             Raylib.SetTargetFPS(0);
+
+            StretchMode = StretchMode.LetterBox;
+
+#if DEBUG
+            AllowDevMode = true;
+#endif
         }
 
         private void Load()
         {
             Assets.Load("res");
             _virtualScreen = Raylib.LoadRenderTexture(Width, Height);
+
+            GameSettingsLoader.Load(Settings);
+
             LoadScene(new GameScene());
         }
 
         private void Unload()
         {
+            GameSettingsLoader.Save(Settings);
+
             Assets.Unload();
             Raylib.UnloadRenderTexture(_virtualScreen);
+            
             LoadScene(null);
+
+            Raylib.CloseAudioDevice();
+            Raylib.CloseWindow();
         }
 
         private void Update()
@@ -106,6 +126,11 @@ namespace Mario2
 
             Time.Progress();
             _activeScene?.Update();
+
+            if (Raylib.IsKeyPressed(KeyboardKey.F11))
+            {
+                Settings.SetFullscreen(!Settings.IsFullscreen);
+            }
         }
 
         private void Draw()
@@ -123,15 +148,19 @@ namespace Mario2
             _activeScene?.Draw();
             Raylib.EndTextureMode();
 
-            int sw = Raylib.GetScreenWidth();
-            int sh = Raylib.GetScreenHeight();
+            Raylib.ClearBackground(LetterBoxColor);
 
-            Raylib.BeginDrawing();
-            Raylib.ClearBackground(Color.Black);
-            Raylib.DrawTexturePro(_virtualScreen.Texture,
-                new Rectangle(0, 0, Width, -Height),
-                new Rectangle(0, 0, sw, sh),
-                Vector2.Zero, 0f, Color.White);
+            // Flip height for opengl reasons
+            Rectangle src = new(0, 0, Width, -Height);
+            Rectangle dst = StretchMode switch
+            {
+                StretchMode.Stretch => GameViewHandler.GetStretchView(),
+                StretchMode.LetterBox => GameViewHandler.GetLetterBoxView(),
+                _ => GameViewHandler.GetNormalView(),
+            };
+
+            Raylib.DrawTexturePro(_virtualScreen.Texture, src, dst, Vector2.Zero, 0f, Color.White);
+
             Raylib.EndDrawing();
         }
     }

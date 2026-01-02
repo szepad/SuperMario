@@ -4,7 +4,7 @@
     {
         protected override void OnLoad()
         {
-
+            Raylib.HideCursor();
         }
 
         protected override void OnUnload()

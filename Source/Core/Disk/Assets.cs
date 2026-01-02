@@ -1,11 +1,19 @@
-﻿namespace Mario2
+﻿using Raylib_cs;
+
+namespace Mario2
 {
     public static class Assets
     {
+        public static readonly string MusicFolder = Path.Combine("res", "music");
+
         private static readonly Dictionary<string, Texture2D> _texByName = [];
+        private static readonly Dictionary<string, Sound> _soundsByName = [];
+        private static readonly Dictionary<string, byte[]> _musicByName = [];
+
         private static Texture2D _placeHolderTex;
 
         private static readonly string[] ImageFormats = [".png"];
+        private static readonly string[] SoundFormats = [".wav"];
         private const string IgnoreFolder = ".ignore";
 
         public static void Load(string root)
@@ -31,6 +39,18 @@
                 if (ImageFormats.Contains(ext))
                 {
                     _texByName[name] = Raylib.LoadTexture(file);
+                }
+                else if (SoundFormats.Contains(ext))
+                {
+                    string? dir = Path.GetDirectoryName(file);
+                    if (dir == MusicFolder)
+                    {
+                        _musicByName[name] = File.ReadAllBytes(file);
+                    }
+                    else
+                    {
+                        _soundsByName[name] = Raylib.LoadSound(file);
+                    }
                 }
             }
         }
@@ -69,6 +89,28 @@
             }
 
             return _placeHolderTex;
+        }
+
+        public static bool TryGetSound(string name, out Sound sound)
+        {
+            if (!_soundsByName.TryGetValue(name, out sound))
+            {
+                Console.WriteLine($"Couldn't retrieve sound '{name}'");
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool TryGetMusic(string name, out byte[]? streamData)
+        {
+            if (!_musicByName.TryGetValue(name, out streamData))
+            {
+                Console.WriteLine($"Couldn't retrieve music stream '{name}'");
+                return false;
+            }
+
+            return true;
         }
     }
 }
