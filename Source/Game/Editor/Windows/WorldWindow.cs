@@ -148,7 +148,8 @@
         {
             Raylib.BeginTextureMode(WorldContentTex);
 
-            Raylib.ClearBackground(Editor.World.BackgroundColor);
+            //Raylib.ClearBackground(Editor.World.Parallax.ClearColor);
+            Raylib.ClearBackground(Color.Black);
 
             if (!_firstRender)
             {

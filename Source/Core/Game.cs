@@ -8,8 +8,8 @@ namespace Mario2
 {
     public class Game
     {
-        public const int Width = 1280;//256;
-        public const int Height = 720;//224;
+        public const int Width = /*1280;*/256 * TextureScale;
+        public const int Height = /*720;*/224 * TextureScale;
         public const int TextureScale = 3;
         public const string Title = "Mario 2";
 

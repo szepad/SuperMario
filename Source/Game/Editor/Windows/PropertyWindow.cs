@@ -50,7 +50,7 @@
             Gui.SameLine();
             if (Gui.Combo("##combo_bg", ref _bgVal, choices, choices.Length))
             {
-                Editor.World.Background = (WorldBackground)_bgVal;
+                Editor.World.SetBackground((WorldBackground)_bgVal);
                 Editor.Dirty();
             }
 

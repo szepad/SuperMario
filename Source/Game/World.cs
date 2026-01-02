@@ -1,19 +1,13 @@
-﻿namespace Mario2
-{
-    public enum WorldBackground
-    {
-        Sky,
-        Underground,
-        Castle,
-        Water,
-        Night
-    }
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Mario2
+{
     public class World
     {
         public int Cols { get; private set; } = 100;
         public const int Rows = 14;
-        public WorldBackground Background { get; set; } = WorldBackground.Sky;
+        public WorldBackground Background { get; private set; }
+        public ParallaxBackground Parallax { get; private set; }
 
         public Player Player { get; }
         public Tile[,] Tiles { get; private set; }
@@ -25,6 +19,15 @@
 
             Tiles = new Tile[Rows, Cols];
             Clear(Tiles);
+
+            SetBackground(WorldBackground.Sky);
+        }
+
+        [MemberNotNull(nameof(Parallax))]
+        public void SetBackground(WorldBackground background)
+        {
+            Background = background;
+            Parallax = WorldBackgroundExtension.GetParallax(background);
         }
 
         public void Clear() => Clear(Tiles);
@@ -85,8 +88,18 @@
             Player.Update();
         }
 
+        public void UpdateParallax(Camera2D camera)
+        {
+            Parallax.Update(camera);
+        }
+
         public void Draw(bool editor = false)
         {
+            if (!editor)
+            {
+                Parallax.Draw();
+            }
+
             for (int y = 0; y < Rows; y++)
             {
                 for (int x = 0; x < Cols; x++)
@@ -108,11 +121,5 @@
 
             Player.Draw();
         }
-
-        public Color BackgroundColor => Background switch
-        {
-            WorldBackground.Sky => new Color(92, 148, 252, 255),
-            _ => Color.Black
-        };
     }
 }
