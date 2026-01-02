@@ -18,16 +18,16 @@ namespace Mario2.Editor
             Editor.CleanDirty();
         }
 
-        public void Open()
+        public void AskOpen()
         {
             DialogResult result = Dialog.FileOpen("lvl");
             if (result.IsOk)
             {
-                Editor.AskSave(() => DoOpen(result.Path));
+                Editor.AskSave(() => Open(result.Path));
             }
         }
 
-        private void DoOpen(string path)
+        public void Open(string path)
         {
             World? world = WorldLoader.Deserialize(path, out Exception? failEx);
             if (world is not null)
