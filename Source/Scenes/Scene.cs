@@ -30,12 +30,16 @@
             SubScene = scene;
             SubScene.ParentScene = this;
             SubScene.Load();
+
+            OnSubSceneLoad();
         }
 
         public void UnloadSubScene()
         {
             SubScene?.Unload();
             SubScene = null;
+
+            OnSubSceneUnload();
         }
 
         public void Update()
@@ -81,5 +85,7 @@
         protected abstract void OnDraw();
 
         protected virtual void OnPreDraw() { }
+        protected virtual void OnSubSceneLoad() { }
+        protected virtual void OnSubSceneUnload() { }
     }
 }

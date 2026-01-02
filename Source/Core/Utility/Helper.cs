@@ -9,6 +9,9 @@
             return val;
         }
 
+        public static float Clamp01(float val) 
+            => Clamp(val, 0f, 1f);
+
         public static bool GuiDisabledButton(string label, bool disabled)
         {
             if (disabled) Gui.BeginDisabled();

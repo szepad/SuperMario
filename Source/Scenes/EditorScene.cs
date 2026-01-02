@@ -49,6 +49,8 @@ namespace Mario2
 
         protected override void OnLoad()
         {
+            Raylib.ShowCursor();
+
             WorldWindow.WorldContentTex = Raylib.LoadRenderTexture(
                 Raylib.GetMonitorWidth(Raylib.GetCurrentMonitor()),
                 Raylib.GetMonitorHeight(Raylib.GetCurrentMonitor()));
@@ -66,6 +68,11 @@ namespace Mario2
         {
             Raylib.UnloadRenderTexture(WorldWindow.WorldContentTex);
             RlImGui.Shutdown();
+        }
+
+        protected override void OnSubSceneUnload()
+        {
+            Raylib.ShowCursor();
         }
 
         public void Dirty()
