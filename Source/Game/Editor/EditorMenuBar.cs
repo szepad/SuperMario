@@ -17,7 +17,7 @@
         private void FileMenu()
         {
             Item("New", "Ctrl+N", Editor.FileManager.New);
-            Item("Open", "Ctrl+O", Editor.FileManager.Open);
+            Item("Open", "Ctrl+O", Editor.FileManager.AskOpen);
             Item("Save", "Ctrl+S", () => Editor.FileManager.Save());
             Item("Save As", "Ctrl+Shift+S", () => Editor.FileManager.SaveAs());
 

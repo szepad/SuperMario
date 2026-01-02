@@ -15,7 +15,7 @@
             BasicTile.QuestionBlock,
             BasicTile.QuestionBlock_Empty,
             BasicTile.Brick,
-            //RuleTile.UndergroundFloor
+            PrefabTile.Pipe
         ];
         
         public Tile GetSelected(World world, int col, int row)

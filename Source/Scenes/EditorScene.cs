@@ -1,5 +1,4 @@
 ﻿using Mario2.Editor;
-using NativeFileDialogSharp;
 
 namespace Mario2
 {
@@ -62,6 +61,8 @@ namespace Mario2
             {
                 QueueLoadLayout(DefaultLayout);
             }
+
+            FileManager.Open(Path.Combine("levels", "01.lvl"));
         }
 
         protected override void OnUnload()
@@ -171,7 +172,7 @@ namespace Mario2
 
                 if (Input.IsKeyPressed(KeyboardKey.O))
                 {
-                    FileManager.Open();
+                    FileManager.AskOpen();
                 }
 
                 if (Input.IsKeyPressed(KeyboardKey.S))
