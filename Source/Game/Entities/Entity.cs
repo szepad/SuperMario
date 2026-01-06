@@ -10,12 +10,14 @@
         public Vector2 Size;
         public Vector2 SpriteOffset;
 
-        public const float DefaultGravity = 500f * Game.TextureScale;
+        public const float DefaultGravity = 650f * Game.TextureScale;
         public float Gravity { get; set; } = DefaultGravity;
 
         public Sprite Sprite { get; set; } = new();
 
         public Rectangle Rect => new(Position, Size);
+
+        public bool IsGrounded { get; private set; }
 
         public virtual void Update()
         {
@@ -32,6 +34,11 @@
 
         private void HandleCollisions(bool horizontal)
         {
+            if (!horizontal)
+            {
+                IsGrounded = false;
+            }
+
             for (int y = 0; y < World.Rows; y++)
             {
                 for (int x = 0; x < World.Cols; x++)
@@ -53,12 +60,14 @@
                                 // Left collision
                                 OldPosition.X = Position.X = tileRect.X + tileRect.Width;
                                 Velocity.X = 0f;
+                                OnWorldCollision(tile, CollisionSide.Left);
                             }
                             else if (Velocity.X > 0f)
                             {
                                 // Right collision
                                 OldPosition.X = Position.X = tileRect.X - Rect.Width;
                                 Velocity.X = 0f;
+                                OnWorldCollision(tile, CollisionSide.Right);
                             }
                         }
                         else
@@ -68,17 +77,25 @@
                                 // Top collision
                                 OldPosition.Y = Position.Y = tileRect.Y + tileRect.Height;
                                 Velocity.Y = 0f;
+                                OnWorldCollision(tile, CollisionSide.Top);
                             }
                             else if (Velocity.Y > 0f)
                             {
                                 // Bottom collision
                                 OldPosition.Y = Position.Y = tileRect.Y - Rect.Height;
                                 Velocity.Y = 0f;
+                                IsGrounded = true;
+                                OnWorldCollision(tile, CollisionSide.Bottom);
                             }
                         }
                     }
                 }
             }
+        }
+
+        protected virtual void OnWorldCollision(Tile tile, CollisionSide side)
+        {
+
         }
 
         public virtual void Draw()

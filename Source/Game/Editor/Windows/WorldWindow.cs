@@ -10,6 +10,8 @@
         private bool _isPanning;
         private Vector2 _panStartPos;
 
+        private (int X, int Y) _tilePos;
+
         private bool _firstRender = true;
 
         public WorldWindow(EditorScene editor)
@@ -27,6 +29,10 @@
 
         public override void Update()
         {
+            Vector2 screenPos = ScreenToWorld(GetMousePositionInsideEditor());
+            _tilePos.X = (int)(screenPos.X / Tile.Size);
+            _tilePos.Y = (int)(screenPos.Y / Tile.Size);
+
             HandleZooming();
             HandlePanning();
             HandleEditing();
@@ -86,9 +92,7 @@
             if (!IsBeingHovered)
                 return;
 
-            Vector2 screenPos = ScreenToWorld(GetMousePositionInsideEditor());
-            int tx = (int)(screenPos.X / Tile.Size);
-            int ty = (int)(screenPos.Y / Tile.Size);
+            (int tx, int ty) = _tilePos;
 
             if (Raylib.IsMouseButtonDown(MouseButton.Left))
             {
@@ -185,6 +189,8 @@
                 _camera.Target.X = -Tile.Size * 4f;
                 _firstRender = false;
             }
+            
+            Gui.Text($"({_tilePos.X},{_tilePos.Y})");
 
             RenderTexDrawPosition = Gui.GetWindowPos() + Gui.GetCursorPos();
             RlImGui.ImageRenderTexture(WorldContentTex);
