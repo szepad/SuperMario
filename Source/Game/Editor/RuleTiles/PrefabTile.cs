@@ -10,14 +10,6 @@ namespace Mario2.Editor
         List<PrefabAction> Blueprint)
         : TileObject(PreviewCol, PreviewRow)
     {
-        public static readonly PrefabTile Pipe = new(true, 0, 3,
-        [
-            new PrefabAction(0, 0, new SimpleTile(24, true)),
-            new PrefabAction(1, 0, new SimpleTile(25, true)),
-            new PrefabActionRecurse(0, 1, new SimpleTile(32, true), 0, 1),
-            new PrefabActionRecurse(1, 1, new SimpleTile(33, true), 0, 1),
-        ]);
-
         public override Tile OnPlace(World world, int col, int row)
         {
             Tile retTile = SimpleTile.Air;

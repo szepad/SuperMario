@@ -35,6 +35,7 @@ namespace Mario2.Editor
                 Editor.World = world;
                 Editor.WorldWindow.AssignRuleTileRefs();
                 Editor.FilePath = path;
+                EditorScene.RecentlyOpened = path;
                 Editor.CleanDirty();
             }
             else if (failEx is not null)

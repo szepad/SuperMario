@@ -21,10 +21,10 @@ namespace Mario2
             {
                 parallax = new ParallaxBackground(new Color(80, 136, 160));
                 parallax.AddLayer(new ParallaxLayer(
-                    Assets.GetTex("bg_clouds"), new Vector2(0f, 0f).Scale(), 0.1f));
+                    Assets.GetTex("bg_clouds"), new Vector2(0f, 16f).Scale(), 0.2f));
 
                 parallax.AddLayer(new ParallaxLayer(
-                    Assets.GetTex("bg_hills"), new Vector2(0f, 16f).Scale(), 0.5f));
+                    Assets.GetTex("bg_hills"), new Vector2(0f, 0f).Scale(), 0.5f));
             }
 
             return parallax;

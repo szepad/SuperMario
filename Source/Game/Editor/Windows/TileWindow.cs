@@ -10,12 +10,13 @@
         public static List<TileObject> Selectables => _selectables;
         private static readonly List<TileObject> _selectables = 
         [
-            RuleTile.Grass,
-            BasicTile.Block,
-            BasicTile.QuestionBlock,
-            BasicTile.QuestionBlock_Empty,
-            BasicTile.Brick,
-            PrefabTile.Pipe
+            TileObjectDefs.Grass,
+            TileObjectDefs.Block,
+            TileObjectDefs.QuestionTile,
+            TileObjectDefs.QuestionBlock_Empty,
+            TileObjectDefs.Brick,
+            TileObjectDefs.Pipe,
+            TileObjectDefs.GrassDecor
         ];
         
         public Tile GetSelected(World world, int col, int row)

@@ -22,6 +22,9 @@
         private float _jumpBuffer;
         private float _coyoteTimer;
 
+        private const float WalkAnimFrameTime = 0.1f;
+        private const float RunAnimFrameTime = 0.075f;
+
         public Player(World world) : base(world)
         {
             Size = new Vector2(8f, 14f).Scale();
@@ -52,6 +55,8 @@
             if (Input.IsKeyDown(KeyboardKey.Left)) _inputDir--;
             if (Input.IsKeyDown(KeyboardKey.Right)) _inputDir++;
 
+            float stopFriction = IsGrounded ? StopFriction : StopFriction * 0.5f;
+
             if (Velocity.X >= 0f && _inputDir > 0f)
             {
                 Velocity.X += accel * Time.DeltaTime;
@@ -62,25 +67,28 @@
             }
             else if (Velocity.X > 0f && _inputDir < 0f)
             {
-                Velocity.X -= (StopFriction + SkidFriction) * Time.DeltaTime;
+                Velocity.X -= (stopFriction + SkidFriction) * Time.DeltaTime;
             }
             else if (Velocity.X < 0f && _inputDir > 0f)
             {
-                Velocity.X += (StopFriction + SkidFriction) * Time.DeltaTime;
+                Velocity.X += (stopFriction + SkidFriction) * Time.DeltaTime;
             }
             else if (Velocity.X != 0f && _inputDir == 0f)
             {
-                Velocity.X -= MathF.Sign(Velocity.X) * StopFriction * Time.DeltaTime;
-                if (Velocity.X.CloseToZero(threshold: StopFriction * Time.DeltaTime + 0.01f))
+                if (IsGrounded)
                 {
-                    Velocity.X = 0f;
+                    Velocity.X -= MathF.Sign(Velocity.X) * stopFriction * Time.DeltaTime;
+                    if (Velocity.X.CloseToZero(threshold: stopFriction * Time.DeltaTime + 0.01f))
+                    {
+                        Velocity.X = 0f;
+                    }
                 }
             }
 
             Velocity.X = Helper.Clamp(Velocity.X, -MaxRunSpeed, MaxRunSpeed);
             if (!running && MathF.Abs(Velocity.X) > MaxWalkSpeed)
             {
-                Velocity.X -= MathF.Sign(Velocity.X) * (0f + StopFriction) * Time.DeltaTime;
+                Velocity.X -= MathF.Sign(Velocity.X) * StopFriction * Time.DeltaTime;
             }
         }
 
@@ -153,6 +161,14 @@
             }
 
             Sprite.Play("run");
+            if (Sprite.CurrentAnimationName == "run")
+            {
+                for (int i = 0; i < Sprite.CurrentAnimation?.FrameTimes.Length; i++)
+                {
+                    float t = Helper.Clamp01(MathF.Abs(Velocity.X) / MaxRunSpeed);
+                    Sprite.CurrentAnimation.FrameTimes[i] = Raymath.Lerp(0.2f, 0.067f, t);
+                }
+            }
         }
 
         protected override void OnWorldCollision(Tile tile, CollisionSide side)
