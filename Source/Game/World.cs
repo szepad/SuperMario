@@ -86,6 +86,18 @@ namespace Mario2
         public void Update()
         {
             Player.Update();
+
+            for (int y = 0; y < Rows; y++)
+            {
+                for (int x = 0; x < Cols; x++)
+                {
+                    Tile tile = Tiles[y, x];
+                    if (tile == SimpleTile.Air)
+                        continue;
+
+                    tile.Update();
+                }
+            }
         }
 
         public void UpdateParallax(Camera2D camera)
@@ -93,13 +105,13 @@ namespace Mario2
             Parallax.Update(camera);
         }
 
+        public void DrawBackground()
+        {
+            Parallax.Draw();
+        }
+
         public void Draw(bool editor = false)
         {
-            if (!editor)
-            {
-                Parallax.Draw();
-            }
-
             for (int y = 0; y < Rows; y++)
             {
                 for (int x = 0; x < Cols; x++)

@@ -1,4 +1,6 @@
-﻿namespace Mario2.Editor
+﻿using System.Linq;
+
+namespace Mario2.Editor
 {
     public class WorldWindow : EditorWindow
     {
@@ -116,16 +118,38 @@
             {
                 for (int col = 0; col < world.Cols; col++)
                 {
-                    if (!world.GetTile(col, row, out Tile tile) || tile is not SimpleTile st)
+                    if (!world.GetTile(col, row, out Tile tile) || tile == SimpleTile.Air)
                         continue;
 
+                    bool assigned = false;
                     foreach (TileObject selectable in TileWindow.Selectables)
                     {
-                        if (selectable is RuleTile ruleTile
-                            && ruleTile.Rules.ContainsValue(st.Id))
+                        if (selectable is RuleTile ruleTile)
                         {
-                            tile.Rule = ruleTile;
-                            break;
+                            foreach (TileObject obj in ruleTile.Rules.Values)
+                            {
+                                Tile objTile = obj.OnPlace(world, 0, 0);
+                                if (tile is SimpleTile st)
+                                {
+                                    if (objTile is SimpleTile ot && st.Id == ot.Id)
+                                    {
+                                        tile.Rule = ruleTile;
+                                        assigned = true;
+                                        break;
+                                    }
+                                }
+                                else if (tile.GetType().FullName == objTile.GetType().FullName)
+                                {
+                                    tile.Rule = ruleTile;
+                                    assigned = true;
+                                    break;
+                                }
+                            }
+
+                            if (assigned)
+                            {
+                                break;
+                            }
                         }
                     }
                 }
@@ -158,8 +182,32 @@
             if (!_firstRender)
             {
                 Raylib.BeginMode2D(_camera);
+                
+                Editor.World.DrawBackground();
+
+                // Draw window background color under and next to map (over world bg),
+                // because bg texture can extend lower than the map itself.
+                int mapWidth = Tile.Size * Editor.World.Cols;
+                int mapHeight = Tile.Size * World.Rows;
+
+                //Raylib.DrawRectangle(0, mapHeight, mapWidth,
+                //    mapHeight / 2, Color.Black);
+
+                //ParallaxLayer? longest = Editor.World.Parallax.Layers.MaxBy(x => x.Tex.Width);
+                //if (longest is not null)
+                //{
+                //    int overdraw = longest.Tex.Width * Game.TextureScale
+                //        - mapWidth;
+
+                //    if (overdraw > 0)
+                //    {
+                //        Raylib.DrawRectangle(mapWidth, 0, overdraw, mapHeight * 2, Color.Black);
+                //    }
+                //}
+
                 if (Editor.Options.ShowGrid) DrawGrid();
                 Editor.World.Draw(editor: true);
+                
                 Raylib.EndMode2D();
             }
 

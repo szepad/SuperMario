@@ -13,6 +13,7 @@ namespace Mario2
         public TileWindow TileWindow { get; private set; }
         public PropertyWindow PropertyWindow { get; private set; }
 
+        public static string RecentlyOpened { get; set; } = string.Empty;
         public string FilePath { get; set; } = string.Empty;
         public bool IsFileDirty { get; private set; }
 
@@ -62,7 +63,10 @@ namespace Mario2
                 QueueLoadLayout(DefaultLayout);
             }
 
-            FileManager.Open(Path.Combine("levels", "01.lvl"));
+            if (RecentlyOpened != string.Empty)
+            {
+                FileManager.Open(RecentlyOpened);
+            }
         }
 
         protected override void OnUnload()
@@ -124,12 +128,12 @@ namespace Mario2
                 LoadNextLayout();
                 _loadLayout = false;
             }
-            
+
+            World.UpdateParallax(new Camera2D(Vector2.Zero, Vector2.Zero, 0f, 1f));
             foreach (EditorWindow window in _windowRenderQueue)
             {
                 window.Update();
             }
-
 
             if (_exitToTitle)
             {

@@ -26,7 +26,7 @@
                     }
                     else
                     {
-                        UnloadSubScene();
+                        ParentScene.UnloadSubScene();
                     }
                 }
                 else
@@ -67,6 +67,7 @@
         protected override void OnDraw()
         {
             Raylib.ClearBackground(_world.Parallax.ClearColor);
+            _world.DrawBackground();
             Raylib.BeginMode2D(_camera);
             _world.Draw();
             Raylib.EndMode2D();

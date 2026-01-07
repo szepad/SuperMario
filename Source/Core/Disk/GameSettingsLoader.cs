@@ -19,6 +19,7 @@
                 writer.WriteLine(settings.IsIntegerScale);
                 writer.WriteLine((int)(settings.SoundVolume * 100f));
                 writer.WriteLine((int)(settings.MusicVolume * 100f));
+                writer.WriteLine(EditorScene.RecentlyOpened);
             }
             catch (Exception error)
             {
@@ -56,6 +57,7 @@
                 settings.SetIntegerScale(Convert.ToBoolean(reader.ReadLine()));
                 settings.SetSoundVolume(Convert.ToInt32(reader.ReadLine()) / 100f);
                 settings.SetMusicVolume(Convert.ToInt32(reader.ReadLine()) / 100f);
+                EditorScene.RecentlyOpened = reader.ReadLine() ?? string.Empty;
             }
             catch (Exception error)
             {

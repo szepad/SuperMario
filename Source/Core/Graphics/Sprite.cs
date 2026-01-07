@@ -17,6 +17,7 @@
         public Vector2 Origin { get; set; } = Vector2.Zero;
         public Color Color { get; set; } = Color.White;
         public float Scale { get; set; } = 1f;
+        public float Opacity { get; set; } = 1f;
         public bool FlipX { get; set; }
         public bool FlipY { get; set; }
 
@@ -27,6 +28,12 @@
         private readonly Dictionary<string, Animation> _anims = [];
 
         private float _frameTimer;
+
+        public Sprite() { }
+        public Sprite(string sheetName)
+        {
+            SetSheet(sheetName);
+        }
 
         public void SetSheet(string name)
         {
@@ -53,14 +60,22 @@
                 CurrentAnimation = anim;
                 CurrentAnimationName = name;
                 CurrentFrame = 0;
-                _frameTimer = CurrentAnimation.FrameTimes[0];
+                _frameTimer = 0f;
             }
         }
 
         public void Update()
         {
-            _frameTimer -= Time.DeltaTime;
-            if (_frameTimer <= 0f)
+            if (CurrentAnimation is null)
+                return;
+
+            _frameTimer += Time.DeltaTime;
+
+            float frameTarget = CurrentFrame < CurrentAnimation.FrameTimes.Length
+                ? CurrentAnimation.FrameTimes[CurrentFrame] 
+                : CurrentAnimation.FrameTimes[^1];
+
+            if (_frameTimer >= frameTarget)
             {
                 ProgressNextFrame();
             }
@@ -78,14 +93,7 @@
                 else CurrentFrame--;
             }
 
-            if (CurrentFrame < CurrentAnimation.FrameTimes.Length)
-            {
-                _frameTimer = CurrentAnimation.FrameTimes[CurrentFrame];
-            }
-            else
-            {
-                _frameTimer = CurrentAnimation.FrameTimes[^1];
-            }
+            _frameTimer = 0f;
         }
 
         public Rectangle GetSourceRectangle()
@@ -100,7 +108,7 @@
                 FlipY ? -CurrentAnimation.FrameHeight : CurrentAnimation.FrameHeight);
         }
 
-        public void Draw(Vector2 position)
+        public void Draw(Vector2 position, float opacityScale = 1f)
         {
             if (CurrentAnimation is null)
                 return;
@@ -108,7 +116,7 @@
             Raylib.DrawTexturePro(SpriteSheet, GetSourceRectangle(),
                 new Rectangle(position,
                 new Vector2(CurrentAnimation.FrameWidth, CurrentAnimation.FrameHeight).Scale() * Scale),
-                Origin, 0f, Color);
+                Origin, 0f, Color.Alpha(Opacity * opacityScale));
         }
     }
 }
