@@ -10,7 +10,7 @@
             using StreamWriter writer = new(path);
 
             // Meta
-            writer.WriteLine($"{world.Cols};{(int)world.Background}");
+            writer.WriteLine($"{world.Cols};{(int)world.Background};{world.Player.Position.X};{world.Player.Position.Y}");
 
             // Tiles
             for (int row = 0; row < World.Rows; row++)
@@ -62,6 +62,7 @@
             int[] meta = [..reader.ReadLine()!.Split(";").Select(int.Parse)];
             world.SetCols(meta[0]);
             world.SetBackground((WorldBackground)meta[1]);
+            world.Player.SetPosition(meta[2], meta[3]);
 
             // Tiles
             for (int row = 0; row < World.Rows; row++)

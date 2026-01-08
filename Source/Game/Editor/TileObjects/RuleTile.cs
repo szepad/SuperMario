@@ -1,13 +1,20 @@
 ﻿namespace Mario2.Editor
 {
-    public sealed record RuleTile(bool IsCollidable, int PreviewCol, int PreviewRow, Dictionary<int, TileObject> Rules)
+    public sealed record RuleTile(bool IsCollidable, int PreviewCol, int PreviewRow, 
+        Dictionary<int, TileObject> Rules, bool ConnectToSolid = false)
         : TileObject(PreviewCol, PreviewRow)
     {
         private bool CheckTileAt(World world, int col, int row)
         {
             if (world.GetTile(col, row, out Tile tile))
             {
-                return tile.Rule == this;
+                if (tile.Rule == this)
+                    return true;
+
+                if (ConnectToSolid && tile.IsCollidable)
+                    return true;
+
+                return false;
             }
 
             // Always connect to edge of map

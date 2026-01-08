@@ -1,6 +1,7 @@
 ﻿namespace Mario2.Editor
 {
     public abstract record TileObject(Texture2D Tileset, int PreviewCol, int PreviewRow)
+        : ISelectableObject<Tile>
     {
         public TileObject(int previewCol, int previewRow)
             : this(Assets.GetTex("tileset"), previewCol, previewRow) 
@@ -54,6 +55,8 @@
         {
             [0b_0000] = new InstanceTile<GrassDecorTileMiddle>(0, 0),
             [0b_1111] = new InstanceTile<GrassDecorTileMiddle>(0, 0),
+            [0b_1000] = new InstanceTile<GrassDecorTileMiddle>(0, 0),
+            [0b_0010] = new InstanceTile<GrassDecorTileMiddle>(0, 0),
 
             [0b_0101] = new InstanceTile<GrassDecorTileMiddle>(0, 0),
             [0b_1101] = new InstanceTile<GrassDecorTileMiddle>(0, 0),
@@ -68,6 +71,6 @@
             [0b_1001] = new InstanceTile<GrassDecorTileRight>(0, 0),
             [0b_1011] = new InstanceTile<GrassDecorTileRight>(0, 0),
             [0b_0011] = new InstanceTile<GrassDecorTileRight>(0, 0),
-        });
+        }, ConnectToSolid: true);
     }
 }

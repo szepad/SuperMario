@@ -9,8 +9,12 @@ namespace Mario2
         public EditorFileManager FileManager { get; }
 
         public EditorMenuBar MenuBar { get; private set; }
+        
         public WorldWindow WorldWindow { get; private set; }
         public TileWindow TileWindow { get; private set; }
+        public EditorWindow ActiveSelector { get; private set; }
+
+        public EntityWindow EntityWindow { get; private set; }
         public PropertyWindow PropertyWindow { get; private set; }
 
         public static string RecentlyOpened { get; set; } = string.Empty;
@@ -40,11 +44,15 @@ namespace Mario2
 
             WorldWindow = new WorldWindow(this);
             TileWindow = new TileWindow(this);
+            EntityWindow = new EntityWindow(this);
             PropertyWindow = new PropertyWindow(this);
 
             _windowRenderQueue.Add(WorldWindow);
             _windowRenderQueue.Add(TileWindow);
+            _windowRenderQueue.Add(EntityWindow);
             _windowRenderQueue.Add(PropertyWindow);
+
+            SetActiveSelector(TileWindow);
         }
 
         protected override void OnLoad()
@@ -78,6 +86,11 @@ namespace Mario2
         protected override void OnSubSceneUnload()
         {
             Raylib.ShowCursor();
+        }
+
+        public void SetActiveSelector(EditorWindow selector)
+        {
+            ActiveSelector = selector;
         }
 
         public void Dirty()
