@@ -19,6 +19,21 @@
 
         public bool IsGrounded { get; private set; }
 
+        public void SetPosition(float x, float y) => SetPosition(new Vector2(x, y));
+        public void SetPosition(Vector2 pos)
+        {
+            Position = OldPosition = pos;
+        }
+
+        public void SetFeetPos(float x, float y) => SetFeetPos(new Vector2(x, y));
+        public void SetFeetPos(Vector2 pos)
+        {
+            Position = OldPosition = new Vector2(
+                pos.X - Size.X / 2f,
+                pos.Y - Size.Y
+            );
+        }
+
         public virtual void Update()
         {
             Velocity.Y += Gravity * Time.DeltaTime;

@@ -98,8 +98,24 @@ namespace Mario2.Editor
 
             if (Raylib.IsMouseButtonDown(MouseButton.Left))
             {
-                Editor.World.SetTile(tx, ty, Editor.TileWindow.GetSelected(Editor.World, tx, ty));
-                UpdateRule(Editor.World, tx, ty);
+                if (Editor.ActiveSelector is TileWindow tileWindow)
+                {
+                    Editor.World.SetTile(tx, ty, tileWindow.GetSelected(Editor.World, tx, ty));
+                    UpdateRule(Editor.World, tx, ty);
+                }
+                else if (Editor.ActiveSelector is EntityWindow entityWindow)
+                {
+                    Entity entity = entityWindow.GetSelected(Editor.World, tx, ty);
+                    if (entity is Player player)
+                    {
+                        Editor.World.Player.SetPosition(player.Position);
+                    }
+                    else
+                    {
+                        // TODO: Place entity
+                    }
+                }
+
                 Editor.Dirty();
             }
 
@@ -122,7 +138,7 @@ namespace Mario2.Editor
                         continue;
 
                     bool assigned = false;
-                    foreach (TileObject selectable in TileWindow.Selectables)
+                    foreach (TileObject selectable in Editor.TileWindow.Selectables)
                     {
                         if (selectable is RuleTile ruleTile)
                         {
