@@ -17,6 +17,7 @@ namespace Mario2
         {
             Player = new Player(this);
             Player.Position.X = 50;
+            Entities.Add(Player);
 
             Tiles = new Tile[Rows, Cols];
             Clear(Tiles);
@@ -104,8 +105,6 @@ namespace Mario2
 
         private void UpdateEntities()
         {
-            Player.Update();
-
             for (int i = Entities.Count - 1; i >= 0; i--)
             {
                 Entities[i].Update();
@@ -148,8 +147,29 @@ namespace Mario2
 
         public void Draw(bool editor = false)
         {
+            Entities.Sort((x, y) => x.LayerDepth.CompareTo(y.LayerDepth));
+
+            int lastBg = -1;
+            for (int i = 0; i < Entities.Count; i++)
+            {
+                Entity entity = Entities[i];
+                if (entity.LayerDepth == LayerDepth.Background)
+                {
+                    Entities[i].Draw();
+                    lastBg = i;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
             DrawTiles(editor);
-            DrawEntities();
+
+            for (int i = lastBg + 1; i < Entities.Count; i++)
+            {
+                Entities[i].Draw();
+            }
         }
 
         private void DrawTiles(bool editor)
@@ -162,40 +182,37 @@ namespace Mario2
                     if (tile == SimpleTile.Air)
                         continue;
 
-                    if (editor)
-                    {
-                        tile.Draw(x, y, tile.IsCollidable ? 1f : 0.5f);
-                        if (tile is ContainerTile ct)
-                        {
-                            if (ct.IsHidden)
-                            {
-                                ct.Sprite.IsVisible = true;
-                                ct.Draw(x, y, 0.5f);
-                                ct.Sprite.IsVisible = false;
-                            }
-
-                            if (ct.ItemInside != ItemType.None)
-                            {
-                                Raylib.DrawTexturePro(Assets.GetTex("items"),
-                                    new Rectangle(0, ((int)ct.ItemInside - 1) * 16, 16, 16),
-                                    new Rectangle(x * Tile.Size, (y - 1) * Tile.Size, new Vector2(Tile.Size)),
-                                    Vector2.Zero, 0f, Color.White.Alpha(0.5f));
-                            }
-
-                        }
-                    }
-                    else
-                    {
-                        tile.Draw(x, y);
-                    }
+                    DrawTile(tile, x, y, editor);
                 }
             }
         }
 
-        private void DrawEntities()
+        private void DrawTile(Tile tile, int x, int y, bool editor)
         {
-            Player.Draw();
-            Entities.ForEach(entity => entity.Draw());
+            if (!editor)
+            {
+                tile.Draw(x, y);
+                return;
+            }
+
+            tile.Draw(x, y, tile.IsCollidable ? 1f : 0.5f);
+            if (tile is ContainerTile ct)
+            {
+                if (ct.IsHidden)
+                {
+                    ct.Sprite.IsVisible = true;
+                    ct.Draw(x, y, 0.5f);
+                    ct.Sprite.IsVisible = false;
+                }
+
+                if (ct.ItemInside != ItemType.None)
+                {
+                    Raylib.DrawTexturePro(Assets.GetTex("items"),
+                        new Rectangle(0, ((int)ct.ItemInside - 1) * 16, 16, 16),
+                        new Rectangle(x * Tile.Size, (y - 1) * Tile.Size, new Vector2(Tile.Size)),
+                        Vector2.Zero, 0f, Color.White.Alpha(0.5f));
+                }
+            }
         }
     }
 }

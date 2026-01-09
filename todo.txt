@@ -6,7 +6,7 @@
 [x] Coins
 	[x] - Tile
 	[x] - Question Block
-[ ] Draw depth   *Don't forget to apply to coin pickup*
+[x] Layer depth   *Don't forget to apply to coin pickup*
 [ ] Mushroom entity & Spawning
 [ ] FireFlower
 [ ] Star
