@@ -1,10 +1,16 @@
 ﻿namespace Mario2
 {
-    public class QuestionTile : AnimatedTile
+    public class QuestionTile : ContainerTile
     {
         public QuestionTile() : base(true)
         {
-            Sprite.Add("?", new Animation(3, 16, 16, 0, 0.15f, true));
+            Sprite.Play("?");
+        }
+
+        protected override void OnHitFirstFrame(Entity entity)
+        {
+            Sprite.Play("block_ow");
+            base.OnHitFirstFrame(entity);
         }
     }
 }

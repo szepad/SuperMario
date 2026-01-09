@@ -2,11 +2,14 @@
 {
     public class PropertyWindow(EditorScene editor) : EditorWindow(editor, "Properties")
     {
-        public bool IsTileCollidable => _tileCollidableVal;
-
         private int _colsInputVal = 0;
         private int _bgVal = (int)editor.World.Background;
-        private bool _tileCollidableVal = true;
+
+        public ItemType ContainerTileItem => (ItemType)_ctItemIndex;
+        private int _ctItemIndex;
+
+        public bool ContainerTileHidden => _ctHidden;
+        private bool _ctHidden;
 
         public override void Update()
         {
@@ -82,7 +85,15 @@
         private void TileProperties()
         {
             Gui.SeparatorText("Tile");
-            Gui.Checkbox("Collidable", ref _tileCollidableVal);
+
+            if (Editor.ActiveSelector is TileWindow tw
+                && tw.GetSelected(Editor.World, 0, 0) is ContainerTile)
+            {
+                Gui.Checkbox("Hidden", ref _ctHidden);
+
+                string[] choices = Enum.GetNames<ItemType>();
+                Gui.Combo("Item", ref _ctItemIndex, choices, choices.Length);
+            }
 
             // Spacing
             Gui.Dummy(new Vector2(0f, 20f));

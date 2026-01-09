@@ -52,7 +52,7 @@ namespace Mario2
             _windowRenderQueue.Add(EntityWindow);
             _windowRenderQueue.Add(PropertyWindow);
 
-            SetActiveSelector(TileWindow);
+            ActiveSelector = TileWindow;
         }
 
         protected override void OnLoad()

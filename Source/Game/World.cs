@@ -11,6 +11,7 @@ namespace Mario2
 
         public Player Player { get; }
         public Tile[,] Tiles { get; private set; }
+        public List<Entity> Entities { get; } = [];
 
         public World()
         {
@@ -52,12 +53,16 @@ namespace Mario2
             return true;
         }
 
-        public void SetTile(int col, int row, Tile tile)
+        public Tile? SetTile(int col, int row, Tile tile)
         {
             if (col < 0 || col >= Cols || row < 0 || row >= Rows)
-                return;
+                return null;
 
+            tile.World = this;
+            tile.Col = col;
+            tile.Row = row;
             Tiles[row, col] = tile;
+            return tile;
         }
 
         public void SetCols(int newCols)
@@ -83,10 +88,36 @@ namespace Mario2
             Tiles = newMtx;
         }
 
+        public T SpawnEntity<T>(T entity, Vector2 feetPos) where T : Entity
+        {
+            Entities.Add(entity);
+            entity.SetFeetPos(feetPos);
+            entity.Spawn();
+            return entity;
+        }
+
         public void Update()
+        {
+            UpdateEntities();
+            UpdateTiles();
+        }
+
+        private void UpdateEntities()
         {
             Player.Update();
 
+            for (int i = Entities.Count - 1; i >= 0; i--)
+            {
+                Entities[i].Update();
+                if (Entities[i].IsDestroyed)
+                {
+                    Entities.RemoveAt(i);
+                }
+            }
+        }
+
+        private void UpdateTiles()
+        {
             for (int y = 0; y < Rows; y++)
             {
                 for (int x = 0; x < Cols; x++)
@@ -96,6 +127,11 @@ namespace Mario2
                         continue;
 
                     tile.Update();
+                    
+                    if (tile.IsDestroyed)
+                    {
+                        Tiles[y, x] = SimpleTile.Air;
+                    }
                 }
             }
         }
@@ -112,17 +148,41 @@ namespace Mario2
 
         public void Draw(bool editor = false)
         {
+            DrawTiles(editor);
+            DrawEntities();
+        }
+
+        private void DrawTiles(bool editor)
+        {
             for (int y = 0; y < Rows; y++)
             {
                 for (int x = 0; x < Cols; x++)
                 {
                     Tile tile = Tiles[y, x];
-                    if (tile == SimpleTile.Air) 
+                    if (tile == SimpleTile.Air)
                         continue;
 
                     if (editor)
                     {
                         tile.Draw(x, y, tile.IsCollidable ? 1f : 0.5f);
+                        if (tile is ContainerTile ct)
+                        {
+                            if (ct.IsHidden)
+                            {
+                                ct.Sprite.IsVisible = true;
+                                ct.Draw(x, y, 0.5f);
+                                ct.Sprite.IsVisible = false;
+                            }
+
+                            if (ct.ItemInside != ItemType.None)
+                            {
+                                Raylib.DrawTexturePro(Assets.GetTex("items"),
+                                    new Rectangle(0, ((int)ct.ItemInside - 1) * 16, 16, 16),
+                                    new Rectangle(x * Tile.Size, (y - 1) * Tile.Size, new Vector2(Tile.Size)),
+                                    Vector2.Zero, 0f, Color.White.Alpha(0.5f));
+                            }
+
+                        }
                     }
                     else
                     {
@@ -130,8 +190,12 @@ namespace Mario2
                     }
                 }
             }
+        }
 
+        private void DrawEntities()
+        {
             Player.Draw();
+            Entities.ForEach(entity => entity.Draw());
         }
     }
 }

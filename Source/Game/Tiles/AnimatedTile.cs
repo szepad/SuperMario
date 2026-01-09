@@ -1,8 +1,8 @@
 ﻿namespace Mario2
 {
-    public class AnimatedTile(bool isCollidable) : Tile(isCollidable)
+    public class AnimatedTile(string sheetName, bool isCollidable) : Tile(isCollidable)
     {
-        public Sprite Sprite { get; protected set; } = new("tile_anims");
+        public Sprite Sprite { get; protected set; } = new(sheetName);
         public Vector2 SpriteOffset;
 
         public override void Update()

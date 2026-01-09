@@ -22,9 +22,6 @@
         private float _jumpBuffer;
         private float _coyoteTimer;
 
-        private const float WalkAnimFrameTime = 0.1f;
-        private const float RunAnimFrameTime = 0.075f;
-
         public Player(World world) : base(world)
         {
             Size = new Vector2(8f, 14f).Scale();
@@ -35,6 +32,16 @@
             Sprite.Add("run", new Animation(3, 16, 16, 16, 0.1f));
             Sprite.Add("skid", new Animation(1, 16, 16, 32, 1f));
             Sprite.Add("jump", new Animation(1, 16, 16, 48, 1f));
+        }
+
+        protected override void OnSpawn()
+        {
+            
+        }
+
+        protected override void OnDestroy()
+        {
+            
         }
 
         public override void Update()
@@ -171,14 +178,25 @@
             }
         }
 
-        protected override void OnWorldCollision(Tile tile, CollisionSide side)
+        protected override void OnTileCollision(Tile tile, CollisionSide side)
         {
             if (side == CollisionSide.Top)
             {
                 StopJump();
-            }
 
-            base.OnWorldCollision(tile, side);
+                if (tile is ContainerTile ct)
+                {
+                    ct.OnHit(this);
+                }
+            }
+        }
+
+        protected override void OnTileOverlap(Tile tile)
+        {
+            if (tile is CoinTile)
+            {
+                tile.Destroy();
+            }
         }
     }
 }

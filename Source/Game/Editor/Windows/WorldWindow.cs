@@ -100,7 +100,15 @@ namespace Mario2.Editor
             {
                 if (Editor.ActiveSelector is TileWindow tileWindow)
                 {
-                    Editor.World.SetTile(tx, ty, tileWindow.GetSelected(Editor.World, tx, ty));
+                    Tile? tile = Editor.World.SetTile(tx, ty, tileWindow.GetSelected(Editor.World, tx, ty));
+                    if (tile is ContainerTile ct)
+                    {
+                        ct.SetItem(Editor.PropertyWindow.ContainerTileItem);
+
+                        if (Editor.PropertyWindow.ContainerTileHidden)
+                            ct.SetHidden();
+                    }
+                    
                     UpdateRule(Editor.World, tx, ty);
                 }
                 else if (Editor.ActiveSelector is EntityWindow entityWindow)
@@ -200,28 +208,9 @@ namespace Mario2.Editor
                 Raylib.BeginMode2D(_camera);
                 
                 Editor.World.DrawBackground();
-
-                // Draw window background color under and next to map (over world bg),
-                // because bg texture can extend lower than the map itself.
-                int mapWidth = Tile.Size * Editor.World.Cols;
-                int mapHeight = Tile.Size * World.Rows;
-
-                //Raylib.DrawRectangle(0, mapHeight, mapWidth,
-                //    mapHeight / 2, Color.Black);
-
-                //ParallaxLayer? longest = Editor.World.Parallax.Layers.MaxBy(x => x.Tex.Width);
-                //if (longest is not null)
-                //{
-                //    int overdraw = longest.Tex.Width * Game.TextureScale
-                //        - mapWidth;
-
-                //    if (overdraw > 0)
-                //    {
-                //        Raylib.DrawRectangle(mapWidth, 0, overdraw, mapHeight * 2, Color.Black);
-                //    }
-                //}
-
-                if (Editor.Options.ShowGrid) DrawGrid();
+                if (Editor.Options.ShowGrid)
+                    DrawGrid();
+                
                 Editor.World.Draw(editor: true);
                 
                 Raylib.EndMode2D();

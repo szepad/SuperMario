@@ -13,11 +13,11 @@
     public static class TileObjectDefs
     {
         public static readonly BasicTile Block = new(16, true, 0, 2);
-        public static readonly BasicTile QuestionBlock = new(17, true, 1, 2);
-        public static readonly BasicTile QuestionBlock_Empty = new(18, true, 2, 2);
-        public static readonly BasicTile Brick = new(19, true, 3, 2);
+        public static readonly BasicTile QuestionTile_Empty = new(18, true, 2, 2);
 
         public static readonly InstanceTile<QuestionTile> QuestionTile = new(1, 2);
+        public static readonly InstanceTile<BrickTile> Brick = new(3, 2);
+        public static readonly InstanceTile<CoinTile> Coin = new(7, 2);
 
         public static readonly PrefabTile Pipe = new(true, 0, 3,
         [
