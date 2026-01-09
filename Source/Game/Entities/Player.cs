@@ -26,6 +26,7 @@
         {
             Size = new Vector2(8f, 14f).Scale();
             SpriteOffset = new Vector2(4f, 2f).Scale();
+            LayerDepth = LayerDepth.Player;
 
             Sprite.SetSheet("mario");
             Sprite.Add("idle", new Animation(1, 16, 16, 0, 1f));

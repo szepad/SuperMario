@@ -17,6 +17,7 @@
 
         public Rectangle Rect => new(Position, Size);
 
+        public LayerDepth LayerDepth { get; set; } = LayerDepth.Normal;
         public bool IsCollidable { get; set; } = true;
         public bool IsGrounded { get; private set; }
         public bool IsSpawned { get; private set; }
