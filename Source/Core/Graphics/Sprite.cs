@@ -20,6 +20,7 @@
         public float Opacity { get; set; } = 1f;
         public bool FlipX { get; set; }
         public bool FlipY { get; set; }
+        public bool IsVisible { get; set; } = true;
 
         public string CurrentAnimationName { get; private set; } = string.Empty;
         public Animation? CurrentAnimation { get; private set; }
@@ -110,7 +111,7 @@
 
         public void Draw(Vector2 position, float opacityScale = 1f)
         {
-            if (CurrentAnimation is null)
+            if (CurrentAnimation is null || !IsVisible)
                 return;
 
             Raylib.DrawTexturePro(SpriteSheet, GetSourceRectangle(),

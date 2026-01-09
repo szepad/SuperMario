@@ -25,6 +25,11 @@
                     else
                     {
                         writer.Write($"{TileAnimAttr},{tile.GetType().FullName}");
+
+                        if (tile is ContainerTile ct)
+                        {
+                            writer.Write($",{(int)ct.ItemInside},{ct.IsHidden}");
+                        }
                     }
 
                     writer.Write(";");
@@ -87,6 +92,13 @@
                         {
                             Tile tile = (Tile)(Activator.CreateInstance(type) ?? SimpleTile.Air);
                             world.SetTile(col, row, tile);
+
+                            if (tile is ContainerTile ct)
+                            {
+                                ct.SetItem((ItemType)int.Parse(attr[2]));
+                                if (Convert.ToBoolean(attr[3]))
+                                    ct.SetHidden();
+                            }
                         }
                     }
                 }

@@ -1,0 +1,15 @@
+[x] Entity selector
+[x] Player movement
+[x] Animated tiles
+[x] Container tiles
+[x] Entity management in World.cs
+[x] Coins
+	[x] - Tile
+	[x] - Question Block
+[ ] Draw depth   *Don't forget to apply to coin pickup*
+[ ] Mushroom entity & Spawning
+[ ] FireFlower
+[ ] Star
+[ ] Coin Stash
+[ ] Goomba
+[ ] Koopa

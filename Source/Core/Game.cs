@@ -28,7 +28,6 @@ namespace Mario2
 
         private RenderTexture2D _virtualScreen;
 
-        #region Singleton
         private static Game? _instance;
         public static Game Instance
         {
@@ -39,7 +38,6 @@ namespace Mario2
         }
 
         private Game() { }
-        #endregion
 
         public void Run()
         {

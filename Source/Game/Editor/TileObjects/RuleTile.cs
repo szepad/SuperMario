@@ -1,7 +1,7 @@
 ﻿namespace Mario2.Editor
 {
     public sealed record RuleTile(bool IsCollidable, int PreviewCol, int PreviewRow, 
-        Dictionary<int, TileObject> Rules, bool ConnectToSolid = false)
+        Dictionary<byte, TileObject> Rules, bool ConnectToSolid = false)
         : TileObject(PreviewCol, PreviewRow)
     {
         private bool CheckTileAt(World world, int col, int row)
@@ -23,7 +23,7 @@
 
         public override Tile OnPlace(World world, int col, int row)
         {
-            int rule = 0;
+            byte rule = 0;
 
             if (CheckTileAt(world, col, row - 1)) rule |= 0b1000;
             if (CheckTileAt(world, col + 1, row)) rule |= 0b0100;

@@ -7,10 +7,11 @@
             TileObjectDefs.Grass,
             TileObjectDefs.Block,
             TileObjectDefs.QuestionTile,
-            TileObjectDefs.QuestionBlock_Empty,
+            TileObjectDefs.QuestionTile_Empty,
             TileObjectDefs.Brick,
             TileObjectDefs.Pipe,
-            TileObjectDefs.GrassDecor
+            TileObjectDefs.GrassDecor,
+            TileObjectDefs.Coin,
         ];
 
         public override void Update()
