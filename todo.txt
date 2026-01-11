@@ -7,7 +7,11 @@
 	[x] - Tile
 	[x] - Question Block
 [x] Layer depth   *Don't forget to apply to coin pickup*
-[ ] Mushroom entity & Spawning
+[x] Mushroom entity & Spawning
+[x] Entity x Entity collisions (& IsHittable Flag for Entities)
+[x] Entity tile bounce hit
+[x] Coin tile bounce hit
+[x] OneUp
 [ ] FireFlower
 [ ] Star
 [ ] Coin Stash

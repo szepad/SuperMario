@@ -15,7 +15,7 @@ namespace Mario2
         public const int TextureScale = 4;
 
         public bool AllowDevMode { get; private set; }
-        public bool IsDevMode { get; private set; }
+        public bool IsDevModeOn { get; private set; }
 
         public Color LetterBoxColor { get; set; } = Color.Black;
         public StretchMode StretchMode { get; set; }
@@ -111,7 +111,7 @@ namespace Mario2
             {
                 if (Input.IsKeyPressed(KeyboardKey.F10))
                 {
-                    IsDevMode = !IsDevMode;
+                    IsDevModeOn = !IsDevModeOn;
                 }
 
                 if (Input.IsKeyPressed(KeyboardKey.Grave)) Time.DebugTimeScale = 0f;
@@ -158,6 +158,11 @@ namespace Mario2
             };
 
             Raylib.DrawTexturePro(_virtualScreen.Texture, src, dst, Vector2.Zero, 0f, Color.White);
+
+            if (IsDevModeOn)
+            {
+                Raylib.DrawText($"Fps: {Raylib.GetFPS()}", 0, 0, 30, Color.White);
+            }
 
             Raylib.EndDrawing();
         }

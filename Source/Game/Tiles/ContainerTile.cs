@@ -9,7 +9,7 @@
 
         protected bool OnlyHitOnce { get; set; } = true;
 
-        private const float BounceTime = 0.2f;
+        public const float BounceTime = 0.2f;
         private const float BounceOffset = 6f * Game.TextureScale;
 
         private float _bounceTimer;
@@ -51,6 +51,9 @@
             _bounceTimer = 0f;
             _isBouncing = true;
             IsHittable = false;
+
+            HandleEntityBounceHit(entity);
+            HandleCoinTileBounceHit();
 
             OnHitFirstFrame(entity);
 
@@ -103,14 +106,42 @@
 
         private void SpawnItemInside()
         {
+            if (World is null || ItemInside == ItemType.None)
+                return;
+
+            Item item = Item.Get(World, ItemInside);
+            World.SpawnEntity(item, new Vector2((Col + 0.5f) * Size, (Row + 1f) * Size));
+            ItemInside = ItemType.None;
+        }
+
+        private void HandleEntityBounceHit(Entity bouncer)
+        {
+            Rectangle bounceRect = new(
+                Col * Size, Row * Size - BounceOffset,
+                Size, BounceOffset
+            );
+
+            foreach (Entity entity in bouncer.World.Entities)
+            {
+                if (entity == bouncer || !entity.IsHittable)
+                    continue;
+
+                if (Raylib.CheckCollisionRecs(entity.Rect, bounceRect))
+                {
+                    entity.OnTileBounceHit(bouncer, this);
+                }
+            }
+        }
+
+        private void HandleCoinTileBounceHit()
+        {
             if (World is null)
                 return;
 
-            Item? item;
-            if ((item = Item.Get(World, ItemInside)) != null)
+            if (World.GetTile(Col, Row - 1, out Tile tile) && tile is CoinTile)
             {
-                World.SpawnEntity(item, new Vector2((Col + 0.5f) * Size, (Row + 1f) * Size));
-                ItemInside = ItemType.None;
+                World.SetTile(Col, Row - 1, SimpleTile.Air);
+                World.SpawnEntity(new CoinPickup(World), new Vector2(Col + 0.5f, Row) * Size);
             }
         }
     }

@@ -241,7 +241,7 @@ namespace Mario2
             Gui.PushStyleColor(ImGuiCol.TabSelectedOverline, Vector4.Zero);
 
             Gui.DockSpaceOverViewport();
-            Gui.ShowDemoWindow();
+            //Gui.ShowDemoWindow();
 
             MenuBar.Render();
             foreach (EditorWindow window in _windowRenderQueue)

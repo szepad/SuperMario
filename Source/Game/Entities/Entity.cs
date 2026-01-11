@@ -19,6 +19,7 @@
 
         public LayerDepth LayerDepth { get; set; } = LayerDepth.Normal;
         public bool IsCollidable { get; set; } = true;
+        public bool IsHittable { get; set; } = true;
         public bool IsGrounded { get; private set; }
         public bool IsSpawned { get; private set; }
         public bool IsDestroyed { get; private set; }
@@ -65,11 +66,12 @@
             HandleCollisions(horizontal: true);
             Position.Y += Velocity.Y * Time.DeltaTime;
             HandleCollisions(horizontal: false);
+            HandleEntityCollisions();
 
             Sprite.Update();
         }
 
-        private void HandleCollisions(bool horizontal)
+        protected void HandleCollisions(bool horizontal)
         {
             if (!IsCollidable)
                 return;
@@ -79,61 +81,96 @@
                 IsGrounded = false;
             }
 
-            for (int y = 0; y < World.Rows; y++)
+            Vector2 min = Vector2.Min(OldPosition, Position);
+            Vector2 max = Vector2.Max(OldPosition, Position);
+            List<Tile> tilesToCheck = new(capacity: 16);
+            
+            for (int y = (int)(min.Y / Tile.Size) - 1; y <= (int)(max.Y / Tile.Size) + 1; y++)
             {
-                for (int x = 0; x < World.Cols; x++)
+                for (int x = (int)(min.X / Tile.Size) - 1; x <= (int)(max.X / Tile.Size) + 1; x++)
                 {
-                    Tile tile = World.Tiles[y, x];
-                    Rectangle tileRect = new(x * Tile.Size, y * Tile.Size, Tile.Size, Tile.Size);
-
-                    if (Rect.X < tileRect.X + tileRect.Width
-                        && Rect.X + Rect.Width > tileRect.X
-                        && Rect.Y < tileRect.Y + tileRect.Height
-                        && Rect.Y + Rect.Height > tileRect.Y)
+                    if (World.GetTile(x, y, out Tile tile)
+                        && tile != SimpleTile.Air)
                     {
-                        if (tile.IsCollidable)
+                        tilesToCheck.Add(tile);
+                    }
+                }
+            }
+
+            Vector2 center = Position + Size / 2f;
+            tilesToCheck.Sort((t1, t2) => 
+                Vector2.DistanceSquared(new Vector2(t1.Col + 0.5f, t1.Row + 0.5f) * Tile.Size, center)
+                .CompareTo(Vector2.DistanceSquared(new Vector2(t2.Col + 0.5f, t2.Row + 0.5f) * Tile.Size, center))
+                );
+
+            foreach (Tile tile in tilesToCheck)
+            {
+                Rectangle tileRect = new(tile.Col * Tile.Size, tile.Row * Tile.Size, Tile.Size, Tile.Size);
+
+                if (Rect.X < tileRect.X + tileRect.Width
+                    && Rect.X + Rect.Width > tileRect.X
+                    && Rect.Y < tileRect.Y + tileRect.Height
+                    && Rect.Y + Rect.Height > tileRect.Y)
+                {
+                    if (tile.IsCollidable)
+                    {
+                        if (horizontal)
                         {
-                            if (horizontal)
+                            if (Velocity.X < 0f && !tile.CollisionExclude.Contains(CollisionSide.Right))
                             {
-                                if (Velocity.X < 0f && !tile.CollisionExclude.Contains(CollisionSide.Right))
-                                {
-                                    // Left collision
-                                    OldPosition.X = Position.X = tileRect.X + tileRect.Width;
-                                    Velocity.X = 0f;
-                                    OnTileCollision(tile, CollisionSide.Left);
-                                }
-                                else if (Velocity.X > 0f && !tile.CollisionExclude.Contains(CollisionSide.Left))
-                                {
-                                    // Right collision
-                                    OldPosition.X = Position.X = tileRect.X - Rect.Width;
-                                    Velocity.X = 0f;
-                                    OnTileCollision(tile, CollisionSide.Right);
-                                }
+                                // Left collision
+                                OldPosition.X = Position.X = tileRect.X + tileRect.Width;
+                                Velocity.X = 0f;
+                                OnTileCollision(tile, CollisionSide.Left);
                             }
-                            else
+                            else if (Velocity.X > 0f && !tile.CollisionExclude.Contains(CollisionSide.Left))
                             {
-                                if (Velocity.Y < 0f && !tile.CollisionExclude.Contains(CollisionSide.Bottom))
-                                {
-                                    // Top collision
-                                    OldPosition.Y = Position.Y = tileRect.Y + tileRect.Height;
-                                    Velocity.Y = 0f;
-                                    OnTileCollision(tile, CollisionSide.Top);
-                                }
-                                else if (Velocity.Y > 0f && !tile.CollisionExclude.Contains(CollisionSide.Top))
-                                {
-                                    // Bottom collision
-                                    OldPosition.Y = Position.Y = tileRect.Y - Rect.Height;
-                                    Velocity.Y = 0f;
-                                    IsGrounded = true;
-                                    OnTileCollision(tile, CollisionSide.Bottom);
-                                }
+                                // Right collision
+                                OldPosition.X = Position.X = tileRect.X - Rect.Width;
+                                Velocity.X = 0f;
+                                OnTileCollision(tile, CollisionSide.Right);
                             }
                         }
                         else
                         {
-                            OnTileOverlap(tile);
+                            if (Velocity.Y < 0f && !tile.CollisionExclude.Contains(CollisionSide.Bottom))
+                            {
+                                // Top collision
+                                OldPosition.Y = Position.Y = tileRect.Y + tileRect.Height;
+                                Velocity.Y = 0f;
+                                OnTileCollision(tile, CollisionSide.Top);
+                            }
+                            else if (Velocity.Y > 0f && !tile.CollisionExclude.Contains(CollisionSide.Top))
+                            {
+                                // Bottom collision
+                                OldPosition.Y = Position.Y = tileRect.Y - Rect.Height;
+                                Velocity.Y = 0f;
+                                IsGrounded = true;
+                                OnTileCollision(tile, CollisionSide.Bottom);
+                            }
                         }
                     }
+                    else
+                    {
+                        OnTileOverlap(tile);
+                    }
+                }
+            }
+        }
+
+        protected void HandleEntityCollisions()
+        {
+            if (!IsHittable)
+                return;
+
+            foreach (Entity other in World.Entities)
+            {
+                if (other == this)
+                    continue;
+
+                if (Raylib.CheckCollisionRecs(Rect, other.Rect))
+                {
+                    OnEntityOverlap(other);
                 }
             }
         }
@@ -142,17 +179,20 @@
         {
             Sprite.Draw(Position - SpriteOffset);
 
-            if (Game.Instance.IsDevMode)
+            if (Game.Instance.IsDevModeOn)
             {
-                Raylib.DrawRectangle((int)Position.X, (int)Position.Y,
-                    (int)Size.X, (int)Size.Y, new Color(255, 255, 0, 128));
+                Raylib.DrawRectangle((int)Rect.X, (int)Rect.Y,
+                    (int)Rect.Width, (int)Rect.Height, new Color(255, 255, 0, 128));
             }
         }
+
+        public virtual void OnTileBounceHit(Entity bouncer, Tile tile) { }
 
         protected abstract void OnSpawn();
         protected abstract void OnDestroy();
 
         protected virtual void OnTileCollision(Tile tile, CollisionSide side) { }
         protected virtual void OnTileOverlap(Tile tile) { }
+        protected virtual void OnEntityOverlap(Entity other) { }
     }
 }
