@@ -37,6 +37,15 @@
 
                 writer.WriteLine();
             }
+
+            // Entities
+            foreach (Entity entity in world.Entities)
+            {
+                if (entity is Player)
+                    continue;
+
+                writer.WriteLine($"{entity.GetType().FullName};{(int)entity.Position.X};{(int)entity.Position.Y}");
+            }
         }
 
         public static World? Deserialize(string path, out Exception? failEx)
@@ -102,6 +111,32 @@
                         }
                     }
                 }
+            }
+
+            // Entities
+            string? line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                string[] data = line.Split(';');
+                Type? type = Type.GetType(data[0]);
+                if (type is null)
+                {
+                    Console.WriteLine($"World load error: Type not found: {data[0]}");
+                    continue;
+                }
+
+                Entity? entity = (Entity?)Activator.CreateInstance(type, world);
+                if (entity is null)
+                {
+                    Console.WriteLine($"World load error: Instantiation failed from type: {data[0]}");
+                    continue;
+                }
+
+                entity.SetPosition(int.Parse(data[1]), int.Parse(data[2]));
+                world.SpawnEntity(entity);
             }
 
             return world;

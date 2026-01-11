@@ -25,7 +25,7 @@
 
         protected override void OnSpawn()
         {
-            Velocity.Y = -350f * Game.TextureScale;
+            Velocity.Y = -330f * Game.TextureScale;
             Position.Y -= 2f * Game.TextureScale;
         }
 

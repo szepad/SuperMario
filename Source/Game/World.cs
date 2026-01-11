@@ -4,8 +4,10 @@ namespace Mario2
 {
     public class World
     {
-        public int Cols { get; private set; } = 100;
         public const int Rows = 14;
+        public const float FallOffHeight = Rows * 1.5f * Tile.Size;
+
+        public int Cols { get; private set; } = 100;
         public WorldBackground Background { get; private set; }
         public ParallaxBackground Parallax { get; private set; }
 
@@ -93,6 +95,13 @@ namespace Mario2
         {
             Entities.Add(entity);
             entity.SetFeetPos(feetPos);
+            entity.Spawn();
+            return entity;
+        }
+
+        public T SpawnEntity<T>(T entity) where T : Entity
+        {
+            Entities.Add(entity);
             entity.Spawn();
             return entity;
         }

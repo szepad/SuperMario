@@ -2,6 +2,8 @@
 {
     public class Player : Entity
     {
+        public bool IsDead { get; private set; }
+
         private const float MaxWalkSpeed = 93.6f * Game.TextureScale;
         private const float MaxRunSpeed = 153.6f * Game.TextureScale;
         private const float WalkAccel = 160f * Game.TextureScale;
@@ -22,6 +24,8 @@
         private float _jumpBuffer;
         private float _coyoteTimer;
 
+        private const float StompBounce = 160f * Game.TextureScale;
+
         public Player(World world) : base(world)
         {
             Size = new Vector2(8f, 14f).Scale();
@@ -33,6 +37,7 @@
             Sprite.Add("run", new Animation(3, 16, 16, 16, 0.1f));
             Sprite.Add("skid", new Animation(1, 16, 16, 32, 1f));
             Sprite.Add("jump", new Animation(1, 16, 16, 48, 1f));
+            Sprite.Add("death", new Animation(1, 16, 16, 80, 1f));
         }
 
         protected override void OnSpawn()
@@ -45,11 +50,26 @@
             
         }
 
+        public void Die(bool fallenOff = false)
+        {
+            if (IsDead) return;
+            IsDead = true;
+
+            IsHittable = false;
+            IsCollidable = false;
+            Velocity = Vector2.Zero;
+            Gravity = 0f;
+            Sprite.Play("death");
+        }
+
         public override void Update()
         {
-            HandleMovement();
-            HandleJumping();
-            HandleAnimations();
+            if (!IsDead)
+            {
+                HandleMovement();
+                HandleJumping();
+                HandleAnimations();
+            }
 
             base.Update();
         }
@@ -211,15 +231,28 @@
 
         protected override void OnEntityOverlap(Entity other)
         {
-            if (other is Item item)
-            {
-                HandleItemCollision(item);
-            }
+            if (other is Item item) HandleItemCollision(item);
+            else if (other is Enemy enemy) HandleEnemyCollision(enemy);
         }
 
         private void HandleItemCollision(Item item)
         {
             item.Pickup();
+        }
+
+        private void HandleEnemyCollision(Enemy enemy)
+        {
+            if (enemy.IsStompable
+                && Velocity.Y > 0f
+                && Feet.Y <= enemy.Feet.Y)
+            {
+                enemy.Stomp(this);
+                Velocity.Y = -StompBounce;
+            }
+            else
+            {
+                Die();
+            }
         }
     }
 }

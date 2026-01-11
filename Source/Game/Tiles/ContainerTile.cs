@@ -104,13 +104,18 @@
             }
         }
 
-        private void SpawnItemInside()
+        protected void SpawnItem(ItemType itemType)
         {
-            if (World is null || ItemInside == ItemType.None)
+            if (World is null || itemType == ItemType.None)
                 return;
 
-            Item item = Item.Get(World, ItemInside);
+            Item item = Item.Get(World, itemType);
             World.SpawnEntity(item, new Vector2((Col + 0.5f) * Size, (Row + 1f) * Size));
+        }
+
+        protected void SpawnItemInside()
+        {
+            SpawnItem(ItemInside);
             ItemInside = ItemType.None;
         }
 
