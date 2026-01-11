@@ -19,8 +19,10 @@
 [x] Goomba
 [x] Stomping
 [x] Castle
-[ ] Flagpole
-[ ] Entity hitbox
+[x] Entity activation
+[x] Entity hitbox
+[x] Koopa
 [ ] Player death -> Level reload
-[ ] Koopa
 [ ] Render culling
+[ ] Flagpole
+[ ] Particles

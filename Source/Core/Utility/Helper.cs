@@ -39,5 +39,10 @@
         {
             return CloseTo(val, 0f, threshold);
         }
+
+        public static void Draw(this Rectangle rect, Color color)
+        {
+            Raylib.DrawRectangle((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height, color);
+        }
     }
 }

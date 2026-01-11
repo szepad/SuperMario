@@ -28,7 +28,7 @@
 
         public Player(World world) : base(world)
         {
-            Size = new Vector2(8f, 14f).Scale();
+            Size = HitboxSize = new Vector2(8f, 14f).Scale();
             SpriteOffset = new Vector2(4f, 2f).Scale();
             LayerDepth = LayerDepth.Player;
 
@@ -243,15 +243,25 @@
         private void HandleEnemyCollision(Enemy enemy)
         {
             if (enemy.IsStompable
+                && !enemy.IsStomped
                 && Velocity.Y > 0f
                 && Feet.Y <= enemy.Feet.Y)
             {
                 enemy.Stomp(this);
                 Velocity.Y = -StompBounce;
+                DisableOverlapUntilCollisionLeave(enemy);
             }
             else
             {
-                Die();
+                if (enemy is ShellEnemy shell && shell.State == ShellState.Shell)
+                {
+                    shell.Kick(this);
+                    DisableOverlapUntilCollisionLeave(enemy);
+                }
+                else
+                {
+                    Die();
+                }
             }
         }
     }

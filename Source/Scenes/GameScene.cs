@@ -51,6 +51,7 @@
 
         protected override void OnUpdate()
         {
+            _world.HandleEntityActivation(_camera);
             _world.Update();
 
             const float HalfX = Game.Width / 2f;

@@ -4,7 +4,15 @@
     {
         public Enemy Owner { get; } = owner;
 
-        public virtual void OnSpawn() { }
+        protected bool FirstSet { get; private set; } = true;
+
+        public void Set()
+        {
+            OnSet();
+            FirstSet = false;
+        }
+
+        protected virtual void OnSet() { }
 
         public virtual void OnStomp(Entity stomper) { }
         public virtual void OnDie() { }

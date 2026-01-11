@@ -20,6 +20,7 @@ namespace Mario2
             Player = new Player(this);
             Player.Position.X = 50;
             Entities.Add(Player);
+            Player.Activate();
 
             Tiles = new Tile[Rows, Cols];
             Clear(Tiles);
@@ -106,6 +107,20 @@ namespace Mario2
             return entity;
         }
 
+        public void HandleEntityActivation(Camera2D camera)
+        {
+            foreach (Entity entity in Entities)
+            {
+                if (entity.IsActive)
+                    continue;
+
+                if (entity.Rect.X <= camera.Target.X + camera.Offset.X)
+                {
+                    entity.Activate();
+                }
+            }
+        }
+
         public void Update()
         {
             UpdateEntities();
@@ -116,11 +131,20 @@ namespace Mario2
         {
             for (int i = Entities.Count - 1; i >= 0; i--)
             {
+                if (!Entities[i].IsActive)
+                    continue;
+                
                 Entities[i].Update();
                 if (Entities[i].IsDestroyed)
                 {
                     Entities.RemoveAt(i);
                 }
+            }
+
+            // Handle entity collisions after every entity has moved for the frame
+            foreach (Entity entity in Entities)
+            {
+                entity.HandleEntityCollisions();
             }
         }
 
@@ -156,15 +180,16 @@ namespace Mario2
 
         public void Draw(bool editor = false)
         {
-            Entities.Sort((x, y) => x.LayerDepth.CompareTo(y.LayerDepth));
+            //Entities.Sort((x, y) => x.LayerDepth.CompareTo(y.LayerDepth));
+            List<Entity> drawList = [..Entities.OrderBy(x => x.LayerDepth)];
 
             int lastBg = -1;
-            for (int i = 0; i < Entities.Count; i++)
+            for (int i = 0; i < drawList.Count; i++)
             {
-                Entity entity = Entities[i];
+                Entity entity = drawList[i];
                 if (entity.LayerDepth == LayerDepth.Background)
                 {
-                    Entities[i].Draw();
+                    drawList[i].Draw();
                     lastBg = i;
                 }
                 else
@@ -175,9 +200,9 @@ namespace Mario2
 
             DrawTiles(editor);
 
-            for (int i = lastBg + 1; i < Entities.Count; i++)
+            for (int i = lastBg + 1; i < drawList.Count; i++)
             {
-                Entities[i].Draw();
+                drawList[i].Draw();
             }
         }
 

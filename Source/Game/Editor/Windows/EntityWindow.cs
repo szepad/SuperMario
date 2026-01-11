@@ -7,6 +7,7 @@
         [
             EntityObjectDefs.Player,
             EntityObjectDefs.Goomba,
+            EntityObjectDefs.Koopa,
         ];
 
         public override void Update()

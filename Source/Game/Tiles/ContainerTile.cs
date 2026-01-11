@@ -133,7 +133,7 @@
 
                 if (Raylib.CheckCollisionRecs(entity.Rect, bounceRect))
                 {
-                    entity.OnTileBounceHit(bouncer, this);
+                    entity.TileBounceHit(bouncer, this);
                 }
             }
         }
