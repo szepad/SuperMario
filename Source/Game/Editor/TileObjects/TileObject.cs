@@ -27,6 +27,40 @@
             new PrefabActionRecurse(1, 1, new SimpleTile(33, true), 0, 1),
         ]);
 
+        public static readonly PrefabTile CastleSmall = new(false, 1, 6,
+        [
+            new PrefabAction(1, 0, new SimpleTile(49, false), OnlyOnAir: false),
+            new PrefabAction(2, 0, new SimpleTile(50, false), OnlyOnAir: false),
+            new PrefabAction(3, 0, new SimpleTile(51, false), OnlyOnAir: false),
+            new PrefabAction(4, 0, new SimpleTile(52, false), OnlyOnAir: false),
+
+            new PrefabAction(1, 1, new SimpleTile(49 + 8, false), OnlyOnAir: false),
+            new PrefabAction(2, 1, new SimpleTile(50 + 8, false), OnlyOnAir: false),
+            new PrefabAction(3, 1, new SimpleTile(51 + 8, false), OnlyOnAir: false),
+            new PrefabAction(4, 1, new SimpleTile(52 + 8, false), OnlyOnAir: false),
+
+            new PrefabAction(0, 2, new SimpleTile(48 + 16, false), OnlyOnAir: false),
+            new PrefabAction(1, 2, new SimpleTile(49 + 16, false), OnlyOnAir: false),
+            new PrefabAction(2, 2, new SimpleTile(50 + 16, false), OnlyOnAir: false),
+            new PrefabAction(3, 2, new SimpleTile(51 + 16, false), OnlyOnAir: false),
+            new PrefabAction(4, 2, new SimpleTile(52 + 16, false), OnlyOnAir: false),
+            new PrefabAction(5, 2, new SimpleTile(53 + 16, false), OnlyOnAir: false),
+
+            new PrefabAction(0, 3, new SimpleTile(48 + 24, false), OnlyOnAir: false),
+            new PrefabAction(1, 3, new SimpleTile(49 + 24, false), OnlyOnAir: false),
+            new PrefabAction(2, 3, new SimpleTile(50 + 24, false), OnlyOnAir: false),
+            new PrefabAction(3, 3, new SimpleTile(51 + 24, false), OnlyOnAir: false),
+            new PrefabAction(4, 3, new SimpleTile(52 + 24, false), OnlyOnAir: false),
+            new PrefabAction(5, 3, new SimpleTile(53 + 24, false), OnlyOnAir: false),
+
+            new PrefabAction(0, 4, new SimpleTile(48 + 32, false), OnlyOnAir: false),
+            new PrefabAction(1, 4, new SimpleTile(49 + 32, false), OnlyOnAir: false),
+            new PrefabAction(2, 4, new SimpleTile(50 + 32, false), OnlyOnAir: false),
+            new PrefabAction(3, 4, new SimpleTile(51 + 32, false), OnlyOnAir: false),
+            new PrefabAction(4, 4, new SimpleTile(52 + 32, false), OnlyOnAir: false),
+            new PrefabAction(5, 4, new SimpleTile(53 + 32, false), OnlyOnAir: false),
+        ]);
+
         // 0bNESW = Id
         public static readonly RuleTile Grass = new(true, 3, 0, new()
         {

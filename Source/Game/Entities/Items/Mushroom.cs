@@ -21,11 +21,6 @@
             Velocity.X = MoveSpeed;
         }
 
-        protected override void OnDestroy()
-        {
-            
-        }
-
         public override void Update()
         {
             base.Update();

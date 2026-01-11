@@ -12,8 +12,15 @@
 [x] Entity tile bounce hit
 [x] Coin tile bounce hit
 [x] OneUp
-[ ] FireFlower
-[ ] Star
-[ ] Coin Stash
-[ ] Goomba
+[x] FireFlower
+[x] Star
+[x] Coin Stash
+[x] Enemy Api
+[x] Goomba
+[x] Stomping
+[x] Castle
+[ ] Flagpole
+[ ] Entity hitbox
+[ ] Player death -> Level reload
 [ ] Koopa
+[ ] Render culling

@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Mario2.Editor
+﻿namespace Mario2.Editor
 {
     public class WorldWindow : EditorWindow
     {
@@ -15,6 +13,10 @@ namespace Mario2.Editor
         private (int X, int Y) _tilePos;
 
         private bool _firstRender = true;
+
+        // After deleting an entity, disable right click, so we don't also delete tiles behind it
+        private bool _disableRightClickTemporarily;
+        private bool _disableLeftClickTemporarily;
 
         public WorldWindow(EditorScene editor)
             : base(editor, "Editor")
@@ -95,12 +97,13 @@ namespace Mario2.Editor
                 return;
 
             (int tx, int ty) = _tilePos;
+            Entity? entityUnderMouse = GetEntityUnderMouse();
 
-            if (Raylib.IsMouseButtonDown(MouseButton.Left))
+            if (Raylib.IsMouseButtonDown(MouseButton.Left) && !_disableLeftClickTemporarily)
             {
                 if (Editor.ActiveSelector is TileWindow tileWindow)
                 {
-                    Tile? tile = Editor.World.SetTile(tx, ty, tileWindow.GetSelected(Editor.World, tx, ty));
+                    Tile? tile = Editor.World.SetTile(tx, ty, tileWindow.PlaceSelected(Editor.World, tx, ty));
                     if (tile is ContainerTile ct)
                     {
                         ct.SetItem(Editor.PropertyWindow.ContainerTileItem);
@@ -113,25 +116,65 @@ namespace Mario2.Editor
                 }
                 else if (Editor.ActiveSelector is EntityWindow entityWindow)
                 {
-                    Entity entity = entityWindow.GetSelected(Editor.World, tx, ty);
-                    if (entity is Player player)
+                    if (entityUnderMouse is null)
                     {
-                        Editor.World.Player.SetPosition(player.Position);
-                    }
-                    else
-                    {
-                        // TODO: Place entity
+                        Entity entity = entityWindow.PlaceSelected(Editor.World, tx, ty);
+                        Vector2 worldPos = ScreenToWorld(GetMousePositionInsideEditor());
+                        Vector2 tilePos = worldPos / Tile.Size;
+                        float xFrac = tilePos.X - (int)tilePos.X;
+                        float xOff = 0.5f;
+                        if (xFrac < 1f / 4f)
+                        {
+                            xOff = 0f;
+                        }
+                        else if (xFrac > 3f / 4f)
+                        {
+                            xOff = 1f;
+                        }
+
+                        Vector2 pos = new(
+                            ((int)tilePos.X + xOff) * Tile.Size,
+                            ((int)tilePos.Y + 1f) * Tile.Size);
+
+                        if (entity is Player)
+                        {
+                            Editor.World.Player.SetFeetPos(pos);
+                        }
+                        else
+                        {
+                            Editor.World.SpawnEntity(entity, pos);
+                        }
+
+                        _disableLeftClickTemporarily = true;
                     }
                 }
 
                 Editor.Dirty();
             }
 
-            if (Raylib.IsMouseButtonDown(MouseButton.Right))
+            if (Raylib.IsMouseButtonDown(MouseButton.Right) && !_disableRightClickTemporarily)
             {
-                Editor.World.SetTile(tx, ty, SimpleTile.Air);
-                UpdateRule(Editor.World, tx, ty);
-                Editor.Dirty();
+                if (entityUnderMouse is null)
+                {
+                    Editor.World.SetTile(tx, ty, SimpleTile.Air);
+                    UpdateRule(Editor.World, tx, ty);
+                    Editor.Dirty();
+                }
+                else
+                {
+                    Editor.World.Entities.Remove(entityUnderMouse);
+                    _disableRightClickTemporarily = true;
+                }
+            }
+
+            if (Raylib.IsMouseButtonUp(MouseButton.Left))
+            {
+                _disableLeftClickTemporarily = false;
+            }
+            
+            if (Raylib.IsMouseButtonUp(MouseButton.Right))
+            {
+                _disableRightClickTemporarily = false;
             }
         }
 
@@ -146,7 +189,7 @@ namespace Mario2.Editor
                         continue;
 
                     bool assigned = false;
-                    foreach (TileObject selectable in Editor.TileWindow.Selectables)
+                    foreach (ISelectableObject<Tile> selectable in Editor.TileWindow.Selectables)
                     {
                         if (selectable is RuleTile ruleTile)
                         {
@@ -194,6 +237,21 @@ namespace Mario2.Editor
             Update(col + 1, row);
             Update(col, row + 1);
             Update(col - 1, row);
+        }
+
+        private Entity? GetEntityUnderMouse()
+        {
+            Vector2 mousePos = ScreenToWorld(GetMousePositionInsideEditor());
+
+            foreach (Entity entity in Editor.World.Entities)
+            {
+                if (Raylib.CheckCollisionPointRec(mousePos, entity.Rect))
+                {
+                    return entity;
+                }
+            }
+
+            return null;
         }
 
         public void RenderWorld()

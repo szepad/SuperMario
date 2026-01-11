@@ -10,7 +10,9 @@
         private float _tileSizeScale = 1f;
         private const int TileSizePx = 16;
 
-        public T GetSelected(World world, int col, int row)
+        public ISelectableObject<T> Selected => Selectables[SelectedIndex];
+
+        public T PlaceSelected(World world, int col, int row)
             => Selectables[SelectedIndex].OnPlace(world, col, row);
 
         protected override void OnRender()

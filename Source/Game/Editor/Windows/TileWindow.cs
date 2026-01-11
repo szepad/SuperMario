@@ -12,6 +12,7 @@
             TileObjectDefs.Pipe,
             TileObjectDefs.GrassDecor,
             TileObjectDefs.Coin,
+            TileObjectDefs.CastleSmall,
         ];
 
         public override void Update()

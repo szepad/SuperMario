@@ -16,6 +16,7 @@
         public Sprite Sprite { get; set; } = new();
 
         public Rectangle Rect => new(Position, Size);
+        public Vector2 Feet => new(Position.X + Size.X / 2f, Position.Y + Size.Y);
 
         public LayerDepth LayerDepth { get; set; } = LayerDepth.Normal;
         public bool IsCollidable { get; set; } = true;
@@ -69,6 +70,11 @@
             HandleEntityCollisions();
 
             Sprite.Update();
+
+            if (Feet.Y > World.FallOffHeight)
+            {
+                Destroy();
+            }
         }
 
         protected void HandleCollisions(bool horizontal)
@@ -165,7 +171,7 @@
 
             foreach (Entity other in World.Entities)
             {
-                if (other == this)
+                if (other == this || !other.IsHittable)
                     continue;
 
                 if (Raylib.CheckCollisionRecs(Rect, other.Rect))
@@ -189,7 +195,7 @@
         public virtual void OnTileBounceHit(Entity bouncer, Tile tile) { }
 
         protected abstract void OnSpawn();
-        protected abstract void OnDestroy();
+        protected virtual void OnDestroy() { }
 
         protected virtual void OnTileCollision(Tile tile, CollisionSide side) { }
         protected virtual void OnTileOverlap(Tile tile) { }

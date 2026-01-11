@@ -6,6 +6,7 @@
         public override List<ISelectableObject<Entity>> Selectables { get; } = 
         [
             EntityObjectDefs.Player,
+            EntityObjectDefs.Goomba,
         ];
 
         public override void Update()

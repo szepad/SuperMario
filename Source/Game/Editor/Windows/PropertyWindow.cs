@@ -87,7 +87,7 @@
             Gui.SeparatorText("Tile");
 
             if (Editor.ActiveSelector is TileWindow tw
-                && tw.GetSelected(Editor.World, 0, 0) is ContainerTile)
+                && (tw.Selected is InstanceTile<QuestionTile> || tw.Selected is InstanceTile<BrickTile>))
             {
                 Gui.Checkbox("Hidden", ref _ctHidden);
 
