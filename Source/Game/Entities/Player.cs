@@ -107,7 +107,6 @@
                 _jumpBuffer = JumpBufferTime;
             }
 
-
             if (IsGrounded)
             {
                 _coyoteTimer = CoyoteTime;
@@ -189,6 +188,16 @@
                 {
                     ct.OnHit(this);
                 }
+
+                //// Check the tile to the right as well
+                //// (beacuse tiles are processed from left to right
+                //// so if you hit the middle of 2 tiles, only the left will be bumped)
+                //if (Rect.X + Rect.Width >= (tile.Col + 1) * Tile.Size
+                //    && World.GetTile(tile.Col + 1, tile.Row, out Tile other)
+                //    && other is ContainerTile otherCt)
+                //{
+                //    otherCt.OnHit(this);
+                //}
             }
         }
 
@@ -198,6 +207,19 @@
             {
                 tile.Destroy();
             }
+        }
+
+        protected override void OnEntityOverlap(Entity other)
+        {
+            if (other is Item item)
+            {
+                HandleItemCollision(item);
+            }
+        }
+
+        private void HandleItemCollision(Item item)
+        {
+            item.Pickup();
         }
     }
 }

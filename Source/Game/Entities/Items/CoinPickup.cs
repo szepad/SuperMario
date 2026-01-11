@@ -8,9 +8,10 @@
 
         private bool _isExploded;
 
-        public CoinPickup(World world) : base(world)
+        public CoinPickup(World world) : base(world, slowAppear: false)
         {
             IsCollidable = false;
+            IsHittable = false;
             Size = new Vector2(10f, 14f).Scale();
             SpriteOffset = new Vector2(5f, 0f).Scale();
 
