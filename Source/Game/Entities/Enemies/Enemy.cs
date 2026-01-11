@@ -4,12 +4,12 @@
     {
         public bool IsStompable { get; set; } = true;
         public bool KillableWithTileBounce { get; set; } = true;
-        public EnemyAi Ai { get; set; }
+        public EnemyAi Ai { get; private set; }
 
         public bool IsDead { get; private set; }
         public bool IsStomped { get; private set; }
 
-        private const float DieBounceForce = 120f * Game.TextureScale;
+        protected const float DieBounceForce = 120f * Game.TextureScale;
 
         public Enemy(World world) : base(world)
         {
@@ -18,7 +18,13 @@
 
         protected override void OnSpawn()
         {
-            Ai.OnSpawn();
+            Ai.Set();
+        }
+
+        public void SetAi(EnemyAi ai)
+        {
+            Ai = ai;
+            Ai.Set();
         }
 
         public void Stomp(Entity stomper)
@@ -28,6 +34,11 @@
 
             OnStomp(stomper);
             Ai.OnStomp(stomper);
+        }
+
+        public void ResetStomped()
+        {
+            IsStomped = false;
         }
 
         public void Die()
@@ -44,20 +55,24 @@
             Ai.OnDie();
         }
 
-        public override void OnTileBounceHit(Entity bouncer, Tile tile)
+        public override void TileBounceHit(Entity bouncer, Tile tile)
         {
             if (KillableWithTileBounce)
             {
-                if (Position.X + Size.X / 2f < (tile.Col + 0.5f) * Tile.Size)
-                {
-                    Velocity.X = -MathF.Abs(Velocity.X);
-                }
-                else
-                {
-                    Velocity.X = MathF.Abs(Velocity.X);
-                }
-
+                FlipVelocityBasedOnTileBounce(tile);
                 Die();
+            }
+        }
+
+        protected void FlipVelocityBasedOnTileBounce(Tile tile)
+        {
+            if (Position.X + Size.X / 2f < (tile.Col + 0.5f) * Tile.Size)
+            {
+                Velocity.X = -MathF.Abs(Velocity.X);
+            }
+            else
+            {
+                Velocity.X = MathF.Abs(Velocity.X);
             }
         }
 
@@ -65,6 +80,12 @@
         {
             Ai.Update();
             base.Update();
+        }
+
+        protected void FlipTowardsVelocity()
+        {
+            if ((Velocity.X > 0f && !Sprite.FlipX) || (Velocity.X < 0f && Sprite.FlipX))
+                Sprite.FlipX = !Sprite.FlipX;
         }
 
         protected virtual void OnStomp(Entity stomper) { }

@@ -142,6 +142,14 @@ namespace Mario2
                 _loadLayout = false;
             }
 
+            foreach (Entity entity in World.Entities)
+            {
+                if (!entity.IsActive)
+                {
+                    entity.Activate();
+                }
+            }
+
             World.UpdateParallax(new Camera2D(Vector2.Zero, Vector2.Zero, 0f, 1f));
             foreach (EditorWindow window in _windowRenderQueue)
             {

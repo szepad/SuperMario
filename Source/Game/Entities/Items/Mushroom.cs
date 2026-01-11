@@ -7,7 +7,7 @@
 
         public Mushroom(World world) : base(world)
         {
-            Size = new Vector2(16f, 16f).Scale();
+            Size = HitboxSize = new Vector2(16f, 16f).Scale();
             Sprite.Add("mushroom", new Animation(1, 16, 16, 16, 0.1f));
         }
 
@@ -38,7 +38,7 @@
             }
         }
 
-        public override void OnTileBounceHit(Entity bouncer, Tile tile)
+        public override void TileBounceHit(Entity bouncer, Tile tile)
         {
             Velocity.Y = -TileBounceForce;
             if (Position.X + Size.X / 2f < (tile.Col + 0.5f) * Tile.Size)

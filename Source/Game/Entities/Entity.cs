@@ -9,6 +9,8 @@
         public Vector2 Velocity;
         public Vector2 Size;
         public Vector2 SpriteOffset;
+        public Vector2 HitboxSize;
+        public Vector2 HitboxOffset;
 
         public const float DefaultGravity = 650f * Game.TextureScale;
         public float Gravity { get; set; } = DefaultGravity;
@@ -16,6 +18,7 @@
         public Sprite Sprite { get; set; } = new();
 
         public Rectangle Rect => new(Position, Size);
+        public Rectangle Hitbox => new(Position + HitboxOffset, HitboxSize);
         public Vector2 Feet => new(Position.X + Size.X / 2f, Position.Y + Size.Y);
 
         public LayerDepth LayerDepth { get; set; } = LayerDepth.Normal;
@@ -24,6 +27,7 @@
         public bool IsGrounded { get; private set; }
         public bool IsSpawned { get; private set; }
         public bool IsDestroyed { get; private set; }
+        public bool IsActive { get; private set; }
 
         public void SetPosition(float x, float y) => SetPosition(new Vector2(x, y));
         public void SetPosition(Vector2 pos)
@@ -40,22 +44,30 @@
             );
         }
 
+        private readonly List<Entity> _overlapDisabled = [];
+
         public void Spawn()
         {
-            if (IsSpawned)
-                return;
-
+            if (IsSpawned) return;
             IsSpawned = true;
+
             OnSpawn();
         }
 
         public void Destroy()
         {
-            if (IsDestroyed)
-                return;
-
+            if (IsDestroyed) return;
             IsDestroyed = true;
+
             OnDestroy();
+        }
+
+        public void Activate()
+        {
+            if (IsActive) return;
+            IsActive = true;
+
+            OnActivate();
         }
 
         public virtual void Update()
@@ -67,7 +79,6 @@
             HandleCollisions(horizontal: true);
             Position.Y += Velocity.Y * Time.DeltaTime;
             HandleCollisions(horizontal: false);
-            HandleEntityCollisions();
 
             Sprite.Update();
 
@@ -164,37 +175,61 @@
             }
         }
 
-        protected void HandleEntityCollisions()
+        public void HandleEntityCollisions()
         {
             if (!IsHittable)
                 return;
 
             foreach (Entity other in World.Entities)
             {
-                if (other == this || !other.IsHittable)
+                if (other == this || !other.IsActive)
                     continue;
 
-                if (Raylib.CheckCollisionRecs(Rect, other.Rect))
+                bool disabled = _overlapDisabled.Contains(other);
+
+                if (Raylib.CheckCollisionRecs(Hitbox, other.Hitbox))
                 {
-                    OnEntityOverlap(other);
+                    if (other.IsHittable && !disabled)
+                    {
+                        OnEntityOverlap(other);
+                    }
+                }
+                else
+                {
+                    if (disabled)
+                    {
+                        _overlapDisabled.Remove(other);
+                    }
                 }
             }
         }
 
         public virtual void Draw()
         {
+            if (!IsActive)
+                return;
+
             Sprite.Draw(Position - SpriteOffset);
 
             if (Game.Instance.IsDevModeOn)
             {
-                Raylib.DrawRectangle((int)Rect.X, (int)Rect.Y,
-                    (int)Rect.Width, (int)Rect.Height, new Color(255, 255, 0, 128));
+                Rect.Draw(new Color(0, 255, 0, 128));
+                Hitbox.Draw(new Color(255, 0, 0, 128));
             }
         }
 
-        public virtual void OnTileBounceHit(Entity bouncer, Tile tile) { }
+        public void DisableOverlapUntilCollisionLeave(Entity entity)
+        {
+            if (!_overlapDisabled.Contains(entity))
+            {
+                _overlapDisabled.Add(entity);
+            }
+        }
+
+        public virtual void TileBounceHit(Entity bouncer, Tile tile) { }
 
         protected abstract void OnSpawn();
+        protected virtual void OnActivate() { }
         protected virtual void OnDestroy() { }
 
         protected virtual void OnTileCollision(Tile tile, CollisionSide side) { }
