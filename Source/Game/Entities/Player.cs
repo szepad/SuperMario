@@ -1,8 +1,18 @@
 ﻿namespace Mario2
 {
+    public enum PlayerState
+    {
+        Small,
+        Big,
+        Fire
+    }
+
     public class Player : Entity
     {
         public bool IsDead { get; private set; }
+        public PlayerState State { get; private set; } = PlayerState.Small;
+
+        public bool IsInvincible => _iFrameTimer > 0f;
 
         private const float MaxWalkSpeed = 93.6f * Game.TextureScale;
         private const float MaxRunSpeed = 153.6f * Game.TextureScale;
@@ -26,18 +36,31 @@
 
         private const float StompBounce = 160f * Game.TextureScale;
 
+        private const float IFrames = 3.5f;
+        private float _iFrameTimer;
+
+        private bool _isCrouching;
+
         public Player(World world) : base(world)
         {
-            Size = HitboxSize = new Vector2(8f, 14f).Scale();
-            SpriteOffset = new Vector2(4f, 2f).Scale();
+            SetSmallStateVars();
             LayerDepth = LayerDepth.Player;
 
             Sprite.SetSheet("mario");
-            Sprite.Add("idle", new Animation(1, 16, 16, 0, 1f));
-            Sprite.Add("run", new Animation(3, 16, 16, 16, 0.1f));
-            Sprite.Add("skid", new Animation(1, 16, 16, 32, 1f));
-            Sprite.Add("jump", new Animation(1, 16, 16, 48, 1f));
-            Sprite.Add("death", new Animation(1, 16, 16, 80, 1f));
+            Sprite.Add("idle_small", new Animation(1, 16, 16, 0, 1f));
+            Sprite.Add("run_small", new Animation(3, 16, 16, 16, 0.1f));
+            Sprite.Add("skid_small", new Animation(1, 16, 16, 32, 1f));
+            Sprite.Add("jump_small", new Animation(1, 16, 16, 48, 1f));
+            Sprite.Add("death_small", new Animation(1, 16, 16, 80, 1f));
+
+            // Big
+            Sprite.Add("grow_big", new Animation(2, 24, 32, 128, 0.1f));
+            Sprite.Add("idle_big", new Animation(1, 24, 32, 128 + 32, 1f));
+            Sprite.Add("run_big", new Animation(3, 24, 32, 128 + 32 * 2, 0.1f));
+            Sprite.Add("skid_big", new Animation(1, 24, 32, 128 + 32 * 3, 1f));
+            Sprite.Add("jump_big", new Animation(1, 24, 32, 128 + 32 * 4, 1f));
+            Sprite.Add("crouch_big", new Animation(1, 24, 32, 128 + 32 * 5, 1f));
+            Sprite.Add("fireball_big", new Animation(1, 24, 32, 128 + 32 * 6, 1f));
         }
 
         protected override void OnSpawn()
@@ -50,7 +73,22 @@
             
         }
 
-        public void Die(bool fallenOff = false)
+        public void TakeDamage()
+        {
+            if (IsInvincible)
+                return;
+
+            if (State == PlayerState.Small)
+            {
+                Die();
+            }
+            else
+            {
+                Shrink();
+            }
+        }
+
+        private void Die()
         {
             if (IsDead) return;
             IsDead = true;
@@ -62,6 +100,118 @@
             Sprite.Play("death");
         }
 
+        private void SetSmallStateVars()
+        {
+            Vector2 prevSize = Size;
+            Size = HitboxSize = new Vector2(8f, 14f).Scale();
+            SpriteOffset = new Vector2(4f, 2f).Scale();
+            SetPosition(Position.X + (prevSize.X - Size.X) / 2f, Position.Y + prevSize.Y - Size.Y);
+        }
+
+        private void SetBigStateVarsX()
+        {
+            float prevSize = Size.X;
+            Size.X = HitboxSize.X = 12f * Game.TextureScale;
+            SpriteOffset.X = 6f * Game.TextureScale;
+            OldPosition.X = Position.X = Position.X - (Size.X - prevSize) / 2f;
+        }
+
+        private void SetBigStateVarsY()
+        {
+            float prevSize = Size.Y;
+            Size.Y = HitboxSize.Y = 28f * Game.TextureScale;
+            SpriteOffset.Y = 3f * Game.TextureScale;
+            OldPosition.Y = Position.Y = Position.Y - Size.Y + prevSize;
+        }
+
+        private void Grow()
+        {
+            if (State != PlayerState.Small) return;
+            State = PlayerState.Big;
+
+            SetBigStateVarsX();
+            EnumerateCollisionTiles(GetTilesForCollisionCheck(), (tile, tileRect) =>
+            {
+                if (tile.IsCollidable)
+                {
+                    if (Position.X + Size.X > tileRect.X + tileRect.Width) // Inside to the left
+                    {
+                        OldPosition.X = Position.X = tileRect.X + tileRect.Width;
+                    }
+                    else if (Position.X < tileRect.X) // Inside to the right
+                    {
+                        OldPosition.X = Position.X = tileRect.X - Size.X;
+                    }
+                }
+            });
+
+            SetBigStateVarsY();
+            EnumerateCollisionTiles(GetTilesForCollisionCheck(), (tile, tileRect) =>
+            {
+                if (tile.IsCollidable)
+                {
+                    Crouch(force: true);
+                }
+            });
+
+            // Grow is usually called after update, but before draw, so call animation
+            // management again to prevent a bugged animation showing for 1 frame
+            HandleAnimations();
+        }
+
+        private void Shrink()
+        {
+            if (State == PlayerState.Small) return;
+            State = PlayerState.Small;
+            ForceStandUp();
+            SetSmallStateVars();
+            _iFrameTimer = IFrames;
+        }
+
+        private void Crouch(bool force = false)
+        {
+            if ((_isCrouching || !IsGrounded) && !force) return;
+            _isCrouching = true;
+
+            Size.Y /= 2f;
+            HitboxSize.Y /= 2f;
+            SpriteOffset.Y += Size.Y;
+            Position.Y += Size.Y;
+        }
+
+        private void TryStandUp()
+        {
+            if (!_isCrouching)
+                return;
+
+            ForceStandUp();
+
+            bool insideTile = false;
+            EnumerateCollisionTiles(GetTilesForCollisionCheck(), (tile, tileRect) =>
+            {
+                if (tile.IsCollidable)
+                {
+                    insideTile = true;
+                }
+            });
+
+            if (insideTile)
+            {
+                Crouch(force: true);
+            }
+        }
+
+        private void ForceStandUp()
+        {
+            if (!_isCrouching) return;
+            _isCrouching = false;
+
+            SpriteOffset.Y -= Size.Y;
+            Position.Y -= Size.Y;
+            Size.Y *= 2f;
+            HitboxSize.Y *= 2f;
+        }
+
         public override void Update()
         {
             if (!IsDead)
@@ -69,6 +219,8 @@
                 HandleMovement();
                 HandleJumping();
                 HandleAnimations();
+
+                _iFrameTimer -= Time.DeltaTime;
             }
 
             base.Update();
@@ -79,29 +231,42 @@
             bool running = Input.IsKeyDown(KeyboardKey.D);
             float accel = running ? RunAccel : WalkAccel;
 
+            if (State != PlayerState.Small)
+            {
+                if (Input.IsKeyDown(KeyboardKey.Down)) Crouch();
+                else TryStandUp();
+            }
+
             _inputDir = 0f;
             if (Input.IsKeyDown(KeyboardKey.Left)) _inputDir--;
             if (Input.IsKeyDown(KeyboardKey.Right)) _inputDir++;
 
             float stopFriction = IsGrounded ? StopFriction : StopFriction * 0.5f;
 
-            if (Velocity.X >= 0f && _inputDir > 0f)
+            // You should only be able to move if you are not crouching
+            // or you're crouching but are in the air
+            if (!_isCrouching || (_isCrouching && !IsGrounded))
             {
-                Velocity.X += accel * Time.DeltaTime;
+                if (Velocity.X >= 0f && _inputDir > 0f) // Normal walk right
+                {
+                    Velocity.X += accel * Time.DeltaTime;
+                }
+                else if (Velocity.X <= 0f && _inputDir < 0f) // Normal walk left
+                {
+                    Velocity.X -= accel * Time.DeltaTime;
+                }
+                else if (Velocity.X > 0f && _inputDir < 0f) // Skidding right
+                {
+                    Velocity.X -= (stopFriction + SkidFriction) * Time.DeltaTime;
+                }
+                else if (Velocity.X < 0f && _inputDir > 0f) // Skidding left
+                {
+                    Velocity.X += (stopFriction + SkidFriction) * Time.DeltaTime;
+                }
             }
-            else if (Velocity.X <= 0f && _inputDir < 0f)
-            {
-                Velocity.X -= accel * Time.DeltaTime;
-            }
-            else if (Velocity.X > 0f && _inputDir < 0f)
-            {
-                Velocity.X -= (stopFriction + SkidFriction) * Time.DeltaTime;
-            }
-            else if (Velocity.X < 0f && _inputDir > 0f)
-            {
-                Velocity.X += (stopFriction + SkidFriction) * Time.DeltaTime;
-            }
-            else if (Velocity.X != 0f && _inputDir == 0f)
+
+            // Stopping
+            if (Velocity.X != 0f && (_inputDir == 0f || (_isCrouching && IsGrounded)))
             {
                 if (IsGrounded)
                 {
@@ -113,6 +278,7 @@
                 }
             }
 
+            // Cap speed
             Velocity.X = Helper.Clamp(Velocity.X, -MaxRunSpeed, MaxRunSpeed);
             if (!running && MathF.Abs(Velocity.X) > MaxWalkSpeed)
             {
@@ -166,9 +332,15 @@
 
         private void HandleAnimations()
         {
+            if (_isCrouching)
+            {
+                PlayAnim("crouch");
+                return;
+            }
+
             if (!IsGrounded)
             {
-                Sprite.Play("jump");
+                PlayAnim("jump");
                 return;
             }
 
@@ -177,24 +349,42 @@
 
             if (Velocity.X == 0f)
             {
-                Sprite.Play("idle");
+                PlayAnim("idle");
                 return;
             }
             
             if (MathF.Sign(Velocity.X) != MathF.Sign(_inputDir) && _inputDir != 0f)
             {
-                Sprite.Play("skid");
+                PlayAnim("skid");
                 return;
             }
 
-            Sprite.Play("run");
-            if (Sprite.CurrentAnimationName == "run")
+            PlayAnim("run");
+            if (Sprite.CurrentAnimationName.Contains("run"))
             {
                 for (int i = 0; i < Sprite.CurrentAnimation?.FrameTimes.Length; i++)
                 {
                     float t = Helper.Clamp01(MathF.Abs(Velocity.X) / MaxRunSpeed);
                     Sprite.CurrentAnimation.FrameTimes[i] = Raymath.Lerp(0.2f, 0.067f, t);
                 }
+            }
+        }
+
+        private void PlayAnim(string name)
+        {
+            Sprite.Play($"{name}_{(State == PlayerState.Small ? "small" : "big")}");
+        }
+
+        public override void Draw()
+        {
+            if (IsInvincible)
+            {
+                if (_iFrameTimer % 0.2f < 0.1f)
+                    base.Draw();
+            }
+            else
+            {
+                base.Draw();
             }
         }
 
@@ -238,6 +428,10 @@
         private void HandleItemCollision(Item item)
         {
             item.Pickup();
+            if (item is Mushroom && item is not OneUp)
+            {
+                Grow();
+            }
         }
 
         private void HandleEnemyCollision(Enemy enemy)
@@ -260,7 +454,7 @@
                 }
                 else
                 {
-                    Die();
+                    TakeDamage();
                 }
             }
         }
