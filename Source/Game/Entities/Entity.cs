@@ -98,10 +98,60 @@
                 IsGrounded = false;
             }
 
-            Vector2 min = Vector2.Min(OldPosition, Position);
-            Vector2 max = Vector2.Max(OldPosition, Position);
+            List<Tile> tilesToCheck = GetTilesForCollisionCheck();
+            EnumerateCollisionTiles(tilesToCheck, (tile, tileRect) =>
+            {
+                if (tile.IsCollidable)
+                {
+                    if (horizontal)
+                    {
+                        if (Velocity.X < 0f && !tile.CollisionExclude.Contains(CollisionSide.Right))
+                        {
+                            // Left collision
+                            OldPosition.X = Position.X = tileRect.X + tileRect.Width;
+                            Velocity.X = 0f;
+                            OnTileCollision(tile, CollisionSide.Left);
+                        }
+                        else if (Velocity.X > 0f && !tile.CollisionExclude.Contains(CollisionSide.Left))
+                        {
+                            // Right collision
+                            OldPosition.X = Position.X = tileRect.X - Rect.Width;
+                            Velocity.X = 0f;
+                            OnTileCollision(tile, CollisionSide.Right);
+                        }
+                    }
+                    else
+                    {
+                        if (Velocity.Y < 0f && !tile.CollisionExclude.Contains(CollisionSide.Bottom))
+                        {
+                            // Top collision
+                            OldPosition.Y = Position.Y = tileRect.Y + tileRect.Height;
+                            Velocity.Y = 0f;
+                            OnTileCollision(tile, CollisionSide.Top);
+                        }
+                        else if (Velocity.Y > 0f && !tile.CollisionExclude.Contains(CollisionSide.Top))
+                        {
+                            // Bottom collision
+                            OldPosition.Y = Position.Y = tileRect.Y - Rect.Height;
+                            Velocity.Y = 0f;
+                            IsGrounded = true;
+                            OnTileCollision(tile, CollisionSide.Bottom);
+                        }
+                    }
+                }
+                else
+                {
+                    OnTileOverlap(tile);
+                }
+            });
+        }
+
+        protected List<Tile> GetTilesForCollisionCheck()
+        {
             List<Tile> tilesToCheck = new(capacity: 16);
-            
+            Vector2 min = Vector2.Min(OldPosition, Position);
+            Vector2 max = Vector2.Max(OldPosition, Position) + Size;
+
             for (int y = (int)(min.Y / Tile.Size) - 1; y <= (int)(max.Y / Tile.Size) + 1; y++)
             {
                 for (int x = (int)(min.X / Tile.Size) - 1; x <= (int)(max.X / Tile.Size) + 1; x++)
@@ -115,12 +165,17 @@
             }
 
             Vector2 center = Position + Size / 2f;
-            tilesToCheck.Sort((t1, t2) => 
+            tilesToCheck.Sort((t1, t2) =>
                 Vector2.DistanceSquared(new Vector2(t1.Col + 0.5f, t1.Row + 0.5f) * Tile.Size, center)
                 .CompareTo(Vector2.DistanceSquared(new Vector2(t2.Col + 0.5f, t2.Row + 0.5f) * Tile.Size, center))
                 );
 
-            foreach (Tile tile in tilesToCheck)
+            return tilesToCheck;
+        }
+
+        protected void EnumerateCollisionTiles(List<Tile> tiles, Action<Tile, Rectangle> OnBroadCheck)
+        {
+            foreach (Tile tile in tiles)
             {
                 Rectangle tileRect = new(tile.Col * Tile.Size, tile.Row * Tile.Size, Tile.Size, Tile.Size);
 
@@ -129,48 +184,7 @@
                     && Rect.Y < tileRect.Y + tileRect.Height
                     && Rect.Y + Rect.Height > tileRect.Y)
                 {
-                    if (tile.IsCollidable)
-                    {
-                        if (horizontal)
-                        {
-                            if (Velocity.X < 0f && !tile.CollisionExclude.Contains(CollisionSide.Right))
-                            {
-                                // Left collision
-                                OldPosition.X = Position.X = tileRect.X + tileRect.Width;
-                                Velocity.X = 0f;
-                                OnTileCollision(tile, CollisionSide.Left);
-                            }
-                            else if (Velocity.X > 0f && !tile.CollisionExclude.Contains(CollisionSide.Left))
-                            {
-                                // Right collision
-                                OldPosition.X = Position.X = tileRect.X - Rect.Width;
-                                Velocity.X = 0f;
-                                OnTileCollision(tile, CollisionSide.Right);
-                            }
-                        }
-                        else
-                        {
-                            if (Velocity.Y < 0f && !tile.CollisionExclude.Contains(CollisionSide.Bottom))
-                            {
-                                // Top collision
-                                OldPosition.Y = Position.Y = tileRect.Y + tileRect.Height;
-                                Velocity.Y = 0f;
-                                OnTileCollision(tile, CollisionSide.Top);
-                            }
-                            else if (Velocity.Y > 0f && !tile.CollisionExclude.Contains(CollisionSide.Top))
-                            {
-                                // Bottom collision
-                                OldPosition.Y = Position.Y = tileRect.Y - Rect.Height;
-                                Velocity.Y = 0f;
-                                IsGrounded = true;
-                                OnTileCollision(tile, CollisionSide.Bottom);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        OnTileOverlap(tile);
-                    }
+                    OnBroadCheck(tile, tileRect);
                 }
             }
         }

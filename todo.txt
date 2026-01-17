@@ -22,7 +22,28 @@
 [x] Entity activation
 [x] Entity hitbox
 [x] Koopa
-[ ] Player death -> Level reload
-[ ] Render culling
-[ ] Flagpole
+[x] Big mario
+	[x] State
+	[x] Crouch
+	[x] Grow glitch fix (if size grows inside a tile, handle it)
+[ ] Break bricks
+	[ ] Normal
+	[ ] Crouching under, then standing up
+	[ ] Growing under one (Previous case might handle it, but a frame late...)
+[ ] Level freeze, and grow animation
+[ ] Sounds
 [ ] Particles
+[ ] Fire mario
+[ ] Star mario
+[ ] Player death -> Level reload
+[ ] Cutscenes
+	[ ] Flagpole
+	[ ] Pipe
+	[ ] Level Pipe intro (like 1-2)
+[ ] Render culling
+[ ] Hud
+[ ] Title screen
+[ ] Scores
+	[ ] Normal scores
+	[ ] Koopa shell kill counter 100 -> 1UP (8? kill in a row I think)
+[ ] Luigi
