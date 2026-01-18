@@ -70,6 +70,24 @@
             OnActivate();
         }
 
+        public void ActivateSurrounding(float activateRadius = 40f * Game.TextureScale)
+        {
+            foreach (Entity entity in World.Entities)
+            {
+                if (entity == this || entity.IsActive)
+                    continue;
+
+                Vector2 center = Position + Size / 2f;
+                Vector2 otherCenter = entity.Position + entity.Size / 2f;
+
+                if (Vector2.DistanceSquared(center, otherCenter) < activateRadius * activateRadius)
+                {
+                    entity.Activate();
+                    entity.ActivateSurrounding();
+                }
+            }
+        }
+
         public virtual void Update()
         {
             Velocity.Y += Gravity * Time.DeltaTime;

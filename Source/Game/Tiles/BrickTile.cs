@@ -8,6 +8,7 @@
         {
             Sprite.Play("brick_ow");
             OnlyHitOnce = false;
+            IsBreakable = true;
         }
 
         protected override void OnHitFirstFrame(Entity entity)

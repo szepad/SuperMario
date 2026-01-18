@@ -15,6 +15,9 @@ namespace Mario2
         public Tile[,] Tiles { get; private set; }
         public List<Entity> Entities { get; } = [];
 
+        public bool IsFrozen => _freezeTimer > 0f;
+        private float _freezeTimer;
+
         public World()
         {
             Player = new Player(this);
@@ -107,6 +110,11 @@ namespace Mario2
             return entity;
         }
 
+        public void Freeze(float time)
+        {
+            _freezeTimer = time;
+        }
+
         public void HandleEntityActivation(Camera2D camera)
         {
             foreach (Entity entity in Entities)
@@ -117,13 +125,25 @@ namespace Mario2
                 if (entity.Rect.X <= camera.Target.X + camera.Offset.X)
                 {
                     entity.Activate();
+                    entity.ActivateSurrounding();
                 }
             }
         }
 
         public void Update()
         {
-            UpdateEntities();
+            if (!IsFrozen)
+            {
+                UpdateEntities();
+            }
+            else
+            {
+                Player.UpdateIFrameTimer();
+                Player.Sprite.Update();
+                _freezeTimer -= Time.DeltaTime;
+                RemoveDestroyedEntities();
+            }
+
             UpdateTiles();
         }
 
@@ -135,16 +155,25 @@ namespace Mario2
                     continue;
                 
                 Entities[i].Update();
-                if (Entities[i].IsDestroyed)
-                {
-                    Entities.RemoveAt(i);
-                }
             }
+
+            RemoveDestroyedEntities();
 
             // Handle entity collisions after every entity has moved for the frame
             foreach (Entity entity in Entities)
             {
                 entity.HandleEntityCollisions();
+            }
+        }
+
+        private void RemoveDestroyedEntities()
+        {
+            for (int i = Entities.Count - 1; i >= 0; i--)
+            {
+                if (Entities[i].IsDestroyed)
+                {
+                    Entities.RemoveAt(i);
+                }
             }
         }
 
