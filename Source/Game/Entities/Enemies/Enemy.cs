@@ -61,6 +61,7 @@
             {
                 FlipVelocityBasedOnTileBounce(tile);
                 Die();
+                World.SpawnEffect(Center, EffectData.Hit);
             }
         }
 

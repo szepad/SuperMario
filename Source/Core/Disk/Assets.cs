@@ -9,11 +9,13 @@ namespace Mario2
         private static readonly Dictionary<string, Texture2D> _texByName = [];
         private static readonly Dictionary<string, Sound> _soundsByName = [];
         private static readonly Dictionary<string, byte[]> _musicByName = [];
+        private static readonly Dictionary<string, Shader> _shadersByName = [];
 
         private static Texture2D _placeHolderTex;
 
         private static readonly string[] ImageFormats = [".png"];
         private static readonly string[] SoundFormats = [".wav"];
+        private static readonly string[] ShaderFormats = [".fs"];
         private const string IgnoreFolder = ".ignore";
 
         public static void Load(string root)
@@ -52,6 +54,10 @@ namespace Mario2
                         _soundsByName[name] = Raylib.LoadSound(file);
                     }
                 }
+                else if (ShaderFormats.Contains(ext))
+                {
+                    _shadersByName[name] = Raylib.LoadShader(null, file);
+                }
             }
         }
 
@@ -79,6 +85,15 @@ namespace Mario2
         public static void Unload()
         {
             Raylib.UnloadTexture(_placeHolderTex);
+
+            foreach (Texture2D tex in _texByName.Values)
+                Raylib.UnloadTexture(tex);
+
+            foreach (Sound sound in _soundsByName.Values)
+                Raylib.UnloadSound(sound);
+
+            foreach (Shader shader in _shadersByName.Values)
+                Raylib.UnloadShader(shader);
         }
 
         public static Texture2D GetTex(string name)
@@ -107,6 +122,17 @@ namespace Mario2
             if (!_musicByName.TryGetValue(name, out streamData))
             {
                 Console.WriteLine($"Couldn't retrieve music stream '{name}'");
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool TryGetShader(string name, out Shader shader)
+        {
+            if (!_shadersByName.TryGetValue(name, out shader))
+            {
+                Console.WriteLine($"Couldn't retrieve shader '{name}'");
                 return false;
             }
 

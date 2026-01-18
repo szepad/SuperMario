@@ -55,18 +55,8 @@
 
             HandleEntityBounceHit(entity);
             HandleCoinTileBounceHit();
-
-            if (IsHidden)
-            {
-                Sprite.IsVisible = true;
-                CollisionExclude.Clear();
-            }
-
-            if (IsBreakable && ItemInside == ItemType.None
-                && entity is Player player && player.State != PlayerState.Small)
-            {
-                entity.World.SetTile(Col, Row, SimpleTile.Air);
-            }
+            HandleRevealing();
+            HandleBreaking(entity);
 
             OnHitFirstFrame(entity);
         }
@@ -157,6 +147,30 @@
             {
                 World.SetTile(Col, Row - 1, SimpleTile.Air);
                 World.SpawnEntity(new CoinPickup(World), new Vector2(Col + 0.5f, Row) * Size);
+            }
+        }
+
+        private void HandleRevealing()
+        {
+            if (!IsHidden)
+                return;
+            
+            Sprite.IsVisible = true;
+            CollisionExclude.Clear();
+        }
+
+        private void HandleBreaking(Entity entity)
+        {
+            if (IsBreakable && ItemInside == ItemType.None
+                && entity is Player player && player.State != PlayerState.Small)
+            {
+                entity.World.SetTile(Col, Row, SimpleTile.Air);
+
+                Vector2 center = new Vector2(Col + 0.5f, Row + 0.5f) * Size;
+                entity.World.SpawnEffect(center, new Vector2(-25f, -121f).Scale() * 1.75f, EffectData.Brick);
+                entity.World.SpawnEffect(center, new Vector2(-33f, -175f).Scale() * 1.75f, EffectData.Brick);
+                entity.World.SpawnEffect(center, new Vector2(25f, -121f).Scale() * 1.75f, EffectData.Brick);
+                entity.World.SpawnEffect(center, new Vector2(33f, -175f).Scale() * 1.75f, EffectData.Brick);
             }
         }
     }

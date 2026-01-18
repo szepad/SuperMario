@@ -9,7 +9,7 @@
         {
             Size = HitboxSize = new Vector2(14f, 14f).Scale();
             SpriteOffset = new Vector2(1f).Scale();
-            Sprite.Add("star", new Animation(4, 16, 16, 64, 0.1f));
+            Sprite.Add("star", new Animation(4, 16, 16, 64, 0.035f));
         }
 
         protected override void OnSpawn()

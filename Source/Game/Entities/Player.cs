@@ -7,6 +7,15 @@
         Fire
     }
 
+    public enum PlayerPalette
+    {
+        Normal,
+        Fire,
+        Star1,
+        Star2,
+        Star3
+    }
+
     public class Player : Entity
     {
         public bool IsDead { get; private set; }
@@ -43,6 +52,21 @@
 
         private bool _shrinkOnNextUpdate;
 
+        private bool _isSkidding;
+        private float _skidEffectTimer;
+        private const float SkidEffectTime = 0.075f;
+
+        private readonly Shader _paletteShader;
+        private readonly int _paletteSamplerLoc;
+        private Texture2D _palette;
+
+        private bool _useStarVisuals;
+        private int _starPaletteIndex = 0;
+        private float _starPaletteSwapTimer;
+        private const float StarPaletteSwapTime = 0.035f;
+
+        private bool _endFireAcquireOnNextUpdate;
+
         public Player(World world) : base(world)
         {
             SetSmallStateVars();
@@ -63,6 +87,10 @@
             Sprite.Add("jump_big", new Animation(1, 24, 32, 128 + 32 * 4, 1f));
             Sprite.Add("crouch_big", new Animation(1, 24, 32, 128 + 32 * 5, 1f));
             Sprite.Add("fireball_big", new Animation(1, 24, 32, 128 + 32 * 6, 1f));
+
+            Assets.TryGetShader("palette", out _paletteShader);
+            _paletteSamplerLoc = Raylib.GetShaderLocation(_paletteShader, "palette");
+            _palette = Assets.GetTex("palette_mario");
         }
 
         protected override void OnSpawn()
@@ -166,6 +194,41 @@
             HandleAnimations();
         }
 
+        private void AcquireFire()
+        {
+            if (State == PlayerState.Fire)
+                return;
+
+            if (State == PlayerState.Small)
+            {
+                Grow();
+                return;
+            }
+
+            State = PlayerState.Fire;
+            World.Freeze(1f);
+            _useStarVisuals = true;
+            _endFireAcquireOnNextUpdate = true;
+        }
+
+        private void EndFireAcquire()
+        {
+            _useStarVisuals = false;
+            ChangePalette(PlayerPalette.Fire);
+        }
+
+        private void ChangePalette(PlayerPalette palette)
+        {
+            _palette = palette switch
+            {
+                PlayerPalette.Fire => Assets.GetTex("palette_mario_fire"),
+                PlayerPalette.Star1 => Assets.GetTex("palette_star_1"),
+                PlayerPalette.Star2 => Assets.GetTex("palette_star_2"),
+                PlayerPalette.Star3 => Assets.GetTex("palette_star_3"),
+                _ => Assets.GetTex("palette_mario")
+            };
+        }
+
         private void Shrink()
         {
             if (_shrinkOnNextUpdate) return;
@@ -174,6 +237,7 @@
             _iFrameTimer = IFrames;
             World.Freeze(1f);
             Sprite.Play("grow");
+            ChangePalette(PlayerPalette.Normal);
         }
 
         private void DoShrinkLogic()
@@ -230,25 +294,37 @@
 
         public override void Update()
         {
-            if (_shrinkOnNextUpdate && !World.IsFrozen)
+            _isSkidding = false;
+
+            HandleStateChangeCallbacks();
+
+            if (!IsDead)
+            {
+                HandleMovement();
+                HandleJumping();
+                UpdateVisualLogic();
+                HandleAnimations();
+            }
+
+            base.Update();
+        }
+
+        private void HandleStateChangeCallbacks()
+        {
+            if (World.IsFrozen)
+                return;
+
+            if (_shrinkOnNextUpdate)
             {
                 DoShrinkLogic();
                 _shrinkOnNextUpdate = false;
             }
 
-            if (!IsDead)
+            if (_endFireAcquireOnNextUpdate)
             {
-                if (!World.IsFrozen)
-                {
-                    HandleMovement();
-                    HandleJumping();
-                }
-
-                UpdateIFrameTimer();
-                HandleAnimations();
+                EndFireAcquire();
+                _endFireAcquireOnNextUpdate = false;
             }
-
-            base.Update();
         }
 
         private void HandleMovement()
@@ -283,10 +359,12 @@
                 else if (Velocity.X > 0f && _inputDir < 0f) // Skidding right
                 {
                     Velocity.X -= (stopFriction + SkidFriction) * Time.DeltaTime;
+                    _isSkidding = IsGrounded;
                 }
                 else if (Velocity.X < 0f && _inputDir > 0f) // Skidding left
                 {
                     Velocity.X += (stopFriction + SkidFriction) * Time.DeltaTime;
+                    _isSkidding = IsGrounded;
                 }
             }
 
@@ -308,6 +386,24 @@
             if (!running && MathF.Abs(Velocity.X) > MaxWalkSpeed)
             {
                 Velocity.X -= MathF.Sign(Velocity.X) * StopFriction * Time.DeltaTime;
+            }
+
+            HandleSkidEffect();
+        }
+
+        private void HandleSkidEffect()
+        {
+            if (!_isSkidding)
+            {
+                _skidEffectTimer = 0f;
+                return;
+            }
+
+            _skidEffectTimer -= Time.DeltaTime;
+            if (_skidEffectTimer <= 0f && MathF.Abs(Velocity.X) >= 32f * Game.TextureScale)
+            {
+                _skidEffectTimer = SkidEffectTime;
+                World.SpawnEffect(Feet, EffectData.Skid);
             }
         }
 
@@ -355,9 +451,25 @@
             _isJumping = false;
         }
 
-        public void UpdateIFrameTimer()
+        public void UpdateVisualLogic()
         {
             _iFrameTimer -= Time.DeltaTime;
+            
+            if (_useStarVisuals)
+            {
+                _starPaletteSwapTimer -= Time.DeltaTime;
+                if (_starPaletteSwapTimer <= 0f)
+                {
+                    _starPaletteSwapTimer = StarPaletteSwapTime;
+                    _starPaletteIndex++;
+                    if (_starPaletteIndex >= 3)
+                    {
+                        _starPaletteIndex = 0;
+                    }
+
+                    ChangePalette((PlayerPalette)Enum.Parse(typeof(PlayerPalette), $"Star{_starPaletteIndex + 1}"));
+                }
+            }
         }
 
         private void HandleAnimations()
@@ -410,6 +522,9 @@
 
         public override void Draw()
         {
+            Raylib.SetShaderValueTexture(_paletteShader, _paletteSamplerLoc, _palette);
+            Raylib.BeginShaderMode(_paletteShader);
+
             if (IsInvincible)
             {
                 if (_iFrameTimer % 0.2f < 0.1f)
@@ -419,6 +534,8 @@
             {
                 base.Draw();
             }
+
+            Raylib.EndShaderMode();
         }
 
         protected override void OnTileCollision(Tile tile, CollisionSide side)
@@ -454,6 +571,10 @@
             if (item is Mushroom && item is not OneUp)
             {
                 Grow();
+            }
+            else if (item is FireFlower)
+            {
+                AcquireFire();
             }
         }
 

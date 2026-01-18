@@ -19,6 +19,7 @@
 
         public Rectangle Rect => new(Position, Size);
         public Rectangle Hitbox => new(Position + HitboxOffset, HitboxSize);
+        public Vector2 Center => Position + Size / 2f;
         public Vector2 Feet => new(Position.X + Size.X / 2f, Position.Y + Size.Y);
 
         public LayerDepth LayerDepth { get; set; } = LayerDepth.Normal;

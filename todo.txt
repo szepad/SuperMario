@@ -32,21 +32,27 @@
 	[-] Growing under one (Previous case might handle it, but a frame late...)
 [x] Level freeze, and grow animation
 [x] Enemies should activate in groups
-[ ] Particles
-	[ ] Break brick
-	[ ] Skid
-	[ ] Enemy kill with shell/brick from below
-	[ ] Shell kick
+[ ] Effects
+	[x] Skid
+	[x] Enemy kill with shell/brick from below
+	[x] Shell kick
+	[x] Break brick
 	[ ] Fire kill
-[ ] Sounds
+[x] Shaders
+	[x] Shader loading
+	[x] Palette shader
+	[X] Mario palette management
 [ ] Fire mario
 [ ] Star mario
+[ ] Sounds
 [ ] Player death -> Level reload
 [ ] Cutscenes
 	[ ] Flagpole
 	[ ] Pipe
 	[ ] Level Pipe intro (like 1-2)
 [ ] Render culling
+[ ] Camera smooth follow
+[ ] Player shouldn't leave camera boundaries
 [ ] Enemy deactivation
 [ ] Hud
 [ ] Title screen
