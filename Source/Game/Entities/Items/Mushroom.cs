@@ -2,8 +2,8 @@
 {
     public class Mushroom : Item
     {
-        private const float MoveSpeed = 40f * Game.TextureScale;
-        private const float TileBounceForce = 120f * Game.TextureScale;
+        private const float MoveSpeed = 50f * Game.TextureScale;
+        private const float TileBounceForce = 140f * Game.TextureScale;
 
         public Mushroom(World world) : base(world)
         {

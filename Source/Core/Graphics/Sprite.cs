@@ -56,13 +56,18 @@
             if (CurrentAnimationName == name)
                 return;
 
-            if (_anims.TryGetValue(name, out Animation? anim))
-            {
-                CurrentAnimation = anim;
-                CurrentAnimationName = name;
-                CurrentFrame = 0;
-                _frameTimer = 0f;
-            }
+            ForcePlay(name);
+        }
+
+        public void ForcePlay(string name)
+        {
+            if (!_anims.TryGetValue(name, out Animation? anim))
+                return;
+
+            CurrentAnimation = anim;
+            CurrentAnimationName = name;
+            CurrentFrame = 0;
+            _frameTimer = 0f;
         }
 
         public void Update()

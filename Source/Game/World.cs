@@ -18,6 +18,8 @@ namespace Mario2
         public bool IsFrozen => _freezeTimer > 0f;
         private float _freezeTimer;
 
+        private readonly EffectPool _effectPool = new();
+
         public World()
         {
             Player = new Player(this);
@@ -115,6 +117,12 @@ namespace Mario2
             _freezeTimer = time;
         }
 
+        public void SpawnEffect(Vector2 position, EffectData data) => SpawnEffect(position, Vector2.Zero, data);
+        public void SpawnEffect(Vector2 position, Vector2 velocity, EffectData data)
+        {
+            _effectPool.Acquire().Init(position, velocity, data);
+        }
+
         public void HandleEntityActivation(Camera2D camera)
         {
             foreach (Entity entity in Entities)
@@ -138,12 +146,13 @@ namespace Mario2
             }
             else
             {
-                Player.UpdateIFrameTimer();
+                Player.UpdateVisualLogic();
                 Player.Sprite.Update();
                 _freezeTimer -= Time.DeltaTime;
                 RemoveDestroyedEntities();
             }
 
+            _effectPool.Update();
             UpdateTiles();
         }
 
@@ -233,6 +242,8 @@ namespace Mario2
             {
                 drawList[i].Draw();
             }
+
+            _effectPool.Draw();
         }
 
         private void DrawTiles(bool editor)

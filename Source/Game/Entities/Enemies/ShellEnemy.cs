@@ -76,6 +76,9 @@
             Velocity.X = player.Feet.X < Feet.X
                 ? MathF.Abs(Velocity.X)
                 : -MathF.Abs(Velocity.X);
+
+            Vector2 effectPos = Raymath.Vector2Lerp(player.Feet, Position + Size / 2f, 0.5f);
+            player.World.SpawnEffect(effectPos, EffectData.Hit);
         }
 
         public override void TileBounceHit(Entity bouncer, Tile tile)
@@ -88,6 +91,7 @@
             Velocity.X = preserveVelX;
             FlipVelocityBasedOnTileBounce(tile);
             Velocity.Y = -DieBounceForce;
+            _standUpTimer = 0f;
         }
 
         protected override void OnTileCollision(Tile tile, CollisionSide side)
@@ -96,6 +100,14 @@
             {
                 // Landed from tile bounce
                 Velocity.X = 0f;
+            }
+
+            if (State == ShellState.Spin && side != CollisionSide.Top && side != CollisionSide.Bottom)
+            {
+                float dir = 1f;
+                if (side == CollisionSide.Left) dir = -1f;
+
+                World.SpawnEffect(Center + new Vector2(dir * Tile.Size / 2f, 0f), EffectData.Hit);
             }
 
             base.OnTileCollision(tile, side);
@@ -124,7 +136,10 @@
                 if (other is ShellEnemy shell && shell.State == ShellState.Spin)
                 {
                     Die();
+                    World.SpawnEffect(Center, EffectData.Hit);
                 }
+
+                World.SpawnEffect(enemy.Center, EffectData.Hit);
             }
 
             base.OnEntityOverlap(other);
