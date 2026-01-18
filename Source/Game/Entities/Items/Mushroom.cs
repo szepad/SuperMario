@@ -7,7 +7,8 @@
 
         public Mushroom(World world) : base(world)
         {
-            Size = HitboxSize = new Vector2(16f, 16f).Scale();
+            Size = HitboxSize = new Vector2(14f, 14f).Scale();
+            SpriteOffset = new Vector2(1f).Scale();
             Sprite.Add("mushroom", new Animation(1, 16, 16, 16, 0.1f));
         }
 

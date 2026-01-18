@@ -41,6 +41,8 @@
 
         private bool _isCrouching;
 
+        private bool _shrinkOnNextUpdate;
+
         public Player(World world) : base(world)
         {
             SetSmallStateVars();
@@ -54,7 +56,7 @@
             Sprite.Add("death_small", new Animation(1, 16, 16, 80, 1f));
 
             // Big
-            Sprite.Add("grow_big", new Animation(2, 24, 32, 128, 0.1f));
+            Sprite.Add("grow", new Animation(2, 24, 32, 128, 0.1f));
             Sprite.Add("idle_big", new Animation(1, 24, 32, 128 + 32, 1f));
             Sprite.Add("run_big", new Animation(3, 24, 32, 128 + 32 * 2, 0.1f));
             Sprite.Add("skid_big", new Animation(1, 24, 32, 128 + 32 * 3, 1f));
@@ -97,7 +99,9 @@
             IsCollidable = false;
             Velocity = Vector2.Zero;
             Gravity = 0f;
-            Sprite.Play("death");
+            SetSmallStateVars();
+            State = PlayerState.Small;
+            Sprite.Play("death_small");
         }
 
         private void SetSmallStateVars()
@@ -128,6 +132,9 @@
         {
             if (State != PlayerState.Small) return;
             State = PlayerState.Big;
+
+            World.Freeze(1f);
+            Sprite.Play("grow");
 
             SetBigStateVarsX();
             EnumerateCollisionTiles(GetTilesForCollisionCheck(), (tile, tileRect) =>
@@ -161,11 +168,20 @@
 
         private void Shrink()
         {
+            if (_shrinkOnNextUpdate) return;
+            _shrinkOnNextUpdate = true;
+
+            _iFrameTimer = IFrames;
+            World.Freeze(1f);
+            Sprite.Play("grow");
+        }
+
+        private void DoShrinkLogic()
+        {
             if (State == PlayerState.Small) return;
             State = PlayerState.Small;
             ForceStandUp();
             SetSmallStateVars();
-            _iFrameTimer = IFrames;
         }
 
         private void Crouch(bool force = false)
@@ -214,13 +230,22 @@
 
         public override void Update()
         {
+            if (_shrinkOnNextUpdate && !World.IsFrozen)
+            {
+                DoShrinkLogic();
+                _shrinkOnNextUpdate = false;
+            }
+
             if (!IsDead)
             {
-                HandleMovement();
-                HandleJumping();
-                HandleAnimations();
+                if (!World.IsFrozen)
+                {
+                    HandleMovement();
+                    HandleJumping();
+                }
 
-                _iFrameTimer -= Time.DeltaTime;
+                UpdateIFrameTimer();
+                HandleAnimations();
             }
 
             base.Update();
@@ -330,8 +355,16 @@
             _isJumping = false;
         }
 
+        public void UpdateIFrameTimer()
+        {
+            _iFrameTimer -= Time.DeltaTime;
+        }
+
         private void HandleAnimations()
         {
+            if (World.IsFrozen)
+                return;
+
             if (_isCrouching)
             {
                 PlayAnim("crouch");
@@ -398,16 +431,6 @@
                 {
                     ct.OnHit(this);
                 }
-
-                //// Check the tile to the right as well
-                //// (beacuse tiles are processed from left to right
-                //// so if you hit the middle of 2 tiles, only the left will be bumped)
-                //if (Rect.X + Rect.Width >= (tile.Col + 1) * Tile.Size
-                //    && World.GetTile(tile.Col + 1, tile.Row, out Tile other)
-                //    && other is ContainerTile otherCt)
-                //{
-                //    otherCt.OnHit(this);
-                //}
             }
         }
 

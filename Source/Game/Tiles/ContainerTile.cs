@@ -3,6 +3,7 @@
     public abstract class ContainerTile : AnimatedTile
     {
         public bool IsHittable { get; set; } = true;
+        public bool IsBreakable { get; set; } = false;
         
         public ItemType ItemInside { get; private set; } = ItemType.None;
         public bool IsHidden { get; private set; }
@@ -55,13 +56,19 @@
             HandleEntityBounceHit(entity);
             HandleCoinTileBounceHit();
 
-            OnHitFirstFrame(entity);
-
             if (IsHidden)
             {
                 Sprite.IsVisible = true;
                 CollisionExclude.Clear();
             }
+
+            if (IsBreakable && ItemInside == ItemType.None
+                && entity is Player player && player.State != PlayerState.Small)
+            {
+                entity.World.SetTile(Col, Row, SimpleTile.Air);
+            }
+
+            OnHitFirstFrame(entity);
         }
 
         public override void Update()
@@ -110,11 +117,14 @@
                 return;
 
             Item item = Item.Get(World, itemType);
-            World.SpawnEntity(item, new Vector2((Col + 0.5f) * Size, (Row + 1f) * Size));
+            World.SpawnEntity(item, new Vector2((Col + 0.5f) * Size, (Row + 1f) * Size - Game.TextureScale));
         }
 
         protected void SpawnItemInside()
         {
+            if (ItemInside == ItemType.Mushroom && World?.Player.State != PlayerState.Small)
+                ItemInside = ItemType.FireFlower;
+
             SpawnItem(ItemInside);
             ItemInside = ItemType.None;
         }

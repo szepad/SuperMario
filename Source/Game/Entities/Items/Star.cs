@@ -7,7 +7,8 @@
 
         public Star(World world) : base(world)
         {
-            Size = HitboxSize = new Vector2(Tile.Size);
+            Size = HitboxSize = new Vector2(14f, 14f).Scale();
+            SpriteOffset = new Vector2(1f).Scale();
             Sprite.Add("star", new Animation(4, 16, 16, 64, 0.1f));
         }
 

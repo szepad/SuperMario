@@ -26,13 +26,19 @@
 	[x] State
 	[x] Crouch
 	[x] Grow glitch fix (if size grows inside a tile, handle it)
-[ ] Break bricks
-	[ ] Normal
-	[ ] Crouching under, then standing up
-	[ ] Growing under one (Previous case might handle it, but a frame late...)
-[ ] Level freeze, and grow animation
-[ ] Sounds
+[x] Break bricks
+	[x] Normal
+	[-] Crouching under, then standing up
+	[-] Growing under one (Previous case might handle it, but a frame late...)
+[x] Level freeze, and grow animation
+[x] Enemies should activate in groups
 [ ] Particles
+	[ ] Break brick
+	[ ] Skid
+	[ ] Enemy kill with shell/brick from below
+	[ ] Shell kick
+	[ ] Fire kill
+[ ] Sounds
 [ ] Fire mario
 [ ] Star mario
 [ ] Player death -> Level reload
@@ -41,6 +47,7 @@
 	[ ] Pipe
 	[ ] Level Pipe intro (like 1-2)
 [ ] Render culling
+[ ] Enemy deactivation
 [ ] Hud
 [ ] Title screen
 [ ] Scores
