@@ -5,7 +5,10 @@ namespace Mario2
     public class World
     {
         public const int Rows = 14;
-        public const float FallOffHeight = Rows * 1.5f * Tile.Size;
+        public const float FallOffHeight = (Rows + 2) * Tile.Size;
+
+        public event Action? OnPlayerDeath;
+        private bool _playerDeathInvoked;
 
         public int Cols { get; private set; } = 100;
         public WorldBackground Background { get; private set; }
@@ -15,22 +18,28 @@ namespace Mario2
         public Tile[,] Tiles { get; private set; }
         public List<Entity> Entities { get; } = [];
 
+        public int FireballCount { get; private set; }
+
         public bool IsFrozen => _freezeTimer > 0f;
         private float _freezeTimer;
+
+        private readonly Sprite _globalQuestionTileAnim = new("question");
 
         private readonly EffectPool _effectPool = new();
 
         public World()
         {
             Player = new Player(this);
-            Player.Position.X = 50;
             Entities.Add(Player);
             Player.Activate();
+            Player.OnDeath += TryInvokePlayerDeath;
 
             Tiles = new Tile[Rows, Cols];
             Clear(Tiles);
 
             SetBackground(WorldBackground.Sky);
+
+            _globalQuestionTileAnim.Add("?", new Animation(3, 16, 16, 0, 0.15f));
         }
 
         [MemberNotNull(nameof(Parallax))]
@@ -99,16 +108,22 @@ namespace Mario2
 
         public T SpawnEntity<T>(T entity, Vector2 feetPos) where T : Entity
         {
-            Entities.Add(entity);
-            entity.SetFeetPos(feetPos);
-            entity.Spawn();
-            return entity;
+            T spawned = SpawnEntity(entity);
+            spawned.SetFeetPos(feetPos);
+            return spawned;
         }
 
         public T SpawnEntity<T>(T entity) where T : Entity
         {
             Entities.Add(entity);
             entity.Spawn();
+
+            if (entity is Fireball fireball)
+            {
+                FireballCount++;
+                fireball.OnImpact += _ => FireballCount--;
+            }
+
             return entity;
         }
 
@@ -123,26 +138,19 @@ namespace Mario2
             _effectPool.Acquire().Init(position, velocity, data);
         }
 
-        public void HandleEntityActivation(Camera2D camera)
+        public void SyncQuestionTileAnim(Sprite sprite)
         {
-            foreach (Entity entity in Entities)
-            {
-                if (entity.IsActive)
-                    continue;
-
-                if (entity.Rect.X <= camera.Target.X + camera.Offset.X)
-                {
-                    entity.Activate();
-                    entity.ActivateSurrounding();
-                }
-            }
+            sprite.SetFrame(_globalQuestionTileAnim.CurrentFrame);
+            sprite.SetFrameTimer(_globalQuestionTileAnim.CurrentFrameTimer);
         }
 
-        public void Update()
+        public void Update(Camera2D camera)
         {
+            _globalQuestionTileAnim.Update();
+
             if (!IsFrozen)
             {
-                UpdateEntities();
+                UpdateEntities(camera);
             }
             else
             {
@@ -153,25 +161,73 @@ namespace Mario2
             }
 
             _effectPool.Update();
-            UpdateTiles();
+            UpdateTiles(camera);
         }
 
-        private void UpdateEntities()
+        private void UpdateEntities(Camera2D camera)
         {
+            HandleEntityCameraLogic(camera);
+
             for (int i = Entities.Count - 1; i >= 0; i--)
             {
-                if (!Entities[i].IsActive)
-                    continue;
-                
-                Entities[i].Update();
+                Entity entity = Entities[i];
+                if (entity.IsActive)
+                {
+                    entity.Update();
+                }
             }
 
             RemoveDestroyedEntities();
 
             // Handle entity collisions after every entity has moved for the frame
+            for (int i = Entities.Count - 1; i >= 0; i--)
+            {
+                Entity entity = Entities[i];
+                if (entity.IsActive)
+                {
+                    entity.HandleEntityCollisions();
+                }
+            }
+        }
+
+        private void HandleEntityCameraLogic(Camera2D camera)
+        {
+            float cameraLeft = camera.Target.X - camera.Offset.X;
+            float cameraRight = camera.Target.X + camera.Offset.X;
+
             foreach (Entity entity in Entities)
             {
-                entity.HandleEntityCollisions();
+                if (entity.IsActive)
+                {
+                    // Deactivate if left camera x2
+                    if (entity.Rect.X + entity.Rect.Width < camera.Target.X - camera.Offset.X * 2.5f
+                        || entity.Rect.X > camera.Target.X + camera.Offset.X * 2.5f)
+                    {
+                        entity.Destroy();
+                    }
+                    else if (entity.Rect.X + entity.Rect.Width < cameraLeft
+                        || entity.Rect.X > cameraRight)
+                    {
+                        entity.OnCameraLeaveX();
+                    }
+                }
+                else if (entity.Rect.X <= cameraRight)
+                {
+                    entity.Activate();
+                    entity.ActivateSurrounding();
+                }
+            }
+
+            // Keep player on screen
+            if (Player.Position.X < cameraLeft)
+            {
+                Player.SetPosition(cameraLeft, Player.Position.Y);
+                Player.Velocity.X = 0f;
+            }
+            else if (Player.Position.X > cameraRight - Player.Size.X)
+            {
+                Player.SetPosition(cameraRight - Player.Size.X, Player.Position.Y);
+                Player.Velocity.X = 0f;
             }
         }
 
@@ -179,18 +235,37 @@ namespace Mario2
         {
             for (int i = Entities.Count - 1; i >= 0; i--)
             {
-                if (Entities[i].IsDestroyed)
+                Entity entity = Entities[i];
+                if (entity.IsDestroyed)
                 {
+                    if (entity is Fireball fireball && !fireball.HasImpacted)
+                    {
+                        FireballCount--;
+                    }
+                    else if (entity is Player)
+                    {
+                        TryInvokePlayerDeath();
+                    }
+
                     Entities.RemoveAt(i);
                 }
             }
         }
 
-        private void UpdateTiles()
+        private void TryInvokePlayerDeath()
         {
+            if (_playerDeathInvoked) return;
+            _playerDeathInvoked = true;
+
+            OnPlayerDeath?.Invoke();
+        }
+
+        private void UpdateTiles(Camera2D camera)
+        {
+            (int minX, int maxX) = GetTileXBoundsOnCamera(camera);
             for (int y = 0; y < Rows; y++)
             {
-                for (int x = 0; x < Cols; x++)
+                for (int x = minX; x < maxX; x++)
                 {
                     Tile tile = Tiles[y, x];
                     if (tile == SimpleTile.Air)
@@ -206,6 +281,19 @@ namespace Mario2
             }
         }
 
+        public void HandleCameraFollow(ref Camera2D camera)
+        {
+            const float HalfX = Game.Width / 2f;
+            const float LookAhead = Tile.Size;
+
+            float targetX = Player.Position.X + LookAhead;
+            if (targetX > camera.Target.X)
+                camera.Target.X = targetX;
+
+            // Clamp inside level bounds
+            camera.Target.X = Helper.Clamp(camera.Target.X, HalfX, Cols * Tile.Size - HalfX);
+        }
+
         public void UpdateParallax(Camera2D camera)
         {
             Parallax.Update(camera);
@@ -216,7 +304,7 @@ namespace Mario2
             Parallax.Draw();
         }
 
-        public void Draw(bool editor = false)
+        public void Draw(Camera2D camera, bool editor = false)
         {
             //Entities.Sort((x, y) => x.LayerDepth.CompareTo(y.LayerDepth));
             List<Entity> drawList = [..Entities.OrderBy(x => x.LayerDepth)];
@@ -236,7 +324,7 @@ namespace Mario2
                 }
             }
 
-            DrawTiles(editor);
+            DrawTiles(camera, editor);
 
             for (int i = lastBg + 1; i < drawList.Count; i++)
             {
@@ -246,11 +334,24 @@ namespace Mario2
             _effectPool.Draw();
         }
 
-        private void DrawTiles(bool editor)
+        private (int, int) GetTileXBoundsOnCamera(Camera2D camera)
         {
+            int minX = (int)((camera.Target.X - camera.Offset.X) / Tile.Size);
+            int maxX = (int)((camera.Target.X + camera.Offset.X) / Tile.Size) + 1;
+
+            minX = Helper.Clamp(minX, 0, Cols);
+            maxX = Helper.Clamp(maxX, 0, Cols);
+
+            return (minX, maxX);
+        }
+
+        private void DrawTiles(Camera2D camera, bool editor)
+        {
+            (int minX, int maxX) = editor ? (0, Cols) : GetTileXBoundsOnCamera(camera);
+
             for (int y = 0; y < Rows; y++)
             {
-                for (int x = 0; x < Cols; x++)
+                for (int x = minX; x < maxX; x++)
                 {
                     Tile tile = Tiles[y, x];
                     if (tile == SimpleTile.Air)
@@ -274,9 +375,9 @@ namespace Mario2
             {
                 if (ct.IsHidden)
                 {
-                    ct.Sprite.IsVisible = true;
+                    //ct.Sprite.IsVisible = true;
                     ct.Draw(x, y, 0.5f);
-                    ct.Sprite.IsVisible = false;
+                    //ct.Sprite.IsVisible = false;
                 }
 
                 if (ct.ItemInside != ItemType.None)

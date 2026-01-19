@@ -4,12 +4,12 @@
     {
         public QuestionTile() : base(true)
         {
-            Sprite.Play("?");
+            DrawSprite = QuestionSprite;
         }
 
         protected override void OnHitFirstFrame(Entity entity)
         {
-            Sprite.Play("block_ow");
+            DrawSprite = BlockSpriteOw;
             base.OnHitFirstFrame(entity);
         }
     }

@@ -4,12 +4,13 @@
     {
         public bool IsStompable { get; set; } = true;
         public bool KillableWithTileBounce { get; set; } = true;
+        public bool KillableWithFireball { get; set; } = true;
         public EnemyAi Ai { get; private set; }
 
         public bool IsDead { get; private set; }
         public bool IsStomped { get; private set; }
 
-        protected const float DieBounceForce = 120f * Game.TextureScale;
+        protected const float DieBounceForce = 140f * Game.TextureScale;
 
         public Enemy(World world) : base(world)
         {

@@ -5,6 +5,7 @@
         protected override void OnLoad()
         {
             Raylib.HideCursor();
+            SessionManager.Reset();
         }
 
         protected override void OnUnload()

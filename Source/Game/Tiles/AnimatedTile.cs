@@ -1,18 +1,47 @@
 ﻿namespace Mario2
 {
-    public class AnimatedTile(string sheetName, bool isCollidable) : Tile(isCollidable)
+    public class AnimatedTile(bool isCollidable) : Tile(isCollidable)
     {
-        public Sprite Sprite { get; protected set; } = new(sheetName);
+        public static readonly Sprite GrassSpriteLeft = new("grass", new Animation(4, 16, 16, 0, 0.25f));
+        public static readonly Sprite GrassSpriteMiddle = new("grass", new Animation(4, 16, 16, 16, 0.25f));
+        public static readonly Sprite GrassSpriteRight = new("grass", new Animation(4, 16, 16, 32, 0.25f));
+
+        public static readonly Sprite QuestionSprite = new("question", new Animation(3, 16, 16, 0, 0.15f));
+        public static readonly Sprite BlockSpriteOw = new("question", new Animation(1, 16, 16, 16, 1f));
+        public static readonly Sprite BlockSpriteUg = new("question", new Animation(1, 16, 16, 32, 1f));
+        public static readonly Sprite BlockSpriteCastle = new("question", new Animation(1, 16, 16, 48, 1f));
+        public static readonly Sprite BrickSpriteOw = new("question", new Animation(1, 16, 16, 64, 1f));
+        public static readonly Sprite BrickSpriteUg = new("question", new Animation(1, 16, 16, 80, 1f));
+        public static readonly Sprite BrickSpriteCastle = new("question", new Animation(1, 16, 16, 96, 1f));
+
+        public static readonly Sprite CoinSprite = new("coin", new Animation(3, 16, 16, 0, 0.15f));
+
         public Vector2 SpriteOffset;
 
-        public override void Update()
+        public Sprite? DrawSprite { private get; set; }
+
+        public static void UpdateSpriteInstances()
         {
-            Sprite.Update();
+            GrassSpriteLeft.Update();
+            GrassSpriteMiddle.Update();
+            GrassSpriteRight.Update();
+
+            QuestionSprite.Update();
+            BlockSpriteOw.Update();
+            BlockSpriteUg.Update();
+            BlockSpriteCastle.Update();
+            BrickSpriteOw.Update();
+            BrickSpriteUg.Update();
+            BrickSpriteCastle.Update();
+
+            CoinSprite.Update();
         }
+
+        public override void Update() { }
 
         public override void Draw(int col, int row, float opacity = 1)
         {
-            Sprite.Draw(new Vector2(col, row) * Size - SpriteOffset, opacity);
+            DrawSprite?.Draw(new Vector2(col, row) * Size - SpriteOffset, opacity);
         }
     }
 }

@@ -18,10 +18,13 @@
 
     public class Player : Entity
     {
+        public event Action? OnDeath;
+
         public bool IsDead { get; private set; }
         public PlayerState State { get; private set; } = PlayerState.Small;
 
         public bool IsInvincible => _iFrameTimer > 0f;
+        public bool IsStarman => _starmanTimer > 0f;
 
         private const float MaxWalkSpeed = 93.6f * Game.TextureScale;
         private const float MaxRunSpeed = 153.6f * Game.TextureScale;
@@ -63,9 +66,19 @@
         private bool _useStarVisuals;
         private int _starPaletteIndex = 0;
         private float _starPaletteSwapTimer;
-        private const float StarPaletteSwapTime = 0.035f;
+        private const float StarPaletteSwapTime = 0.05f;
+        private const float StarPaletteSwapTimeNearEnd = 0.2f;
 
         private bool _endFireAcquireOnNextUpdate;
+
+        private float _starmanTimer;
+        private const float StarmanTime = 11.5f;
+        private const float StarmanNearEndTime = 2f;
+
+        private const float FireballCooldown = 0.1f;
+        private float _throwFireballCooldown = 0f;
+
+        private bool _isGapDashing;
 
         public Player(World world) : base(world)
         {
@@ -130,6 +143,8 @@
             SetSmallStateVars();
             State = PlayerState.Small;
             Sprite.Play("death_small");
+
+            OnDeath?.Invoke();
         }
 
         private void SetSmallStateVars()
@@ -213,8 +228,17 @@
 
         private void EndFireAcquire()
         {
-            _useStarVisuals = false;
-            ChangePalette(PlayerPalette.Fire);
+            if (!IsStarman)
+            {
+                _useStarVisuals = false;
+                ChangePalette(PlayerPalette.Fire);
+            }
+        }
+
+        private void AcquireStar()
+        {
+            _useStarVisuals = true;
+            _starmanTimer = StarmanTime;
         }
 
         private void ChangePalette(PlayerPalette palette)
@@ -300,13 +324,30 @@
 
             if (!IsDead)
             {
+                HandleStarman();
                 HandleMovement();
                 HandleJumping();
+                HandleFireballThrowing();
                 UpdateVisualLogic();
                 HandleAnimations();
             }
 
-            base.Update();
+            // Apply gravity this way so "Gap-dash" is possible
+            //                               |
+            //                               V
+            //              (Run over 1-tile gaps without jumping)
+
+            if (_coyoteTimer <= 0f || MathF.Abs(Velocity.X) < MaxRunSpeed * 0.9f)
+            {
+                ApplyGravity();
+                _isGapDashing = false;
+            }
+            else
+            {
+                _isGapDashing = true;
+            }
+
+            MoveAndCollide();
         }
 
         private void HandleStateChangeCallbacks()
@@ -327,20 +368,40 @@
             }
         }
 
+        private void HandleStarman()
+        {
+            if (!IsStarman)
+                return;
+
+            _starmanTimer -= Time.DeltaTime;
+            if (_starmanTimer <= 0f)
+            {
+                _useStarVisuals = false;
+                ChangePalette(State == PlayerState.Fire ? PlayerPalette.Fire : PlayerPalette.Normal);
+            }
+        }
+
         private void HandleMovement()
         {
             bool running = Input.IsKeyDown(KeyboardKey.D);
             float accel = running ? RunAccel : WalkAccel;
 
-            if (State != PlayerState.Small)
-            {
-                if (Input.IsKeyDown(KeyboardKey.Down)) Crouch();
-                else TryStandUp();
-            }
-
             _inputDir = 0f;
             if (Input.IsKeyDown(KeyboardKey.Left)) _inputDir--;
             if (Input.IsKeyDown(KeyboardKey.Right)) _inputDir++;
+
+            if (State != PlayerState.Small)
+            {
+                if (Input.IsKeyDown(KeyboardKey.Down)
+                    && (_inputDir == 0f || !IsGrounded))
+                {
+                    Crouch();
+                }
+                else
+                {
+                    TryStandUp();
+                } 
+            }
 
             float stopFriction = IsGrounded ? StopFriction : StopFriction * 0.5f;
 
@@ -383,7 +444,7 @@
 
             // Cap speed
             Velocity.X = Helper.Clamp(Velocity.X, -MaxRunSpeed, MaxRunSpeed);
-            if (!running && MathF.Abs(Velocity.X) > MaxWalkSpeed)
+            if ((!running || (_inputDir == 0f && IsGrounded)) && MathF.Abs(Velocity.X) > MaxWalkSpeed)
             {
                 Velocity.X -= MathF.Sign(Velocity.X) * StopFriction * Time.DeltaTime;
             }
@@ -442,13 +503,43 @@
             }
         }
 
-        public void StopJump()
+        private void StopJump()
         {
             if (!_isJumping)
                 return;
 
             _jumpTimer = MaxJumpTime;
             _isJumping = false;
+        }
+
+        private void HandleFireballThrowing()
+        {
+            _throwFireballCooldown -= Time.DeltaTime;
+
+            if (Raylib.IsKeyPressed(KeyboardKey.D) 
+                && State == PlayerState.Fire
+                && _throwFireballCooldown <= 0f
+                && !_isCrouching
+                && World.FireballCount < 2)
+            {
+                ThrowFireball();
+            }
+        }
+
+        private void ThrowFireball()
+        {
+            _throwFireballCooldown = FireballCooldown;
+
+            if (Sprite.FlipX)
+            {
+                Fireball fireball = World.SpawnEntity(new Fireball(World, -1f));
+                fireball.SetPosition(Position.X - 4f * Game.TextureScale, Position.Y);
+            }
+            else
+            {
+                Fireball fireball = World.SpawnEntity(new Fireball(World, 1f));
+                fireball.SetPosition(Position.X + Size.X - 4f * Game.TextureScale, Position.Y);
+            }
         }
 
         public void UpdateVisualLogic()
@@ -460,7 +551,6 @@
                 _starPaletteSwapTimer -= Time.DeltaTime;
                 if (_starPaletteSwapTimer <= 0f)
                 {
-                    _starPaletteSwapTimer = StarPaletteSwapTime;
                     _starPaletteIndex++;
                     if (_starPaletteIndex >= 3)
                     {
@@ -468,6 +558,9 @@
                     }
 
                     ChangePalette((PlayerPalette)Enum.Parse(typeof(PlayerPalette), $"Star{_starPaletteIndex + 1}"));
+
+                    if (IsStarman && _starmanTimer <= StarmanNearEndTime) _starPaletteSwapTimer = StarPaletteSwapTimeNearEnd;
+                    else _starPaletteSwapTimer = StarPaletteSwapTime;
                 }
             }
         }
@@ -483,7 +576,7 @@
                 return;
             }
 
-            if (!IsGrounded)
+            if (!IsGrounded && !_isGapDashing)
             {
                 PlayAnim("jump");
                 return;
@@ -491,6 +584,13 @@
 
             if (_inputDir < 0f) Sprite.FlipX = true;
             else if (_inputDir > 0f) Sprite.FlipX = false;
+
+            if (_throwFireballCooldown > 0f && 
+                (!Sprite.CurrentAnimationName.Contains("run") || MathF.Abs(Velocity.X) <= MaxWalkSpeed * 1.1f))
+            {
+                PlayAnim("fireball");
+                return;
+            }
 
             if (Velocity.X == 0f)
             {
@@ -528,14 +628,20 @@
             if (IsInvincible)
             {
                 if (_iFrameTimer % 0.2f < 0.1f)
-                    base.Draw();
+                    DoDraw();
             }
             else
             {
-                base.Draw();
+                DoDraw();
             }
 
             Raylib.EndShaderMode();
+            DrawDebug();
+        }
+
+        private void DoDraw()
+        {
+            Sprite.Draw(Position - SpriteOffset);
         }
 
         protected override void OnTileCollision(Tile tile, CollisionSide side)
@@ -576,10 +682,28 @@
             {
                 AcquireFire();
             }
+            else if (item is Star)
+            {
+                AcquireStar();
+            }
         }
 
         private void HandleEnemyCollision(Enemy enemy)
         {
+            if (IsStarman)
+            {
+                enemy.Die();
+                World.SpawnEffect(enemy.Center, EffectData.Hit);
+                
+                enemy.Velocity.X = MathF.Abs(enemy.Velocity.X);
+                if (enemy.Center.X < Center.X)
+                {
+                    enemy.Velocity.X = -enemy.Velocity.X;
+                }
+                
+                return;
+            }
+
             if (enemy.IsStompable
                 && !enemy.IsStomped
                 && Velocity.Y > 0f

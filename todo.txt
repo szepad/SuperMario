@@ -32,31 +32,38 @@
 	[-] Growing under one (Previous case might handle it, but a frame late...)
 [x] Level freeze, and grow animation
 [x] Enemies should activate in groups
-[ ] Effects
-	[x] Skid
-	[x] Enemy kill with shell/brick from below
-	[x] Shell kick
-	[x] Break brick
-	[ ] Fire kill
 [x] Shaders
 	[x] Shader loading
 	[x] Palette shader
 	[X] Mario palette management
-[ ] Fire mario
-[ ] Star mario
+[x] Star mario
+[x] Fire mario
+	[x] Fire state
+	[x] Throw animation
+	[x] Fireball entity
+[x] Effects
+	[x] Skid
+	[x] Enemy kill with shell/brick from below
+	[x] Shell kick
+	[x] Break brick
+	[x] Fire kill
+[x] Fireball bounds check (inside camera)
+[-] Camera smooth follow
+[x] Player shouldn't leave camera boundaries
+[x] Enemy deactivation
+[x] Render culling
+[x] Gap dash
+[x] Player death -> Level reload
+	[x] Loading routine inside game scene
+	[x] World should freeze when play dies/destroyed and wait, then call raise an event for the game scene to react to
+[ ] Hud
+[ ] Scores
+	[ ] Normal scores
+	[ ] Koopa shell kill counter 100 -> 1UP (8? kill in a row I think)
 [ ] Sounds
-[ ] Player death -> Level reload
 [ ] Cutscenes
 	[ ] Flagpole
 	[ ] Pipe
 	[ ] Level Pipe intro (like 1-2)
-[ ] Render culling
-[ ] Camera smooth follow
-[ ] Player shouldn't leave camera boundaries
-[ ] Enemy deactivation
-[ ] Hud
 [ ] Title screen
-[ ] Scores
-	[ ] Normal scores
-	[ ] Koopa shell kill counter 100 -> 1UP (8? kill in a row I think)
 [ ] Luigi
