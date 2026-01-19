@@ -124,6 +124,7 @@ namespace Mario2
 
             Time.Progress();
             _activeScene?.Update();
+            AnimatedTile.UpdateSpriteInstances();
 
             if (Raylib.IsKeyPressed(KeyboardKey.F11))
             {

@@ -160,7 +160,7 @@
                     UpdateRule(Editor.World, tx, ty);
                     Editor.Dirty();
                 }
-                else
+                else if (entityUnderMouse is not Player)
                 {
                     Editor.World.Entities.Remove(entityUnderMouse);
                     _disableRightClickTemporarily = true;
@@ -269,7 +269,7 @@
                 if (Editor.Options.ShowGrid)
                     DrawGrid();
                 
-                Editor.World.Draw(editor: true);
+                Editor.World.Draw(default, editor: true);
                 
                 Raylib.EndMode2D();
             }

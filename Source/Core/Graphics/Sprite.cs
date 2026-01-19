@@ -25,15 +25,19 @@
         public string CurrentAnimationName { get; private set; } = string.Empty;
         public Animation? CurrentAnimation { get; private set; }
         public int CurrentFrame { get; private set; }
+        public float CurrentFrameTimer { get; private set; }
 
         private readonly Dictionary<string, Animation> _anims = [];
-
-        private float _frameTimer;
 
         public Sprite() { }
         public Sprite(string sheetName)
         {
             SetSheet(sheetName);
+        }
+
+        public Sprite(string sheetName, Animation animation) : this(sheetName)
+        {
+            Add("animation", animation);
         }
 
         public void SetSheet(string name)
@@ -67,7 +71,26 @@
             CurrentAnimation = anim;
             CurrentAnimationName = name;
             CurrentFrame = 0;
-            _frameTimer = 0f;
+            CurrentFrameTimer = 0f;
+        }
+
+        public void SetFrameTimer(float time)
+        {
+            CurrentFrameTimer = time;
+        }
+
+        public void SetFrame(int frame)
+        {
+            if (CurrentAnimation is null)
+                return;
+
+            if (frame >= CurrentAnimation.FrameCount)
+            {
+                if (CurrentAnimation.IsLooped) frame = 0;
+                else frame--;
+            }
+
+            CurrentFrame = frame;
         }
 
         public void Update()
@@ -75,13 +98,13 @@
             if (CurrentAnimation is null)
                 return;
 
-            _frameTimer += Time.DeltaTime;
+            CurrentFrameTimer += Time.DeltaTime;
 
             float frameTarget = CurrentFrame < CurrentAnimation.FrameTimes.Length
                 ? CurrentAnimation.FrameTimes[CurrentFrame] 
                 : CurrentAnimation.FrameTimes[^1];
 
-            if (_frameTimer >= frameTarget)
+            if (CurrentFrameTimer >= frameTarget)
             {
                 ProgressNextFrame();
             }
@@ -92,14 +115,8 @@
             if (CurrentAnimation is null)
                 return;
 
-            CurrentFrame++;
-            if (CurrentFrame >= CurrentAnimation.FrameCount)
-            {
-                if (CurrentAnimation.IsLooped) CurrentFrame = 0;
-                else CurrentFrame--;
-            }
-
-            _frameTimer = 0f;
+            SetFrame(CurrentFrame + 1);
+            CurrentFrameTimer = 0f;
         }
 
         public Rectangle GetSourceRectangle()

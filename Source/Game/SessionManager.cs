@@ -19,14 +19,19 @@
 
         public static SessionLoadResult LoadNext(out World world)
         {
-            world = new World();
-
             CurrentLevel++;
             if (CurrentLevel > LevelCount)
             {
+                world = new World();
                 return SessionLoadResult.ReachedEnd;
             }
 
+            return LoadCurrent(out world);
+        }
+
+        public static SessionLoadResult LoadCurrent(out World world)
+        {
+            world = new World();
             string name = (CurrentLevel < 10 ? "0" : "") + $"{CurrentLevel}.lvl";
 
             World? loaded = WorldLoader.Deserialize(Path.Combine("levels", name), out _);

@@ -1,6 +1,6 @@
 ﻿namespace Mario2
 {
-    public abstract class ContainerTile : AnimatedTile
+    public abstract class ContainerTile(bool isCollidable) : AnimatedTile(isCollidable)
     {
         public bool IsHittable { get; set; } = true;
         public bool IsBreakable { get; set; } = false;
@@ -16,17 +16,6 @@
         private float _bounceTimer;
         private bool _isBouncing;
 
-        public ContainerTile(bool isCollidable) : base("question", isCollidable)
-        {
-            Sprite.Add("?", new Animation(3, 16, 16, 0, 0.15f));
-            Sprite.Add("block_ow", new Animation(1, 16, 16, 16, 1f));
-            Sprite.Add("block_ug", new Animation(1, 16, 16, 32, 1f));
-            Sprite.Add("block_castle", new Animation(1, 16, 16, 48, 1f));
-            Sprite.Add("brick_ow", new Animation(1, 16, 16, 64, 1f));
-            Sprite.Add("brick_ug", new Animation(1, 16, 16, 80, 1f));
-            Sprite.Add("brick_castle", new Animation(1, 16, 16, 96, 1f));
-        }
-
         public void SetItem(ItemType item)
         {
             ItemInside = item;
@@ -38,7 +27,6 @@
                 return;
 
             IsHidden = true;
-            Sprite.IsVisible = false;
             CollisionExclude.Add(CollisionSide.Top);
             CollisionExclude.Add(CollisionSide.Left);
             CollisionExclude.Add(CollisionSide.Right);
@@ -64,24 +52,28 @@
         public override void Update()
         {
             base.Update();
+            HandleBounceLogic();
+        }
 
-            if (_isBouncing)
+        protected void HandleBounceLogic()
+        {
+            if (!_isBouncing)
+                return;
+            
+            const float Half = BounceTime / 2f;
+            float t = Helper.Clamp01(_bounceTimer > Half
+                ? 1f - (_bounceTimer - Half) / Half
+                : _bounceTimer / Half);
+
+            SpriteOffset.Y = BounceOffset * t;
+
+            _bounceTimer += Time.DeltaTime;
+            if (_bounceTimer >= BounceTime)
             {
-                const float Half = BounceTime / 2f;
-                float t = Helper.Clamp01(_bounceTimer > Half
-                    ? 1f - (_bounceTimer - Half) / Half
-                    : _bounceTimer / Half);
-
-                SpriteOffset.Y = BounceOffset * t;
-
-                _bounceTimer += Time.DeltaTime;
-                if (_bounceTimer >= BounceTime)
-                {
-                    _isBouncing = false;
-                    SpriteOffset.Y = 0f;
-                    if (!OnlyHitOnce) IsHittable = true;
-                    OnHitLastFrame();
-                }
+                _isBouncing = false;
+                SpriteOffset.Y = 0f;
+                if (!OnlyHitOnce) IsHittable = true;
+                OnHitLastFrame();
             }
         }
 
@@ -128,7 +120,7 @@
 
             foreach (Entity entity in bouncer.World.Entities)
             {
-                if (entity == bouncer || !entity.IsHittable)
+                if (entity == bouncer || !entity.IsHittable || !entity.IsActive)
                     continue;
 
                 if (Raylib.CheckCollisionRecs(entity.Rect, bounceRect))
@@ -155,7 +147,6 @@
             if (!IsHidden)
                 return;
             
-            Sprite.IsVisible = true;
             CollisionExclude.Clear();
         }
 
@@ -172,6 +163,11 @@
                 entity.World.SpawnEffect(center, new Vector2(25f, -121f).Scale() * 1.75f, EffectData.Brick);
                 entity.World.SpawnEffect(center, new Vector2(33f, -175f).Scale() * 1.75f, EffectData.Brick);
             }
+        }
+
+        public override void Draw(int col, int row, float opacity = 1)
+        {
+            base.Draw(col, row, opacity);
         }
     }
 }

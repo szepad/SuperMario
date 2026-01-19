@@ -9,6 +9,13 @@
             return val;
         }
 
+        public static int Clamp(int val, int min, int max)
+        {
+            if (val < min) return min;
+            if (val > max) return max;
+            return val;
+        }
+
         public static float Clamp01(float val) 
             => Clamp(val, 0f, 1f);
 

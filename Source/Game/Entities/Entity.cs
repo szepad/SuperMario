@@ -47,6 +47,8 @@
 
         private readonly List<Entity> _overlapDisabled = [];
 
+        private bool _steppedUpFromHorizontalCollision;
+
         public void Spawn()
         {
             if (IsSpawned) return;
@@ -91,7 +93,18 @@
 
         public virtual void Update()
         {
+            ApplyGravity();
+            MoveAndCollide();
+        }
+
+        protected void ApplyGravity()
+        {
             Velocity.Y += Gravity * Time.DeltaTime;
+        }
+
+        protected void MoveAndCollide()
+        {
+            _steppedUpFromHorizontalCollision = false;
 
             OldPosition = Position;
             Position.X += Velocity.X * Time.DeltaTime;
@@ -124,37 +137,47 @@
                 {
                     if (horizontal)
                     {
-                        if (Velocity.X < 0f && !tile.CollisionExclude.Contains(CollisionSide.Right))
+                        const float MaxYBias = 3f * Game.TextureScale;
+                        float yBias = Position.Y + Size.Y - tileRect.Y;
+                        if (yBias >= 0 && yBias <= MaxYBias && MathF.Abs(Velocity.X) > 140f * Game.TextureScale)
                         {
-                            // Left collision
-                            OldPosition.X = Position.X = tileRect.X + tileRect.Width;
-                            Velocity.X = 0f;
-                            OnTileCollision(tile, CollisionSide.Left);
+                            _steppedUpFromHorizontalCollision = true;
                         }
-                        else if (Velocity.X > 0f && !tile.CollisionExclude.Contains(CollisionSide.Left))
+                        else
                         {
-                            // Right collision
-                            OldPosition.X = Position.X = tileRect.X - Rect.Width;
-                            Velocity.X = 0f;
-                            OnTileCollision(tile, CollisionSide.Right);
+                            if (Position.X < OldPosition.X && !tile.CollisionExclude.Contains(CollisionSide.Right))
+                            {
+                                // Left collision
+                                OldPosition.X = Position.X = tileRect.X + tileRect.Width;
+                                Velocity.X = 0f;
+                                OnTileCollision(tile, CollisionSide.Left);
+                            }
+                            else if (Position.X > OldPosition.X && !tile.CollisionExclude.Contains(CollisionSide.Left))
+                            {
+                                // Right collision
+                                OldPosition.X = Position.X = tileRect.X - Rect.Width;
+                                Velocity.X = 0f;
+                                OnTileCollision(tile, CollisionSide.Right);
+                            }
                         }
                     }
                     else
                     {
-                        if (Velocity.Y < 0f && !tile.CollisionExclude.Contains(CollisionSide.Bottom))
-                        {
-                            // Top collision
-                            OldPosition.Y = Position.Y = tileRect.Y + tileRect.Height;
-                            Velocity.Y = 0f;
-                            OnTileCollision(tile, CollisionSide.Top);
-                        }
-                        else if (Velocity.Y > 0f && !tile.CollisionExclude.Contains(CollisionSide.Top))
+                        if (_steppedUpFromHorizontalCollision ||
+                            (Position.Y > OldPosition.Y && !tile.CollisionExclude.Contains(CollisionSide.Top)))
                         {
                             // Bottom collision
                             OldPosition.Y = Position.Y = tileRect.Y - Rect.Height;
                             Velocity.Y = 0f;
                             IsGrounded = true;
                             OnTileCollision(tile, CollisionSide.Bottom);
+                        }
+                        else if (Position.Y < OldPosition.Y && !tile.CollisionExclude.Contains(CollisionSide.Bottom))
+                        {
+                            // Top collision
+                            OldPosition.Y = Position.Y = tileRect.Y + tileRect.Height;
+                            Velocity.Y = 0f;
+                            OnTileCollision(tile, CollisionSide.Top);
                         }
                     }
                 }
@@ -243,12 +266,16 @@
                 return;
 
             Sprite.Draw(Position - SpriteOffset);
+            DrawDebug();
+        }
 
-            if (Game.Instance.IsDevModeOn)
-            {
-                Rect.Draw(new Color(0, 255, 0, 128));
-                Hitbox.Draw(new Color(255, 0, 0, 128));
-            }
+        protected virtual void DrawDebug()
+        {
+            if (!Game.Instance.IsDevModeOn)
+                return;
+            
+            Rect.Draw(new Color(0, 255, 0, 128));
+            Hitbox.Draw(new Color(255, 0, 0, 128));
         }
 
         public void DisableOverlapUntilCollisionLeave(Entity entity)
@@ -260,6 +287,8 @@
         }
 
         public virtual void TileBounceHit(Entity bouncer, Tile tile) { }
+
+        public virtual void OnCameraLeaveX() { }
 
         protected abstract void OnSpawn();
         protected virtual void OnActivate() { }

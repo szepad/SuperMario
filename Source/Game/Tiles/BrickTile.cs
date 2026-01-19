@@ -6,7 +6,7 @@
 
         public BrickTile() : base(true)
         {
-            Sprite.Play("brick_ow");
+            DrawSprite = BrickSpriteOw;
             OnlyHitOnce = false;
             IsBreakable = true;
         }
@@ -19,7 +19,7 @@
                 _coinStashAmount--;
                 if (_coinStashAmount <= 0)
                 {
-                    Sprite.Play("block_ow");
+                    DrawSprite = BlockSpriteOw;
                     OnlyHitOnce = true;
                 }
 
@@ -28,7 +28,7 @@
 
             if (ItemInside != ItemType.None)
             {
-                Sprite.Play("block_ow");
+                DrawSprite = BlockSpriteOw;
                 OnlyHitOnce = true;
             }
 
