@@ -15,6 +15,7 @@
         public static readonly Sprite BrickSpriteCastle = new("question", new Animation(1, 16, 16, 96, 1f));
 
         public static readonly Sprite CoinSprite = new("coin", new Animation(3, 16, 16, 0, 0.15f));
+        public static readonly Sprite HudCoinSprite = new("hud_coin", new Animation(3, 16, 8, 0, 0.15f));
 
         public Vector2 SpriteOffset;
 
@@ -35,6 +36,7 @@
             BrickSpriteCastle.Update();
 
             CoinSprite.Update();
+            HudCoinSprite.Update();
         }
 
         public override void Update() { }

@@ -11,6 +11,7 @@ namespace Mario2
         private bool _playerDeathInvoked;
 
         public int Cols { get; private set; } = 100;
+        public int TimeLeft { get; private set; } = 400;
         public WorldBackground Background { get; private set; }
         public ParallaxBackground Parallax { get; private set; }
 
@@ -27,6 +28,8 @@ namespace Mario2
 
         private readonly EffectPool _effectPool = new();
 
+        private bool _hasStarted;
+
         public World()
         {
             Player = new Player(this);
@@ -40,6 +43,14 @@ namespace Mario2
             SetBackground(WorldBackground.Sky);
 
             _globalQuestionTileAnim.Add("?", new Animation(3, 16, 16, 0, 0.15f));
+        }
+
+        public void Start()
+        {
+            if (_hasStarted) return;
+            _hasStarted = true;
+
+            SoundManager.PlayMusic(MusicName.Overworld);
         }
 
         [MemberNotNull(nameof(Parallax))]

@@ -9,12 +9,15 @@
 
     public static class Text
     {
-        public static void Draw(string text, Vector2 pos, int fontSize, Color color, Pivot pivot = Pivot.Center)
-            => Draw(text, pos.X, pos.Y, fontSize, color, pivot);
+        public static void Draw(string text, Vector2 pos, Pivot pivot = Pivot.TopLeft)
+            => Draw(text, pos.X, pos.Y, pivot);
 
-        public static void Draw(string text, float x, float y, int fontSize, Color color, Pivot pivot = Pivot.TopLeft)
+        public static void Draw(string text, float x, float y, Pivot pivot = Pivot.TopLeft)
         {
-            int width = Raylib.MeasureText(text, fontSize);
+            text = text.ToUpper();
+            const int fontSize = 8 * Game.TextureScale;
+
+            int width = (int)Raylib.MeasureTextEx(Assets.Font, text, fontSize, 0f).X;
 
             float xoff = 0f;
             if (pivot == Pivot.Top || pivot == Pivot.Center || pivot == Pivot.Bottom)
@@ -36,7 +39,8 @@
                 yoff = fontSize;
             }
 
-            Raylib.DrawText(text, (int)(x - xoff), (int)(y - yoff), fontSize, color);
+            Raylib.DrawTextEx(Assets.Font, text, new Vector2((int)(x - xoff), (int)(y - yoff)), 
+                fontSize, 0, Color.White);
         }
     }
 }

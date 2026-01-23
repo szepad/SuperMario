@@ -37,6 +37,11 @@
             return vec2 * Game.TextureScale;
         }
 
+        public static float Scale(this float val)
+        {
+            return val * Game.TextureScale;
+        }
+
         public static bool CloseTo(this float val, float target, float threshold = 0.01f)
         {
             return MathF.Abs(val - target) < threshold;

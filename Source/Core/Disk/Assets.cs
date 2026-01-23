@@ -6,6 +6,8 @@ namespace Mario2
     {
         public static readonly string MusicFolder = Path.Combine("res", "music");
 
+        public static Font Font { get; private set; }
+
         private static readonly Dictionary<string, Texture2D> _texByName = [];
         private static readonly Dictionary<string, Sound> _soundsByName = [];
         private static readonly Dictionary<string, byte[]> _musicByName = [];
@@ -20,6 +22,8 @@ namespace Mario2
 
         public static void Load(string root)
         {
+            Font = Raylib.LoadFont(Path.Combine("res", "font.png"));
+
             // Create placeholder texture
             Image img = Raylib.GenImageColor(16, 16, Color.Pink);
             _placeHolderTex = Raylib.LoadTextureFromImage(img);

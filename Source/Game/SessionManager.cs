@@ -9,12 +9,23 @@
 
     public static class SessionManager
     {
-        public static int CurrentLevel { get; private set; } = 0;
+        // Campaign data
         public static int LevelCount { get; private set; } = 32;
+        public static int LevelsPerWorld { get; private set; } = 4;
+
+        // Session data
+        public static int CurrentLevel { get; private set; } = 0;
+        public static int Score { get; private set; }
+        public static int Coins { get; private set; }
+        
+        public static int CurrentWorld => (CurrentLevel - 1) / LevelsPerWorld + 1;
+        public static int CurrentLevelDisplay => ((CurrentLevel - 1) % LevelsPerWorld) + 1;
 
         public static void Reset()
         {
             CurrentLevel = 0;
+            Score = 0;
+            Coins = 0;
         }
 
         public static SessionLoadResult LoadNext(out World world)
@@ -32,7 +43,7 @@
         public static SessionLoadResult LoadCurrent(out World world)
         {
             world = new World();
-            string name = (CurrentLevel < 10 ? "0" : "") + $"{CurrentLevel}.lvl";
+            string name = $"{CurrentLevel.ToString().PadLeft(2, '0')}.lvl";
 
             World? loaded = WorldLoader.Deserialize(Path.Combine("levels", name), out _);
             if (loaded is null)

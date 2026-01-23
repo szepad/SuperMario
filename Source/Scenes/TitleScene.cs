@@ -4,6 +4,7 @@
     {
         protected override void OnLoad()
         {
+            SoundManager.PlayMusic(MusicName.Title);
             Raylib.HideCursor();
             SessionManager.Reset();
         }
@@ -34,7 +35,7 @@
         protected override void OnDraw()
         {
             Raylib.ClearBackground(Color.Black);
-            Text.Draw("Title", Game.Width / 2, 5, 10, Color.White, Pivot.Top);
+            Text.Draw("Title", Game.Width / 2, 5, Pivot.Top);
         }
     }
 }
