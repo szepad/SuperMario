@@ -56,7 +56,9 @@
 [x] Player death -> Level reload
 	[x] Loading routine inside game scene
 	[x] World should freeze when play dies/destroyed and wait, then call raise an event for the game scene to react to
-[ ] Hud
+[x] Hud
+[ ] Hidden blocks
+[ ] No jump anim when walking off ledge
 [ ] Scores
 	[ ] Normal scores
 	[ ] Koopa shell kill counter 100 -> 1UP (8? kill in a row I think)

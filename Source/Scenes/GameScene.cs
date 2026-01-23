@@ -24,6 +24,7 @@
 
         protected override void OnLoad()
         {
+            SoundManager.StopMusic();
             Raylib.HideCursor();
 
             if (_insideEditor)
@@ -41,6 +42,7 @@
             _camera = new(Vector2.Zero, Vector2.Zero, 0f, 1f);
             _camera.Offset.X = Game.Width / 2f;
             _camera.Offset.Y = Game.Height - World.Rows * Tile.Size + Tile.Size;
+            _world.HandleCameraFollow(ref _camera);
         }
 
         protected override void OnUnload()
@@ -75,6 +77,7 @@
             if (loader.Invoke() != SessionLoadResult.Success)
             {
                 Game.Instance.LoadScene(new TitleScene());
+                return;
             }
 
             _world.OnPlayerDeath += () => _playerDeathTimer = PlayerDeathReloadTime;
@@ -96,6 +99,7 @@
             if (_loadTimer <= 0f)
             {
                 _state = State.Gameplay;
+                _world.Start();
             }
         }
 
@@ -132,17 +136,46 @@
         private void DrawLoadState()
         {
             Raylib.ClearBackground(Color.Black);
-            Text.Draw($"Level {SessionManager.CurrentLevel}", new Vector2(Game.Width / 2f, Game.Height * 0.4f),
-                40, Color.White);
+            DrawHud();
+
+            const int OffsetYFromOriginal = 16;
+            Text.Draw($"WORLD {SessionManager.CurrentWorld}-{SessionManager.CurrentLevelDisplay}",
+                new Vector2(88f, 63f + OffsetYFromOriginal).Scale());
+
+            Raylib.DrawTexturePro(Assets.GetTex("entity_selector"), new Rectangle(0, 0, 16, 16),
+                new Rectangle(new Vector2(97f + 4f, 80f + OffsetYFromOriginal).Scale(), new Vector2(16f).Scale()), Vector2.Zero, 0f, Color.White);
+
+            Text.Draw($"*{"1".PadLeft(2, ' ')}",
+                new Vector2(128f, 87f + OffsetYFromOriginal).Scale());
         }
 
         private void DrawGameplayState()
         {
             Raylib.ClearBackground(_world.Parallax.ClearColor);
             _world.DrawBackground();
+            DrawHud();
             Raylib.BeginMode2D(_camera);
             _world.Draw(_camera);
             Raylib.EndMode2D();
+        }
+
+        private void DrawHud()
+        {
+            const int Row1 = 14 * Game.TextureScale;
+            const int Row2 = 23 * Game.TextureScale;
+
+            Text.Draw("MARIO", 24f.Scale(), Row1);
+            Text.Draw(SessionManager.Score.ToString().PadLeft(6, '0'), 24f.Scale(), Row2);
+
+            AnimatedTile.HudCoinSprite.Draw(new Vector2(88f.Scale(), Row2));
+            Text.Draw(SessionManager.Coins.ToString().PadLeft(2, '0'), 104f.Scale(), Row2);
+
+            Text.Draw("WORLD", 144f.Scale(), Row1);
+            Text.Draw(SessionManager.CurrentWorld.ToString(), 160f.Scale(), Row2, Pivot.TopRight);
+            Text.Draw($"-{SessionManager.CurrentLevelDisplay}", 160f.Scale(), Row2);
+
+            Text.Draw("TIME", 200f.Scale(), Row1);
+            Text.Draw(_world.TimeLeft.ToString().PadLeft(3, '0'), 208f.Scale(), Row2);
         }
     }
 }
