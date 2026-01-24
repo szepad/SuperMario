@@ -8,7 +8,8 @@
 
         private bool _isExploded;
 
-        public CoinPickup(World world) : base(world, slowAppear: false)
+        public CoinPickup(World world)
+            : base(world, slowAppear: false)
         {
             IsCollidable = false;
             IsHittable = false;
@@ -27,6 +28,7 @@
         {
             Velocity.Y = -330f * Game.TextureScale;
             Position.Y -= 2f * Game.TextureScale;
+            SessionManager.GetCoin();
         }
 
         protected override void OnDestroy()
@@ -47,13 +49,14 @@
                 Velocity = Vector2.Zero;
                 Sprite.Play("explode");
                 _isExploded = true;
+                SessionManager.GetScore(World, ScoreRewards.Coin, Center);
             }
             else if (_lifeTimer <= LayerChangeTime)
             {
                 LayerDepth = LayerDepth.Normal;
             }
 
-                base.Update();
+            base.Update();
         }
     }
 }

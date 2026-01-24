@@ -21,6 +21,7 @@
         public Rectangle Hitbox => new(Position + HitboxOffset, HitboxSize);
         public Vector2 Center => Position + Size / 2f;
         public Vector2 Feet => new(Position.X + Size.X / 2f, Position.Y + Size.Y);
+        public Vector2 Head => new(Position.X + Size.X / 2f, Position.Y);
 
         public LayerDepth LayerDepth { get; set; } = LayerDepth.Normal;
         public bool IsCollidable { get; set; } = true;
@@ -139,7 +140,9 @@
                     {
                         const float MaxYBias = 3f * Game.TextureScale;
                         float yBias = Position.Y + Size.Y - tileRect.Y;
-                        if (yBias >= 0 && yBias <= MaxYBias && MathF.Abs(Velocity.X) > 140f * Game.TextureScale)
+                        if (yBias >= 0 && yBias <= MaxYBias 
+                            && MathF.Abs(Velocity.X) > 140f * Game.TextureScale
+                            && (tile is not ContainerTile ct || !ct.IsHidden))
                         {
                             _steppedUpFromHorizontalCollision = true;
                         }
@@ -236,8 +239,9 @@
             if (!IsHittable)
                 return;
 
-            foreach (Entity other in World.Entities)
+            for (int i = World.Entities.Count - 1; i >= 0; i--)
             {
+                Entity other = World.Entities[i];
                 if (other == this || !other.IsActive)
                     continue;
 

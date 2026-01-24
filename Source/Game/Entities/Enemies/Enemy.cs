@@ -35,6 +35,12 @@
 
             OnStomp(stomper);
             Ai.OnStomp(stomper);
+
+            SoundManager.PlaySound(Sounds.EnemyStomp);
+            SessionManager.GetScore(World, ScoreRewards.GetEnemyStompScore(), Head,
+                ScoreRewards.ShorterLifeTime, ScoreRewards.FasterSpeed);
+
+            ScoreRewards.EnemyStompCount++;
         }
 
         public void ResetStomped()
@@ -42,7 +48,7 @@
             IsStomped = false;
         }
 
-        public void Die()
+        public void Die(Entity killer)
         {
             if (IsDead) return;
             IsDead = true;
@@ -54,6 +60,28 @@
 
             OnDie();
             Ai.OnDie();
+
+            if (killer is ShellEnemy shell && shell.State == ShellState.Spin)
+            {
+                if (shell.KillCombo >= 8)
+                {
+                    SessionManager.GetLife();
+                }
+
+                // Incremental sound
+                if (Enum.TryParse($"ShellCombo0{shell.KillCombo}", out Sounds sound))
+                {
+                    SoundManager.PlaySound(sound);
+                }
+                else
+                {
+                    SoundManager.PlaySound(Sounds.ShellCombo08);
+                }
+            }
+            else
+            {
+                SoundManager.PlaySound(Sounds.ShellHit);
+            }
         }
 
         public override void TileBounceHit(Entity bouncer, Tile tile)
@@ -61,8 +89,10 @@
             if (KillableWithTileBounce)
             {
                 FlipVelocityBasedOnTileBounce(tile);
-                Die();
+                Die(this);
                 World.SpawnEffect(Center, EffectData.Hit);
+                SessionManager.GetScore(World, ScoreRewards.TileBounceKill, Head,
+                    ScoreRewards.ShorterLifeTime, ScoreRewards.FasterSpeed);
             }
         }
 

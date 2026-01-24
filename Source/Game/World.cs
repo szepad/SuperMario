@@ -165,9 +165,15 @@ namespace Mario2
             }
             else
             {
+                _freezeTimer -= Time.DeltaTime;
+
                 Player.UpdateVisualLogic();
                 Player.Sprite.Update();
-                _freezeTimer -= Time.DeltaTime;
+
+                foreach (Entity entity in Entities)
+                    if (entity is ScoreText)
+                        entity.Update();
+
                 RemoveDestroyedEntities();
             }
 
@@ -377,27 +383,32 @@ namespace Mario2
         {
             if (!editor)
             {
-                tile.Draw(x, y);
+                tile.Draw(x, y, (tile is ContainerTile ct && ct.IsHidden) ? 0f : 1f);
                 return;
             }
 
-            tile.Draw(x, y, tile.IsCollidable ? 1f : 0.5f);
-            if (tile is ContainerTile ct)
+            if (tile is ContainerTile ct2)
             {
-                if (ct.IsHidden)
+                if (ct2.IsHidden)
                 {
-                    //ct.Sprite.IsVisible = true;
-                    ct.Draw(x, y, 0.5f);
-                    //ct.Sprite.IsVisible = false;
+                    ct2.Draw(x, y, 0.5f);
+                }
+                else
+                {
+                    ct2.Draw(x, y, tile.IsCollidable ? 1f : 0.5f);
                 }
 
-                if (ct.ItemInside != ItemType.None)
+                if (ct2.ItemInside != ItemType.None)
                 {
                     Raylib.DrawTexturePro(Assets.GetTex("items"),
-                        new Rectangle(0, ((int)ct.ItemInside - 1) * 16, 16, 16),
+                        new Rectangle(0, ((int)ct2.ItemInside - 1) * 16, 16, 16),
                         new Rectangle(x * Tile.Size, (y - 1) * Tile.Size, new Vector2(Tile.Size)),
                         Vector2.Zero, 0f, Color.White.Alpha(0.5f));
                 }
+            }
+            else
+            {
+                tile.Draw(x, y, tile.IsCollidable ? 1f : 0.5f);
             }
         }
     }

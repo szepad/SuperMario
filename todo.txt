@@ -57,15 +57,18 @@
 	[x] Loading routine inside game scene
 	[x] World should freeze when play dies/destroyed and wait, then call raise an event for the game scene to react to
 [x] Hud
-[ ] Hidden blocks
-[ ] No jump anim when walking off ledge
-[ ] Scores
-	[ ] Normal scores
-	[ ] Koopa shell kill counter 100 -> 1UP (8? kill in a row I think)
-[ ] Sounds
+[x] Hidden blocks
+[x] No jump anim when walking off ledge
+[x] Scores
+	[x] Normal scores
+	[x] Koopa shell kill counter 100 -> 1UP (8? kill in a row I think)
+[x] Sounds
+[ ] Music choice & save into file
+[ ] Star music 
 [ ] Cutscenes
 	[ ] Flagpole
 	[ ] Pipe
 	[ ] Level Pipe intro (like 1-2)
+[ ] Sublevels
 [ ] Title screen
 [ ] Luigi

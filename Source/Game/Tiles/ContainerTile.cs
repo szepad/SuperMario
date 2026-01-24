@@ -118,8 +118,9 @@
                 Size, BounceOffset
             );
 
-            foreach (Entity entity in bouncer.World.Entities)
+            for (int i = bouncer.World.Entities.Count - 1; i >= 0; i--)
             {
+                Entity entity = bouncer.World.Entities[i];
                 if (entity == bouncer || !entity.IsHittable || !entity.IsActive)
                     continue;
 
@@ -144,8 +145,8 @@
 
         private void HandleRevealing()
         {
-            if (!IsHidden)
-                return;
+            if (!IsHidden) return;
+            IsHidden = false;
             
             CollisionExclude.Clear();
         }
@@ -162,6 +163,9 @@
                 entity.World.SpawnEffect(center, new Vector2(-33f, -175f).Scale() * 1.75f, EffectData.Brick);
                 entity.World.SpawnEffect(center, new Vector2(25f, -121f).Scale() * 1.75f, EffectData.Brick);
                 entity.World.SpawnEffect(center, new Vector2(33f, -175f).Scale() * 1.75f, EffectData.Brick);
+
+                SoundManager.PlaySound(Sounds.BrickBreak);
+                SessionManager.GetScoreWithoutText(ScoreRewards.BrickBreak);
             }
         }
 
