@@ -46,11 +46,12 @@
         private float _jumpBuffer;
         private float _coyoteTimer;
 
-        private const float StompBounce = 160f * Game.TextureScale;
+        private const float StompBounce = 180f * Game.TextureScale;
 
         private const float IFrames = 3.5f;
         private float _iFrameTimer;
 
+        private bool _hasJumped;
         private bool _isCrouching;
 
         private bool _shrinkOnNextUpdate;
@@ -77,8 +78,6 @@
 
         private const float FireballCooldown = 0.1f;
         private float _throwFireballCooldown = 0f;
-
-        private bool _isGapDashing;
 
         public Player(World world) : base(world)
         {
@@ -145,6 +144,9 @@
             Sprite.Play("death_small");
 
             OnDeath?.Invoke();
+
+            SoundManager.StopMusic();
+            SoundManager.PlaySound(Sounds.PlayerDie);
         }
 
         private void SetSmallStateVars()
@@ -262,6 +264,8 @@
             World.Freeze(1f);
             Sprite.Play("grow");
             ChangePalette(PlayerPalette.Normal);
+
+            SoundManager.PlaySound(Sounds.PlayerWarp);
         }
 
         private void DoShrinkLogic()
@@ -332,22 +336,12 @@
                 HandleAnimations();
             }
 
-            // Apply gravity this way so "Gap-dash" is possible
-            //                               |
-            //                               V
-            //              (Run over 1-tile gaps without jumping)
+            base.Update();
 
-            if (_coyoteTimer <= 0f || MathF.Abs(Velocity.X) < MaxRunSpeed * 0.9f)
+            if (IsGrounded)
             {
-                ApplyGravity();
-                _isGapDashing = false;
+                ScoreRewards.EnemyStompCount = 0;
             }
-            else
-            {
-                _isGapDashing = true;
-            }
-
-            MoveAndCollide();
         }
 
         private void HandleStateChangeCallbacks()
@@ -465,6 +459,7 @@
             {
                 _skidEffectTimer = SkidEffectTime;
                 World.SpawnEffect(Feet, EffectData.Skid);
+                SoundManager.PlaySound(Sounds.PlayerSkid);
             }
         }
 
@@ -478,6 +473,7 @@
             if (IsGrounded)
             {
                 _coyoteTimer = CoyoteTime;
+                _hasJumped = false;
             }
 
             _jumpBuffer -= Time.DeltaTime;
@@ -485,9 +481,15 @@
 
             if (_coyoteTimer > 0f && _jumpBuffer > 0f)
             {
+                _coyoteTimer = 0f;
+                _jumpBuffer = 0f;
+
                 Velocity.Y = -JumpForce;
                 _isJumping = true;
+                _hasJumped = true;
                 _jumpTimer = 0f;
+
+                SoundManager.PlaySound(Sounds.PlayerJump);
             }
 
             _jumpTimer += Time.DeltaTime;
@@ -540,6 +542,8 @@
                 Fireball fireball = World.SpawnEntity(new Fireball(World, 1f));
                 fireball.SetPosition(Position.X + Size.X - 4f * Game.TextureScale, Position.Y);
             }
+
+            SoundManager.PlaySound(Sounds.PlayerFireball);
         }
 
         public void UpdateVisualLogic()
@@ -576,41 +580,55 @@
                 return;
             }
 
-            if (!IsGrounded && !_isGapDashing)
+            if (_hasJumped)
             {
                 PlayAnim("jump");
                 return;
             }
 
-            if (_inputDir < 0f) Sprite.FlipX = true;
-            else if (_inputDir > 0f) Sprite.FlipX = false;
+            if (IsGrounded)
+            {
+                if (_inputDir < 0f) Sprite.FlipX = true;
+                else if (_inputDir > 0f) Sprite.FlipX = false;
 
-            if (_throwFireballCooldown > 0f && 
-                (!Sprite.CurrentAnimationName.Contains("run") || MathF.Abs(Velocity.X) <= MaxWalkSpeed * 1.1f))
-            {
-                PlayAnim("fireball");
-                return;
-            }
-
-            if (Velocity.X == 0f)
-            {
-                PlayAnim("idle");
-                return;
-            }
-            
-            if (MathF.Sign(Velocity.X) != MathF.Sign(_inputDir) && _inputDir != 0f)
-            {
-                PlayAnim("skid");
-                return;
-            }
-
-            PlayAnim("run");
-            if (Sprite.CurrentAnimationName.Contains("run"))
-            {
-                for (int i = 0; i < Sprite.CurrentAnimation?.FrameTimes.Length; i++)
+                if (_throwFireballCooldown > 0f && 
+                    (!Sprite.CurrentAnimationName.Contains("run") || MathF.Abs(Velocity.X) <= MaxWalkSpeed * 1.1f))
                 {
-                    float t = Helper.Clamp01(MathF.Abs(Velocity.X) / MaxRunSpeed);
-                    Sprite.CurrentAnimation.FrameTimes[i] = Raymath.Lerp(0.2f, 0.067f, t);
+                    PlayAnim("fireball");
+                    return;
+                }
+
+                if (Velocity.X == 0f)
+                {
+                    PlayAnim("idle");
+                    return;
+                }
+            
+                if (MathF.Sign(Velocity.X) != MathF.Sign(_inputDir) && _inputDir != 0f)
+                {
+                    PlayAnim("skid");
+                    return;
+                }
+
+                PlayAnim("run");
+                if (Sprite.CurrentAnimationName.Contains("run"))
+                {
+                    for (int i = 0; i < Sprite.CurrentAnimation?.FrameTimes.Length; i++)
+                    {
+                        float t = Helper.Clamp01(MathF.Abs(Velocity.X) / MaxRunSpeed);
+                        Sprite.CurrentAnimation.FrameTimes[i] = Raymath.Lerp(0.2f, 0.067f, t);
+                    }
+                }
+            }
+            else
+            {
+                PlayAnim("run");
+                if (Sprite.CurrentAnimationName.Contains("run"))
+                {
+                    for (int i = 0; i < Sprite.CurrentAnimation?.FrameTimes.Length; i++)
+                    {
+                        Sprite.CurrentAnimation.FrameTimes[i] = float.PositiveInfinity;
+                    }
                 }
             }
         }
@@ -649,6 +667,7 @@
             if (side == CollisionSide.Top)
             {
                 StopJump();
+                SoundManager.PlaySound(Sounds.PlayerHitBlock);
 
                 if (tile is ContainerTile ct)
                 {
@@ -662,6 +681,8 @@
             if (tile is CoinTile)
             {
                 tile.Destroy();
+                SessionManager.GetCoin();
+                SessionManager.GetScoreWithoutText(ScoreRewards.Coin);
             }
         }
 
@@ -673,8 +694,14 @@
 
         private void HandleItemCollision(Item item)
         {
+            int score = ScoreRewards.PowerUp;
+            bool oneUp = item is OneUp;
+
+            if (oneUp) score = ScoreRewards.OneUp;
+            else SoundManager.PlaySound(Sounds.PlayerPowerup);
+
             item.Pickup();
-            if (item is Mushroom && item is not OneUp)
+            if (item is Mushroom && !oneUp)
             {
                 Grow();
             }
@@ -686,14 +713,18 @@
             {
                 AcquireStar();
             }
+
+            SessionManager.GetScore(World, score, item.Head, speed: ScoreRewards.FasterSpeed);
         }
 
         private void HandleEnemyCollision(Enemy enemy)
         {
             if (IsStarman)
             {
-                enemy.Die();
+                enemy.Die(this);
                 World.SpawnEffect(enemy.Center, EffectData.Hit);
+                SessionManager.GetScore(World, ScoreRewards.StarKill, enemy.Head,
+                    ScoreRewards.ShorterLifeTime, ScoreRewards.FasterSpeed);
                 
                 enemy.Velocity.X = MathF.Abs(enemy.Velocity.X);
                 if (enemy.Center.X < Center.X)
@@ -704,7 +735,12 @@
                 return;
             }
 
-            if (enemy.IsStompable
+            if (enemy is ShellEnemy shell && shell.State == ShellState.Shell)
+            {
+                shell.Kick(this);
+                DisableOverlapUntilCollisionLeave(enemy);
+            }
+            else if (enemy.IsStompable
                 && !enemy.IsStomped
                 && Velocity.Y > 0f
                 && Feet.Y <= enemy.Feet.Y)
@@ -715,15 +751,7 @@
             }
             else
             {
-                if (enemy is ShellEnemy shell && shell.State == ShellState.Shell)
-                {
-                    shell.Kick(this);
-                    DisableOverlapUntilCollisionLeave(enemy);
-                }
-                else
-                {
-                    TakeDamage();
-                }
+                TakeDamage();
             }
         }
     }

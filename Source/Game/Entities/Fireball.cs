@@ -44,6 +44,8 @@
             IsCollidable = false;
 
             OnImpact?.Invoke(this);
+
+            SoundManager.PlaySound(Sounds.PlayerHitBlock);
         }
 
         public override void Update()
@@ -87,7 +89,9 @@
                         enemy.Velocity.X = -enemy.Velocity.X;
                     }
 
-                    enemy.Die();
+                    enemy.Die(this);
+                    SessionManager.GetScore(World, ScoreRewards.Fireball, enemy.Head,
+                        ScoreRewards.ShorterLifeTime, ScoreRewards.FasterSpeed);
                 }
             }
         }

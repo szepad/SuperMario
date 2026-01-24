@@ -11,6 +11,8 @@
     {
         public ShellState State { get; private set; } = ShellState.Normal;
 
+        public int KillCombo { get; private set; } = 0;
+
         protected const string WalkAnim = "walk";
         protected const string ShellAnim = "shell";
         protected const string ShellSpinAnim = "shell_spin";
@@ -79,6 +81,12 @@
 
             Vector2 effectPos = Raymath.Vector2Lerp(player.Feet, Position + Size / 2f, 0.5f);
             player.World.SpawnEffect(effectPos, EffectData.Hit);
+
+            KillCombo = 0;
+            SoundManager.PlaySound(Sounds.ShellHit);
+
+            SessionManager.GetScore(World, ScoreRewards.Kick, Head,
+                ScoreRewards.ShorterLifeTime, ScoreRewards.FasterSpeed);
         }
 
         public override void TileBounceHit(Entity bouncer, Tile tile)
@@ -92,6 +100,9 @@
             FlipVelocityBasedOnTileBounce(tile);
             Velocity.Y = -DieBounceForce;
             _standUpTimer = 0f;
+
+            SessionManager.GetScore(World, ScoreRewards.TileBounceKill, Head,
+                ScoreRewards.ShorterLifeTime, ScoreRewards.FasterSpeed);
         }
 
         protected override void OnTileCollision(Tile tile, CollisionSide side)
@@ -108,6 +119,7 @@
                 if (side == CollisionSide.Left) dir = -1f;
 
                 World.SpawnEffect(Center + new Vector2(dir * Tile.Size / 2f, 0f), EffectData.Hit);
+                SoundManager.PlaySound(Sounds.PlayerHitBlock);
             }
 
             base.OnTileCollision(tile, side);
@@ -132,10 +144,14 @@
         {
             if (State == ShellState.Spin && other is Enemy enemy)
             {
-                enemy.Die();
+                SessionManager.GetScore(World, ScoreRewards.GetShellKillScore(KillCombo), enemy.Head,
+                    ScoreRewards.ShorterLifeTime, ScoreRewards.FasterSpeed);
+
+                KillCombo++;
+                enemy.Die(this);
                 if (other is ShellEnemy shell && shell.State == ShellState.Spin)
                 {
-                    Die();
+                    Die(shell);
                     World.SpawnEffect(Center, EffectData.Hit);
                 }
 

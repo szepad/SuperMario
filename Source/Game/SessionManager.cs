@@ -15,15 +15,19 @@
 
         // Session data
         public static int CurrentLevel { get; private set; } = 0;
+        public static int Lives { get; private set; } = 5;
         public static int Score { get; private set; }
         public static int Coins { get; private set; }
         
         public static int CurrentWorld => (CurrentLevel - 1) / LevelsPerWorld + 1;
         public static int CurrentLevelDisplay => ((CurrentLevel - 1) % LevelsPerWorld) + 1;
 
+        private const int CoinCap = 99;
+
         public static void Reset()
         {
             CurrentLevel = 0;
+            Lives = 5;
             Score = 0;
             Coins = 0;
         }
@@ -54,6 +58,44 @@
             {
                 world = loaded;
                 return SessionLoadResult.Success;
+            }
+        }
+
+        public static void GetCoin()
+        {
+            Coins++;
+            if (Coins > CoinCap)
+            {
+                Coins = 0;
+                GetLife();
+            }
+
+            SoundManager.PlaySound(Sounds.CoinCollect);
+        }
+
+        public static void GetLife()
+        {
+            Lives++;
+            SoundManager.PlaySound(Sounds.ExtraLife);
+        }
+        
+        public static void GetScoreWithoutText(int points)
+        {
+            Score += points;
+        }
+
+        public static void GetScore(World world, int points, Vector2 pos, 
+            float lifeTime = ScoreRewards.NormalLifeTime,
+            float speed = ScoreRewards.NormalSpeed)
+        {
+            world.SpawnEntity(new ScoreText(world, points, pos, lifeTime, speed));
+            if (points == ScoreRewards.OneUp)
+            {
+                GetLife();
+            }
+            else
+            {
+                Score += points;
             }
         }
     }

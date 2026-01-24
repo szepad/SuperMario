@@ -31,7 +31,7 @@
             return item;
         }
 
-        public void Pickup()
+        public virtual void Pickup()
         {
             Destroy();
         }
@@ -45,6 +45,7 @@
                 Gravity = 0f;
                 IsCollidable = false;
                 IsHittable = false;
+                SoundManager.PlaySound(Sounds.AppearItem);
             }
         }
 
