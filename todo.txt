@@ -66,9 +66,11 @@
 [x] Music choice & save into file
 [x] Star music
 [ ] Cutscenes
+	[x] Api
 	[ ] Flagpole
 	[ ] Pipe
 	[ ] Level Pipe intro (like 1-2)
+[ ] Fix music looping stuff
 [ ] Sublevels
 [ ] Jump higher linearly based on movement speed (max get on 5 blocks high)
 [ ] Title screen

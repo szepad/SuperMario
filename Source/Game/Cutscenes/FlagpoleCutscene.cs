@@ -4,7 +4,6 @@
     {
         SlideDown,
         TurnAround,
-        Wait,
         WalkToCastle,
         Emote,
         Disappear,
@@ -18,9 +17,13 @@
 
         private const float SlideSpeed = Tile.Size * 5f;
 
+        private const float TurnAroundTime = 0.5f;
+
         public override Action GetFunction(FlagpoleCutsceneState state) => state switch
         { 
             FlagpoleCutsceneState.SlideDown => SlideDown,
+            FlagpoleCutsceneState.TurnAround => TurnAround,
+            FlagpoleCutsceneState.WalkToCastle => WalkToCastle,
             _ => () => { }
         };
 
@@ -31,6 +34,10 @@
             Player.Gravity = 0f;
             Player.Sprite.FlipX = false;
             Player.PlayAnim(PlayerAnim.Climb);
+            Player.World.CameraStyle = CameraStyle.Stopped;
+
+            SoundManager.StopMusic();
+            SoundManager.PlaySound(Sounds.Flagpole);
         }
 
         private void SlideDown()
@@ -50,6 +57,34 @@
             }
 
             _flagpole.FlagRelY += SlideSpeed * Time.DeltaTime;
+            if (_flagpole.FlagRelY >= Tile.Size * 7.75f)
+            {
+                State++;
+                Player.Velocity.Y = 0f;
+                StateTimer = 0f;
+                Player.Sprite.FlipX = true;
+                Player.Position.X = Player.OldPosition.X = _flagpole.Position.X + 4f.Scale();
+                SoundManager.PlayMusic(MusicName.LevelClear);
+            }
+        }
+
+        private void TurnAround()
+        {
+            StateTimer += Time.DeltaTime;
+            if (StateTimer >= TurnAroundTime)
+            {
+                State++;
+            }
+        }
+
+        private void WalkToCastle()
+        {
+            Player.Sprite.FlipX = false;
+            Player.Gravity = Entity.DefaultGravity;
+            Player.Velocity.X = Player.World.CameraAutoScrollSpeed = 69f.Scale();
+            Player.World.CameraStyle = CameraStyle.AutoScroll;
+            Player.PlayAnim(PlayerAnim.Run);
+            Player.SetRunAnimFrameTimes(0.15f);
         }
     }
 }

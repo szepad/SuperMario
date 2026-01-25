@@ -640,8 +640,9 @@ namespace Mario2
                 if (_inputDir < 0f) Sprite.FlipX = true;
                 else if (_inputDir > 0f) Sprite.FlipX = false;
 
+                bool runAnimPlaying = Sprite.CurrentAnimationName.Contains("run", StringComparison.CurrentCultureIgnoreCase);
                 if (_throwFireballCooldown > 0f && 
-                    (!Sprite.CurrentAnimationName.ToLower().Contains("run") || MathF.Abs(Velocity.X) <= MaxWalkSpeed * 1.1f))
+                    (!runAnimPlaying || MathF.Abs(Velocity.X) <= MaxWalkSpeed * 1.1f))
                 {
                     PlayAnim(PlayerAnim.Fireball);
                     return;
@@ -660,24 +661,32 @@ namespace Mario2
                 }
 
                 PlayAnim(PlayerAnim.Run);
-                if (Sprite.CurrentAnimationName.ToLower().Contains("run"))
-                {
-                    for (int i = 0; i < Sprite.CurrentAnimation?.FrameTimes.Length; i++)
-                    {
-                        float t = Helper.Clamp01(MathF.Abs(Velocity.X) / MaxRunSpeed);
-                        Sprite.CurrentAnimation.FrameTimes[i] = Raymath.Lerp(0.135f, 0.067f, t);
-                    }
-                }
+
+                float t = Helper.Clamp01(MathF.Abs(Velocity.X) / MaxRunSpeed);
+                SetRunAnimFrameTimes(Raymath.Lerp(0.135f, 0.067f, t));
             }
             else
             {
                 PlayAnim(PlayerAnim.Run);
-                if (Sprite.CurrentAnimationName.ToLower().Contains("run"))
+                SetRunAnimFrameTimes(float.PositiveInfinity);
+            }
+        }
+
+        public void SetRunAnimFrameTimes(float time = 0.1f)
+        {
+            if (Sprite.Animations.TryGetValue("Run_small", out Animation? anim))
+            {
+                for (int i = 0; i < anim.FrameTimes.Length; i++)
                 {
-                    for (int i = 0; i < Sprite.CurrentAnimation?.FrameTimes.Length; i++)
-                    {
-                        Sprite.CurrentAnimation.FrameTimes[i] = float.PositiveInfinity;
-                    }
+                    anim.FrameTimes[i] = time;
+                }
+            }
+
+            if (Sprite.Animations.TryGetValue("Run_big", out Animation? anim2))
+            {
+                for (int i = 0; i < anim2.FrameTimes.Length; i++)
+                {
+                    anim2.FrameTimes[i] = time;
                 }
             }
         }

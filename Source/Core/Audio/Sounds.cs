@@ -13,7 +13,7 @@
         EnemyHammerThrow,
         EnemyStomp,
         ExtraLife,
-        GoalPole,
+        Flagpole,
         HurryUp,
         PlayerJump,
         Pause,
