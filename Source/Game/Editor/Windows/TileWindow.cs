@@ -13,6 +13,7 @@
             TileObjectDefs.GrassDecor,
             TileObjectDefs.Coin,
             TileObjectDefs.CastleSmall,
+            TileObjectDefs.Flagpole,
         ];
 
         public override void Update()

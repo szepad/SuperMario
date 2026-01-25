@@ -27,6 +27,12 @@
             new PrefabActionRecurse(1, 1, new SimpleTile(33, true), 0, 1),
         ]);
 
+        public static readonly PrefabTile Flagpole = new(true, 6, 3,
+        [
+            new PrefabAction(0, 0, new SimpleTile(29, false)),
+            new PrefabActionRecurse(0, 1, new SimpleTile(37, false), 0, 1),
+        ]);
+
         public static readonly PrefabTile CastleSmall = new(false, 1, 6,
         [
             new PrefabAction(1, 0, new SimpleTile(49, false), OnlyOnAir: false),

@@ -56,6 +56,7 @@
             if (loaded is not null)
             {
                 _world = loaded;
+                _world.Start();
             }
             else if (ParentScene is null)
             {

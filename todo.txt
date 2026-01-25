@@ -63,12 +63,13 @@
 	[x] Normal scores
 	[x] Koopa shell kill counter 100 -> 1UP (8? kill in a row I think)
 [x] Sounds
-[ ] Music choice & save into file
-[ ] Star music 
+[x] Music choice & save into file
+[x] Star music
 [ ] Cutscenes
 	[ ] Flagpole
 	[ ] Pipe
 	[ ] Level Pipe intro (like 1-2)
 [ ] Sublevels
+[ ] Jump higher linearly based on movement speed (max get on 5 blocks high)
 [ ] Title screen
 [ ] Luigi

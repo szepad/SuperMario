@@ -14,6 +14,7 @@ namespace Mario2
         public int TimeLeft { get; private set; } = 400;
         public WorldBackground Background { get; private set; }
         public ParallaxBackground Parallax { get; private set; }
+        public MusicName Music { get; private set; } = MusicName.None;
 
         public Player Player { get; }
         public Tile[,] Tiles { get; private set; }
@@ -50,7 +51,7 @@ namespace Mario2
             if (_hasStarted) return;
             _hasStarted = true;
 
-            SoundManager.PlayMusic(MusicName.Overworld);
+            SoundManager.PlayMusic(Music);
         }
 
         [MemberNotNull(nameof(Parallax))]
@@ -58,6 +59,11 @@ namespace Mario2
         {
             Background = background;
             Parallax = WorldBackgroundExtension.GetParallax(background);
+        }
+
+        public void SetMusic(MusicName music)
+        {
+            Music = music;
         }
 
         public void Clear() => Clear(Tiles);

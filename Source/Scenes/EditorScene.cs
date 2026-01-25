@@ -37,6 +37,8 @@ namespace Mario2
         private bool _showError;
         private string _errorMessage = string.Empty;
 
+        private const MusicName EditorMusic = MusicName.None;
+
         public EditorScene()
         {
             FileManager = new(this);
@@ -58,6 +60,7 @@ namespace Mario2
         protected override void OnLoad()
         {
             Raylib.ShowCursor();
+            SoundManager.PlayMusic(EditorMusic);
 
             WorldWindow.WorldContentTex = Raylib.LoadRenderTexture(
                 Raylib.GetMonitorWidth(Raylib.GetCurrentMonitor()),
@@ -86,6 +89,7 @@ namespace Mario2
         protected override void OnSubSceneUnload()
         {
             Raylib.ShowCursor();
+            SoundManager.PlayMusic(EditorMusic);
         }
 
         public void SetActiveSelector(EditorWindow selector)
