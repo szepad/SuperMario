@@ -4,27 +4,27 @@
     {
         None = 0,
 
-        Title,
-
+        // World music (values matter as they're saved in file)
         Overworld,
-        UndergroundIntro,
         Underground,
         Castle,
         Water,
+        Bonus,
+        UndergroundIntro,
 
+        // Event based
         Invincible,
         Warning,
-
         Bowser,
         BowserFinal,
-        Bonus,
-
         LevelClear,
         WorldClear,
+
+        // Not gameplay
+        Title,
+        LostLevelsTitle,
+        LostLevelsEnding,
         Ending,
         GameOver,
-
-        LostLevelsEnding,
-        LostLevelsTitle,
     }
 }

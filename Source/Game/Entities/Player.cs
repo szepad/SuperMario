@@ -241,6 +241,14 @@
         {
             _useStarVisuals = true;
             _starmanTimer = StarmanTime;
+            SoundManager.PlayMusic(MusicName.Invincible);
+        }
+
+        private void EndStar()
+        {
+            _useStarVisuals = false;
+            ChangePalette(State == PlayerState.Fire ? PlayerPalette.Fire : PlayerPalette.Normal);
+            SoundManager.PlayMusic(World.Music);
         }
 
         private void ChangePalette(PlayerPalette palette)
@@ -370,8 +378,7 @@
             _starmanTimer -= Time.DeltaTime;
             if (_starmanTimer <= 0f)
             {
-                _useStarVisuals = false;
-                ChangePalette(State == PlayerState.Fire ? PlayerPalette.Fire : PlayerPalette.Normal);
+                EndStar();
             }
         }
 

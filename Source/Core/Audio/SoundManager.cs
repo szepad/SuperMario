@@ -32,12 +32,22 @@
             if (_musicLoaded)
             {
                 StopMusic();
+
+                if (music == MusicName.None)
+                {
+                    return;
+                }
             }
 
             string name = GetMusicName(music);
             if (Assets.TryGetMusic(name, out byte[]? data))
             {
                 _music = Raylib.LoadMusicStreamFromMemory(".wav", data);
+            }
+            else
+            {
+                Console.WriteLine("Internal _music var cleared.");
+                _music = default;
             }
 
             if (Raylib.IsMusicValid(_music))

@@ -3,7 +3,8 @@
     public class PropertyWindow(EditorScene editor) : EditorWindow(editor, "Properties")
     {
         private int _colsInputVal = 0;
-        private int _bgVal = (int)editor.World.Background;
+        private int _bgVal;
+        private int _musicVal;
 
         public ItemType ContainerTileItem => (ItemType)_ctItemIndex;
         private int _ctItemIndex;
@@ -14,6 +15,18 @@
         public override void Update()
         {
             
+        }
+
+        public void ReadSettings()
+        {
+            _bgVal = (int)Editor.World.Background;
+            _musicVal = (int)Editor.World.Music;
+        }
+
+        public void ClearSettings()
+        {
+            _bgVal = 0;
+            _musicVal = 0;
         }
 
         protected override void OnRender()
@@ -47,13 +60,24 @@
             Gui.EndDisabled();
 
             // Background
-            string[] choices = ["Sky", "Underground", "Castle", "Water", "Night"];
+            string[] bgChoices = ["Sky", "Underground", "Castle", "Water", "Night"];
             Gui.Text("Background");
             Gui.SetNextItemWidth(110f);
             Gui.SameLine();
-            if (Gui.Combo("##combo_bg", ref _bgVal, choices, choices.Length))
+            if (Gui.Combo("##combo_bg", ref _bgVal, bgChoices, bgChoices.Length))
             {
                 Editor.World.SetBackground((WorldBackground)_bgVal);
+                Editor.Dirty();
+            }
+
+            // Music
+            string[] musicChoices = ["None", "Overworld", "Underground", "Castle", "Water", "Bonus", "Underground Intro"];
+            Gui.Text("Music");
+            Gui.SetNextItemWidth(110f);
+            Gui.SameLine();
+            if (Gui.Combo("##combo_music", ref _musicVal, musicChoices, musicChoices.Length))
+            {
+                Editor.World.SetMusic((MusicName)_musicVal);
                 Editor.Dirty();
             }
 
@@ -84,19 +108,19 @@
 
         private void TileProperties()
         {
-            Gui.SeparatorText("Tile");
-
             if (Editor.ActiveSelector is TileWindow tw
                 && (tw.Selected is InstanceTile<QuestionTile> || tw.Selected is InstanceTile<BrickTile>))
             {
+                Gui.SeparatorText("Tile");
+
                 Gui.Checkbox("Hidden", ref _ctHidden);
 
                 string[] choices = Enum.GetNames<ItemType>();
                 Gui.Combo("Item", ref _ctItemIndex, choices, choices.Length);
+                
+                // Spacing
+                Gui.Dummy(new Vector2(0f, 20f));
             }
-
-            // Spacing
-            Gui.Dummy(new Vector2(0f, 20f));
         }
     }
 }
