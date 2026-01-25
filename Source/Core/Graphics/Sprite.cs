@@ -27,6 +27,7 @@
         public int CurrentFrame { get; private set; }
         public float CurrentFrameTimer { get; private set; }
 
+        public IReadOnlyDictionary<string, Animation> Animations => _anims;
         private readonly Dictionary<string, Animation> _anims = [];
 
         public Sprite() { }

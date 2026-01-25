@@ -2,10 +2,20 @@
 
 namespace Mario2
 {
+    public enum CameraStyle
+    {
+        Follow,
+        AutoScroll,
+        Stopped
+    }
+
     public class World
     {
         public const int Rows = 14;
         public const float FallOffHeight = (Rows + 2) * Tile.Size;
+
+        public CameraStyle CameraStyle { get; set; } = CameraStyle.Follow;
+        public float CameraAutoScrollSpeed { get; set; } = Tile.Size * 4f;
 
         public event Action? OnPlayerDeath;
         private bool _playerDeathInvoked;
@@ -307,11 +317,20 @@ namespace Mario2
         public void HandleCameraFollow(ref Camera2D camera)
         {
             const float HalfX = Game.Width / 2f;
-            const float LookAhead = Tile.Size;
-
-            float targetX = Player.Position.X + LookAhead;
-            if (targetX > camera.Target.X)
-                camera.Target.X = targetX;
+            
+            if (CameraStyle == CameraStyle.Follow)
+            {
+                const float LookAhead = Tile.Size;
+                float targetX = Player.Position.X + LookAhead;
+                if (targetX > camera.Target.X)
+                {
+                    camera.Target.X = targetX;
+                }
+            }
+            else if (CameraStyle == CameraStyle.AutoScroll)
+            {
+                camera.Target.X += CameraAutoScrollSpeed * Time.DeltaTime;
+            }
 
             // Clamp inside level bounds
             camera.Target.X = Helper.Clamp(camera.Target.X, HalfX, Cols * Tile.Size - HalfX);
