@@ -17,6 +17,7 @@ namespace Mario2.Editor
             Editor.FilePath = string.Empty;
             Editor.PropertyWindow.ClearSettings();
             Editor.CleanDirty();
+            Editor.WorldWindow.FocusCameraOn(Editor.World.Player);
         }
 
         public void AskOpen()
@@ -39,6 +40,7 @@ namespace Mario2.Editor
                 Editor.FilePath = path;
                 EditorScene.RecentlyOpened = path;
                 Editor.CleanDirty();
+                Editor.WorldWindow.FocusCameraOn(world.Player);
             }
             else if (failEx is not null)
             {

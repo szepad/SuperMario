@@ -31,6 +31,14 @@
         public Vector2 ScreenToWorld(Vector2 screenPos)
             => (screenPos + _camera.Target * _camera.Zoom) / _camera.Zoom;
 
+        public Vector2 WorldToScreen(Vector2 worldPos)
+            => (worldPos - _camera.Target) * _camera.Zoom;
+
+        public void FocusCameraOn(Entity entity)
+        {
+            _camera.Target = entity.Center - new Vector2(Game.Width, Game.Height) / 2f;
+        }
+
         public override void Update()
         {
             Vector2 screenPos = ScreenToWorld(GetMousePositionInsideEditor());
@@ -296,8 +304,8 @@
         {
             if (_firstRender)
             {
-                _camera.Target.Y = -Tile.Size * 2f;
-                _camera.Target.X = -Tile.Size * 4f;
+                //_camera.Target.Y = -Tile.Size * 2f;
+                //_camera.Target.X = -Tile.Size * 4f;
                 _firstRender = false;
             }
             
