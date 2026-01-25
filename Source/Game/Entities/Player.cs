@@ -1,4 +1,6 @@
-﻿namespace Mario2
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Mario2
 {
     public enum PlayerState
     {
@@ -16,6 +18,20 @@
         Star3
     }
 
+    public enum PlayerAnim
+    {
+        Idle,
+        Run,
+        Skid,
+        Jump,
+        Climb,
+        ClimbStop,
+        Death,
+        Grow,
+        Crouch,
+        Fireball
+    }
+
     public class Player : Entity
     {
         public event Action? OnDeath;
@@ -25,6 +41,9 @@
 
         public bool IsInvincible => _iFrameTimer > 0f;
         public bool IsStarman => _starmanTimer > 0f;
+
+        [MemberNotNullWhen(true, nameof(_cutscene))]
+        public bool IsCutscenePlaying => _cutscene is not null;
 
         private const float MaxWalkSpeed = 93.6f * Game.TextureScale;
         private const float MaxRunSpeed = 153.6f * Game.TextureScale;
@@ -79,26 +98,32 @@
         private const float FireballCooldown = 0.1f;
         private float _throwFireballCooldown = 0f;
 
+        private ICutscene? _cutscene;
+
         public Player(World world) : base(world)
         {
             SetSmallStateVars();
             LayerDepth = LayerDepth.Player;
 
             Sprite.SetSheet("mario");
-            Sprite.Add("idle_small", new Animation(1, 16, 16, 0, 1f));
-            Sprite.Add("run_small", new Animation(3, 16, 16, 16, 0.1f));
-            Sprite.Add("skid_small", new Animation(1, 16, 16, 32, 1f));
-            Sprite.Add("jump_small", new Animation(1, 16, 16, 48, 1f));
-            Sprite.Add("death_small", new Animation(1, 16, 16, 80, 1f));
+            Sprite.Add($"{PlayerAnim.Idle}_small", new Animation(1, 16, 16, 0, 1f));
+            Sprite.Add($"{PlayerAnim.Run}_small", new Animation(3, 16, 16, 16, 0.1f));
+            Sprite.Add($"{PlayerAnim.Skid}_small", new Animation(1, 16, 16, 32, 1f));
+            Sprite.Add($"{PlayerAnim.Jump}_small", new Animation(1, 16, 16, 48, 1f));
+            Sprite.Add($"{PlayerAnim.Climb}_small", new Animation(2, 16, 16, 64, 0.15f));
+            Sprite.Add($"{PlayerAnim.ClimbStop}_small", new Animation(1, 16, 16, 64, 0.15f));
+            Sprite.Add($"{PlayerAnim.Death}_small", new Animation(1, 16, 16, 80, 1f));
 
             // Big
-            Sprite.Add("grow", new Animation(2, 24, 32, 128, 0.1f));
-            Sprite.Add("idle_big", new Animation(1, 24, 32, 128 + 32, 1f));
-            Sprite.Add("run_big", new Animation(3, 24, 32, 128 + 32 * 2, 0.1f));
-            Sprite.Add("skid_big", new Animation(1, 24, 32, 128 + 32 * 3, 1f));
-            Sprite.Add("jump_big", new Animation(1, 24, 32, 128 + 32 * 4, 1f));
-            Sprite.Add("crouch_big", new Animation(1, 24, 32, 128 + 32 * 5, 1f));
-            Sprite.Add("fireball_big", new Animation(1, 24, 32, 128 + 32 * 6, 1f));
+            Sprite.Add($"{PlayerAnim.Grow}_big", new Animation(2, 24, 32, 128, 0.1f));
+            Sprite.Add($"{PlayerAnim.Idle}_big", new Animation(1, 24, 32, 128 + 32, 1f));
+            Sprite.Add($"{PlayerAnim.Run}_big", new Animation(3, 24, 32, 128 + 32 * 2, 0.1f));
+            Sprite.Add($"{PlayerAnim.Skid}_big", new Animation(1, 24, 32, 128 + 32 * 3, 1f));
+            Sprite.Add($"{PlayerAnim.Jump}_big", new Animation(1, 24, 32, 128 + 32 * 4, 1f));
+            Sprite.Add($"{PlayerAnim.Crouch}_big", new Animation(1, 24, 32, 128 + 32 * 5, 1f));
+            Sprite.Add($"{PlayerAnim.Fireball}_big", new Animation(1, 24, 32, 128 + 32 * 6, 1f));
+            Sprite.Add($"{PlayerAnim.Climb}_big", new Animation(2, 24, 32, 128 + 32 * 7, 0.15f));
+            Sprite.Add($"{PlayerAnim.ClimbStop}_big", new Animation(1, 24, 32, 128 + 32 * 7, 0.15f));
 
             Assets.TryGetShader("palette", out _paletteShader);
             _paletteSamplerLoc = Raylib.GetShaderLocation(_paletteShader, "palette");
@@ -113,6 +138,12 @@
         protected override void OnDestroy()
         {
             
+        }
+
+        public void StartCutscene(ICutscene cutscene)
+        {
+            _cutscene = cutscene;
+            cutscene.Start();
         }
 
         public void TakeDamage()
@@ -141,7 +172,7 @@
             Gravity = 0f;
             SetSmallStateVars();
             State = PlayerState.Small;
-            Sprite.Play("death_small");
+            PlayAnim(PlayerAnim.Death);
 
             OnDeath?.Invoke();
 
@@ -179,7 +210,7 @@
             State = PlayerState.Big;
 
             World.Freeze(1f);
-            Sprite.Play("grow");
+            PlayAnim(PlayerAnim.Grow);
 
             SetBigStateVarsX();
             EnumerateCollisionTiles(GetTilesForCollisionCheck(), (tile, tileRect) =>
@@ -270,7 +301,7 @@
 
             _iFrameTimer = IFrames;
             World.Freeze(1f);
-            Sprite.Play("grow");
+            PlayAnim(PlayerAnim.Grow);
             ChangePalette(PlayerPalette.Normal);
 
             SoundManager.PlaySound(Sounds.PlayerWarp);
@@ -336,12 +367,23 @@
 
             if (!IsDead)
             {
-                HandleStarman();
-                HandleMovement();
-                HandleJumping();
-                HandleFireballThrowing();
-                UpdateVisualLogic();
-                HandleAnimations();
+                if (IsCutscenePlaying)
+                {
+                    _cutscene.Update();
+                    if (_cutscene.IsFinished)
+                    {
+                        _cutscene = null;
+                    }
+                }
+                else
+                {
+                    HandleStarman();
+                    HandleMovement();
+                    HandleJumping();
+                    HandleFireballThrowing();
+                    UpdateVisualLogic();
+                    HandleAnimations();
+                }
             }
 
             base.Update();
@@ -583,13 +625,13 @@
 
             if (_isCrouching)
             {
-                PlayAnim("crouch");
+                PlayAnim(PlayerAnim.Crouch);
                 return;
             }
 
             if (_hasJumped)
             {
-                PlayAnim("jump");
+                PlayAnim(PlayerAnim.Jump);
                 return;
             }
 
@@ -599,38 +641,38 @@
                 else if (_inputDir > 0f) Sprite.FlipX = false;
 
                 if (_throwFireballCooldown > 0f && 
-                    (!Sprite.CurrentAnimationName.Contains("run") || MathF.Abs(Velocity.X) <= MaxWalkSpeed * 1.1f))
+                    (!Sprite.CurrentAnimationName.ToLower().Contains("run") || MathF.Abs(Velocity.X) <= MaxWalkSpeed * 1.1f))
                 {
-                    PlayAnim("fireball");
+                    PlayAnim(PlayerAnim.Fireball);
                     return;
                 }
 
                 if (Velocity.X == 0f)
                 {
-                    PlayAnim("idle");
+                    PlayAnim(PlayerAnim.Idle);
                     return;
                 }
             
                 if (MathF.Sign(Velocity.X) != MathF.Sign(_inputDir) && _inputDir != 0f)
                 {
-                    PlayAnim("skid");
+                    PlayAnim(PlayerAnim.Skid);
                     return;
                 }
 
-                PlayAnim("run");
-                if (Sprite.CurrentAnimationName.Contains("run"))
+                PlayAnim(PlayerAnim.Run);
+                if (Sprite.CurrentAnimationName.ToLower().Contains("run"))
                 {
                     for (int i = 0; i < Sprite.CurrentAnimation?.FrameTimes.Length; i++)
                     {
                         float t = Helper.Clamp01(MathF.Abs(Velocity.X) / MaxRunSpeed);
-                        Sprite.CurrentAnimation.FrameTimes[i] = Raymath.Lerp(0.2f, 0.067f, t);
+                        Sprite.CurrentAnimation.FrameTimes[i] = Raymath.Lerp(0.135f, 0.067f, t);
                     }
                 }
             }
             else
             {
-                PlayAnim("run");
-                if (Sprite.CurrentAnimationName.Contains("run"))
+                PlayAnim(PlayerAnim.Run);
+                if (Sprite.CurrentAnimationName.ToLower().Contains("run"))
                 {
                     for (int i = 0; i < Sprite.CurrentAnimation?.FrameTimes.Length; i++)
                     {
@@ -640,9 +682,9 @@
             }
         }
 
-        private void PlayAnim(string name)
+        public void PlayAnim(PlayerAnim anim)
         {
-            Sprite.Play($"{name}_{(State == PlayerState.Small ? "small" : "big")}");
+            Sprite.Play($"{anim}_{(State == PlayerState.Small ? "small" : "big")}");
         }
 
         public override void Draw()
@@ -695,8 +737,18 @@
 
         protected override void OnEntityOverlap(Entity other)
         {
+            if (IsCutscenePlaying)
+                return;
+
             if (other is Item item) HandleItemCollision(item);
             else if (other is Enemy enemy) HandleEnemyCollision(enemy);
+            else
+            {
+                if (other is Flagpole flag)
+                {
+                    StartCutscene(new FlagpoleCutscene(this, flag));
+                }
+            }
         }
 
         private void HandleItemCollision(Item item)

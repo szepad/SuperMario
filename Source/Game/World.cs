@@ -125,8 +125,8 @@ namespace Mario2
 
         public T SpawnEntity<T>(T entity, Vector2 feetPos) where T : Entity
         {
+            entity.SetFeetPos(feetPos);
             T spawned = SpawnEntity(entity);
-            spawned.SetFeetPos(feetPos);
             return spawned;
         }
 

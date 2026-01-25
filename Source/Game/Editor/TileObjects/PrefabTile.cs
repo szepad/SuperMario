@@ -2,9 +2,16 @@
 
 namespace Mario2.Editor
 {
-    public record PrefabAction(int Col, int Row, Tile Tile, bool OnlyOnAir = true);
+    public abstract record PrefabAction;
+
+    public record PrefabActionTile(int Col, int Row, Tile Tile, bool OnlyOnAir = true)
+        : PrefabAction;
+
     public sealed record PrefabActionRecurse(int Col, int Row, Tile Tile, int OffX, int OffY, bool OnlyOnAir = true)
-        : PrefabAction(Col, Row, Tile, OnlyOnAir);
+        : PrefabActionTile(Col, Row, Tile, OnlyOnAir);
+
+    public record PrefabActionEntity(float RelXInPx, float RelYInPx, Type Type) 
+        : PrefabAction;
 
     public sealed record PrefabTile(bool IsCollidable, int PreviewCol, int PreviewRow, 
         List<PrefabAction> Blueprint)
@@ -16,38 +23,68 @@ namespace Mario2.Editor
             
             foreach (PrefabAction action in Blueprint)
             {
-                if (action.Col == 0 && action.Row == 0)
-                    retTile = action.Tile;
+                if (action is PrefabActionTile tileAction)
+                {
+                    if (tileAction.Col == 0 && tileAction.Row == 0)
+                        retTile = tileAction.Tile;
 
-                if (action is PrefabActionRecurse recurse)
-                {
-                    bool stop;
-                    int x = col;
-                    int y = row;
-                    do
+                    if (action is PrefabActionRecurse recurse)
                     {
-                        stop = !Place(world, x, y, action);
-                        x += recurse.OffX;
-                        y += recurse.OffY;
+                        bool stop;
+                        int x = col;
+                        int y = row;
+                        do
+                        {
+                            stop = !PlaceTile(world, x, y, tileAction);
+                            x += recurse.OffX;
+                            y += recurse.OffY;
+                        }
+                        while (!stop);
                     }
-                    while (!stop);
+                    else
+                    {
+                        PlaceTile(world, col, row, tileAction);
+                    }
                 }
-                else
+                else if (action is PrefabActionEntity entityAction)
                 {
-                    Place(world, col, row, action);
+                    Entity? entity = (Entity?)Activator.CreateInstance(entityAction.Type, world);
+                    if (entity is not null)
+                    {
+                        entity.SetPosition(col * Tile.Size + entityAction.RelXInPx.Scale(),
+                            row * Tile.Size + entityAction.RelYInPx.Scale());
+
+                        if (EntityNotColliding(world, entity))
+                        {
+                            world.SpawnEntity(entity);
+                        }
+                    }
                 }
             }
 
             return retTile;
         }
 
-        private static bool Place(World world, int col, int row, PrefabAction action)
+        private static bool PlaceTile(World world, int col, int row, PrefabActionTile action)
         {
             if (action.OnlyOnAir && world.GetTile(col + action.Col, row + action.Row, out Tile tile)
                     && tile != SimpleTile.Air)
                 return false;
 
             world.SetTile(col + action.Col, row + action.Row, action.Tile);
+            return true;
+        }
+
+        private static bool EntityNotColliding(World world, Entity entity)
+        {
+            foreach (Entity other in world.Entities)
+            {
+                if (Raylib.CheckCollisionRecs(entity.Rect, other.Rect))
+                {
+                    return false;
+                }
+            }
+
             return true;
         }
     }

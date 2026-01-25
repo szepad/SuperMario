@@ -89,7 +89,7 @@ namespace Mario2
 
             GameSettingsLoader.Load(Settings);
 
-            LoadScene(new GameScene());
+            LoadScene(new EditorScene());
         }
 
         private void Unload()
