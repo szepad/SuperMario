@@ -24,6 +24,8 @@
         PlayerSkid,
         PlayerWarp,
         SaveAndContinue,
+        Score,
+        ScoreEnd,
         ShellCombo01,
         ShellCombo02,
         ShellCombo03,

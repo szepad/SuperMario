@@ -66,6 +66,8 @@
             new PrefabActionTile(3, 4, new SimpleTile(51 + 32, false), OnlyOnAir: false),
             new PrefabActionTile(4, 4, new SimpleTile(52 + 32, false), OnlyOnAir: false),
             new PrefabActionTile(5, 4, new SimpleTile(53 + 32, false), OnlyOnAir: false),
+
+            new PrefabActionEntity(40, 64, typeof(CastleEntrance))
         ]);
 
         // 0bNESW = Id

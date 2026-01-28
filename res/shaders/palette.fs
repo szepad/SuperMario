@@ -7,6 +7,7 @@ in vec4 fragColor;
 // Input uniform values
 uniform sampler2D texture0;
 uniform sampler2D palette;
+uniform float opacity;
 
 // Output fragment color
 out vec4 finalColor;
@@ -15,5 +16,5 @@ void main()
 {
     vec4 texel = texture(texture0, fragTexCoord);
     finalColor = texture(palette, vec2(texel.r + 1/15f * 0.5f, 0));
-    finalColor.a = texel.a;
+    finalColor.a = texel.a * opacity;
 }

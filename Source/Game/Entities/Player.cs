@@ -29,7 +29,8 @@ namespace Mario2
         Death,
         Grow,
         Crouch,
-        Fireball
+        Fireball,
+        Emote
     }
 
     public class Player : Entity
@@ -81,6 +82,7 @@ namespace Mario2
 
         private readonly Shader _paletteShader;
         private readonly int _paletteSamplerLoc;
+        private readonly int _paletteOpacityLoc;
         private Texture2D _palette;
 
         private bool _useStarVisuals;
@@ -113,6 +115,7 @@ namespace Mario2
             Sprite.Add($"{PlayerAnim.Climb}_small", new Animation(2, 16, 16, 64, 0.15f));
             Sprite.Add($"{PlayerAnim.ClimbStop}_small", new Animation(1, 16, 16, 64, 0.15f));
             Sprite.Add($"{PlayerAnim.Death}_small", new Animation(1, 16, 16, 80, 1f));
+            Sprite.Add($"{PlayerAnim.Emote}_small", new Animation(2, 16, 16, 96, 0.5f, isLooped: false));
 
             // Big
             Sprite.Add($"{PlayerAnim.Grow}_big", new Animation(2, 24, 32, 128, 0.1f));
@@ -124,9 +127,11 @@ namespace Mario2
             Sprite.Add($"{PlayerAnim.Fireball}_big", new Animation(1, 24, 32, 128 + 32 * 6, 1f));
             Sprite.Add($"{PlayerAnim.Climb}_big", new Animation(2, 24, 32, 128 + 32 * 7, 0.15f));
             Sprite.Add($"{PlayerAnim.ClimbStop}_big", new Animation(1, 24, 32, 128 + 32 * 7, 0.15f));
+            Sprite.Add($"{PlayerAnim.Emote}_big", new Animation(1, 24, 32, 128 + 32 * 8, 0.5f, isLooped: false));
 
             Assets.TryGetShader("palette", out _paletteShader);
             _paletteSamplerLoc = Raylib.GetShaderLocation(_paletteShader, "palette");
+            _paletteOpacityLoc = Raylib.GetShaderLocation(_paletteShader, "opacity");
             _palette = Assets.GetTex("palette_mario");
         }
 
@@ -699,6 +704,7 @@ namespace Mario2
         public override void Draw()
         {
             Raylib.SetShaderValueTexture(_paletteShader, _paletteSamplerLoc, _palette);
+            Raylib.SetShaderValue(_paletteShader, _paletteOpacityLoc, Sprite.Opacity, ShaderUniformDataType.Float);
             Raylib.BeginShaderMode(_paletteShader);
 
             if (IsInvincible)

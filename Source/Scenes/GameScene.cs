@@ -82,7 +82,13 @@
             }
 
             _world.OnPlayerDeath += () => _playerDeathTimer = PlayerDeathReloadTime;
+            _world.OnLevelEnd += World_OnLevelEnd;
             ResetCamera();
+        }
+
+        private void World_OnLevelEnd()
+        {
+            Load(() => SessionManager.LoadNext(out _world));
         }
 
         protected override void OnUpdate()
