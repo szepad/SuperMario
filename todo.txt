@@ -67,7 +67,7 @@
 [x] Star music
 [ ] Cutscenes
 	[x] Api
-	[ ] Flagpole
+	[x] Flagpole
 	[ ] Pipe
 	[ ] Level Pipe intro (like 1-2)
 [ ] Fix music looping stuff

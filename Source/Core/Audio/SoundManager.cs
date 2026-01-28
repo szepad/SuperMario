@@ -24,7 +24,7 @@
             }
         }
 
-        public static void PlayMusic(MusicName music)
+        public static void PlayMusic(MusicName music, bool isLooped = true)
         {
             if (CurrentMusic == music)
                 return;
@@ -53,6 +53,7 @@
             if (Raylib.IsMusicValid(_music))
             {
                 _musicLoaded = true;
+                _music.Looping = isLooped;
                 MusicVolumeScaler = 1f;
                 UpdateMusicVolume();
 
@@ -100,6 +101,14 @@
                 return;
 
             Raylib.ResumeMusicStream(_music);
+        }
+
+        public static bool IsCurrentMusicFinished()
+        {
+            if (!_musicLoaded)
+                return true;
+
+            return Raylib.GetMusicTimePlayed(_music) == 0;
         }
 
         public static void PlaySoundRandomPitch(Sounds name, float pitchVariance = 0.1f, float volume = 1f)

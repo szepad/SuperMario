@@ -20,7 +20,10 @@
 
         public void Update()
         {
-            GetFunction(State).Invoke();
+            if (!IsFinished)
+            {
+                GetFunction(State).Invoke();
+            }
         }
     }
 }

@@ -20,8 +20,11 @@ namespace Mario2
         public event Action? OnPlayerDeath;
         private bool _playerDeathInvoked;
 
+        public event Action? OnLevelEnd;
+        private bool _levelEndInvoked;
+
+        public int TimeLeft { get; set; } = 400;
         public int Cols { get; private set; } = 100;
-        public int TimeLeft { get; private set; } = 400;
         public WorldBackground Background { get; private set; }
         public ParallaxBackground Parallax { get; private set; }
         public MusicName Music { get; private set; } = MusicName.None;
@@ -29,6 +32,10 @@ namespace Mario2
         public Player Player { get; }
         public Tile[,] Tiles { get; private set; }
         public List<Entity> Entities { get; } = [];
+
+        public bool DrawStarFlag { get; set; }
+        public Sprite StarFlag { get; } = new("star_flag");
+        public Vector2 StarFlagPosition;
 
         public int FireballCount { get; private set; }
 
@@ -54,6 +61,9 @@ namespace Mario2
             SetBackground(WorldBackground.Sky);
 
             _globalQuestionTileAnim.Add("?", new Animation(3, 16, 16, 0, 0.15f));
+
+            StarFlag.Add("flag", new Animation(4, 16, 16, 0, 0.15f));
+            StarFlag.Origin = new Vector2(Tile.Size / 2f, 0f);
         }
 
         public void Start()
@@ -131,6 +141,14 @@ namespace Mario2
 
             Cols = newCols;
             Tiles = newMtx;
+        }
+
+        public void ReachLevelEnd()
+        {
+            if (_levelEndInvoked) return;
+            _levelEndInvoked = true;
+
+            OnLevelEnd?.Invoke();
         }
 
         public T SpawnEntity<T>(T entity, Vector2 feetPos) where T : Entity
@@ -348,7 +366,11 @@ namespace Mario2
 
         public void Draw(Camera2D camera, bool editor = false)
         {
-            //Entities.Sort((x, y) => x.LayerDepth.CompareTo(y.LayerDepth));
+            if (DrawStarFlag)
+            {
+                StarFlag.Draw(StarFlagPosition);
+            }
+
             List<Entity> drawList = [..Entities.OrderBy(x => x.LayerDepth)];
 
             int lastBg = -1;
