@@ -193,8 +193,6 @@
                 Player.World.StarFlagPosition.Y -= StarFlagSpeed * Time.DeltaTime;
             }
 
-            Player.World.StarFlag.Update();
-
             StateTimer += Time.DeltaTime;
             if (StateTimer >= AfterFlagWaitTime)
             {

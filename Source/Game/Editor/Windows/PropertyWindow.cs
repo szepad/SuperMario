@@ -1,6 +1,7 @@
 ﻿namespace Mario2.Editor
 {
-    public class PropertyWindow(EditorScene editor) : EditorWindow(editor, "Properties")
+    public class PropertyWindow(EditorScene editor)
+        : EditorWindow(editor, "Properties")
     {
         private int _colsInputVal = 0;
         private int _bgVal;
@@ -11,6 +12,9 @@
 
         public bool ContainerTileHidden => _ctHidden;
         private bool _ctHidden;
+
+        private string _warpPipeDest = string.Empty;
+        private string _warpPipeTag = string.Empty;
 
         public override void Update()
         {
@@ -33,6 +37,10 @@
         {
             WorldProperties();
             TileProperties();
+            EntityProperties();
+
+            // Spacing
+            Gui.Dummy(new Vector2(0f, 20f));
         }
 
         private void WorldProperties()
@@ -108,18 +116,50 @@
 
         private void TileProperties()
         {
-            if (Editor.ActiveSelector is TileWindow tw
-                && (tw.Selected is InstanceTile<QuestionTile> || tw.Selected is InstanceTile<BrickTile>))
+            if (Editor.ActiveSelector is not TileWindow tw)
+                return;
+
+            if (tw.Selected is InstanceTile<QuestionTile> || tw.Selected is InstanceTile<BrickTile>)
             {
-                Gui.SeparatorText("Tile");
+                Gui.SeparatorText("Item Tile");
 
                 Gui.Checkbox("Hidden", ref _ctHidden);
 
                 string[] choices = Enum.GetNames<ItemType>();
                 Gui.Combo("Item", ref _ctItemIndex, choices, choices.Length);
+            }
+        }
+
+        private void EntityProperties()
+        {
+            Entity? sel = Editor.WorldWindow.SelectedEntity;
+            if (sel is null)
+                return;
+
+            if (sel is WarpPipe pipe)
+            {
+                Gui.SeparatorText("Warp Pipe");
                 
-                // Spacing
-                Gui.Dummy(new Vector2(0f, 20f));
+                _warpPipeDest = pipe.Destination;
+                if (Gui.InputText("Dest", ref _warpPipeDest, 30))
+                {
+                    pipe.Destination = _warpPipeDest;
+                }
+
+                _warpPipeTag = pipe.Tag;
+                if (Gui.InputText("Tag", ref _warpPipeTag, 10))
+                {
+                    pipe.Tag = _warpPipeTag;
+                }
+            }
+            else if (sel is WarpExit exit)
+            {
+                Gui.SeparatorText("Pipe Exit");
+                _warpPipeTag = exit.Tag;
+                if (Gui.InputText("Tag", ref _warpPipeTag, 10))
+                {
+                    exit.Tag = _warpPipeTag;
+                }
             }
         }
     }

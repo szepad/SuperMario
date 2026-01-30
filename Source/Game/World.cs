@@ -34,8 +34,8 @@ namespace Mario2
         public List<Entity> Entities { get; } = [];
 
         public bool DrawStarFlag { get; set; }
-        public Sprite StarFlag { get; } = new("star_flag");
         public Vector2 StarFlagPosition;
+        private readonly Sprite _starFlag = new("star_flag");
 
         public int FireballCount { get; private set; }
 
@@ -62,8 +62,8 @@ namespace Mario2
 
             _globalQuestionTileAnim.Add("?", new Animation(3, 16, 16, 0, 0.15f));
 
-            StarFlag.Add("flag", new Animation(4, 16, 16, 0, 0.15f));
-            StarFlag.Origin = new Vector2(Tile.Size / 2f, 0f);
+            _starFlag.Add("flag", new Animation(4, 16, 16, 0, 0.15f));
+            _starFlag.Origin = new Vector2(Tile.Size / 2f, 0f);
         }
 
         public void Start()
@@ -177,6 +177,21 @@ namespace Mario2
             _freezeTimer = time;
         }
 
+        public void HandlePipeTransition(WarpPipe pipe)
+        {
+            WarpExit? exit = (WarpExit?)Entities.FirstOrDefault(
+                ent => ent is WarpExit exit && ent != pipe 
+                && exit.Tag == pipe.Tag);
+
+            if (exit is null)
+            {
+                exit = new WarpExit(this);
+                exit.SetFeetPos(pipe.Feet);
+            }
+
+            Player.StartCutscene(new PipeExitCutscene(Player, exit));
+        }
+
         public void SpawnEffect(Vector2 position, EffectData data) => SpawnEffect(position, Vector2.Zero, data);
         public void SpawnEffect(Vector2 position, Vector2 velocity, EffectData data)
         {
@@ -192,6 +207,7 @@ namespace Mario2
         public void Update(Camera2D camera)
         {
             _globalQuestionTileAnim.Update();
+            _starFlag.Update();
 
             if (!IsFrozen)
             {
@@ -368,7 +384,7 @@ namespace Mario2
         {
             if (DrawStarFlag)
             {
-                StarFlag.Draw(StarFlagPosition);
+                _starFlag.Draw(StarFlagPosition);
             }
 
             List<Entity> drawList = [..Entities.OrderBy(x => x.LayerDepth)];

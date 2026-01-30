@@ -21,10 +21,9 @@ namespace Mario2
         public StretchMode StretchMode { get; set; }
 
         public GameSettings Settings { get; } = new();
+        public Scene? ActiveScene { get; private set; }
 
         private bool _hasExited;
-
-        private Scene? _activeScene;
 
         private RenderTexture2D _virtualScreen;
 
@@ -59,9 +58,9 @@ namespace Mario2
 
         public void LoadScene(Scene? scene)
         {
-            _activeScene?.Unload();
-            _activeScene = scene;
-            _activeScene?.Load();
+            ActiveScene?.Unload();
+            ActiveScene = scene;
+            ActiveScene?.Load();
         }
 
         private void Init()
@@ -123,7 +122,7 @@ namespace Mario2
             }
 
             Time.Progress();
-            _activeScene?.Update();
+            ActiveScene?.Update();
             AnimatedTile.UpdateSpriteInstances();
             SoundManager.UpdateCurrentMusic();
 
@@ -135,17 +134,17 @@ namespace Mario2
 
         private void Draw()
         {
-            if (_activeScene is EditorScene && _activeScene.SubScene is null)
+            if (ActiveScene is EditorScene && ActiveScene.SubScene is null)
             {
-                _activeScene.PreDraw();
-                _activeScene.Draw();
+                ActiveScene.PreDraw();
+                ActiveScene.Draw();
                 return;
             }
 
-            _activeScene?.PreDraw();
+            ActiveScene?.PreDraw();
 
             Raylib.BeginTextureMode(_virtualScreen);
-            _activeScene?.Draw();
+            ActiveScene?.Draw();
             Raylib.EndTextureMode();
 
             Raylib.ClearBackground(LetterBoxColor);

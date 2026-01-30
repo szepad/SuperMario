@@ -1,5 +1,7 @@
 ﻿namespace Mario2
 {
+    public enum SingleCutsceneState { Always }
+
     public interface ICutscene
     {
         public bool IsFinished { get; }
