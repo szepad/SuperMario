@@ -763,6 +763,15 @@ namespace Mario2
                 {
                     StartCutscene(new FlagpoleCutscene(this, flag));
                 }
+                else if (other is WarpPipe pipe)
+                {
+                    const float EnterThreshold = 4f * Game.TextureScale;
+                    if (IsGrounded && Input.IsKeyPressed(KeyboardKey.Down)
+                        && MathF.Abs(pipe.Feet.X - Feet.X) < EnterThreshold)
+                    {
+                        StartCutscene(new PipeEnterCutscene(this, pipe));
+                    }
+                }
             }
         }
 

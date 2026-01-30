@@ -301,5 +301,8 @@
         protected virtual void OnTileCollision(Tile tile, CollisionSide side) { }
         protected virtual void OnTileOverlap(Tile tile) { }
         protected virtual void OnEntityOverlap(Entity other) { }
+
+        public virtual string SaveCustomData() => string.Empty;
+        public virtual void LoadCustomData(string data) { }
     }
 }

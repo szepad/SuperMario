@@ -15,11 +15,4 @@
             return entity;
         }
     }
-
-    public static class EntityObjectDefs
-    {
-        public static readonly EntityObject<Player> Player = new(0, 0);
-        public static readonly EntityObject<Goomba> Goomba = new(1, 0);
-        public static readonly EntityObject<Koopa> Koopa = new(2, 0);
-    }
 }

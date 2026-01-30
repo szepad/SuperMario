@@ -5,6 +5,8 @@
         public Vector2 RenderTexDrawPosition { get; private set; }
         public RenderTexture2D WorldContentTex { get; set; }
 
+        public Entity? SelectedEntity { get; private set; }
+
         private Camera2D _camera = new(Vector2.Zero, Vector2.Zero, 0f, 0.4f);
 
         private bool _isPanning;
@@ -33,6 +35,11 @@
 
         public Vector2 WorldToScreen(Vector2 worldPos)
             => (worldPos - _camera.Target) * _camera.Zoom;
+
+        public void DeselectEntity()
+        {
+            SelectedEntity = null;
+        }
 
         public void FocusCameraOn(Entity entity)
         {
@@ -107,59 +114,92 @@
             (int tx, int ty) = _tilePos;
             Entity? entityUnderMouse = GetEntityUnderMouse();
 
-            if (Raylib.IsMouseButtonDown(MouseButton.Left) && !_disableLeftClickTemporarily)
+            HandlePlacing(entityUnderMouse, tx, ty);
+            HandleDeleting(entityUnderMouse, tx, ty);
+
+            if (Raylib.IsMouseButtonUp(MouseButton.Left))
             {
-                if (Editor.ActiveSelector is TileWindow tileWindow)
-                {
-                    Tile? tile = Editor.World.SetTile(tx, ty, tileWindow.PlaceSelected(Editor.World, tx, ty));
-                    if (tile is ContainerTile ct)
-                    {
-                        ct.SetItem(Editor.PropertyWindow.ContainerTileItem);
+                _disableLeftClickTemporarily = false;
+            }
+            
+            if (Raylib.IsMouseButtonUp(MouseButton.Right))
+            {
+                _disableRightClickTemporarily = false;
+            }
+        }
 
-                        if (Editor.PropertyWindow.ContainerTileHidden)
-                            ct.SetHidden();
-                    }
-                    
-                    UpdateRule(Editor.World, tx, ty);
-                }
-                else if (Editor.ActiveSelector is EntityWindow entityWindow)
-                {
-                    if (entityUnderMouse is null)
-                    {
-                        Entity entity = entityWindow.PlaceSelected(Editor.World, tx, ty);
-                        Vector2 worldPos = ScreenToWorld(GetMousePositionInsideEditor());
-                        Vector2 tilePos = worldPos / Tile.Size;
-                        float xFrac = tilePos.X - (int)tilePos.X;
-                        float xOff = 0.5f;
-                        if (xFrac < 1f / 4f)
-                        {
-                            xOff = 0f;
-                        }
-                        else if (xFrac > 3f / 4f)
-                        {
-                            xOff = 1f;
-                        }
-
-                        Vector2 pos = new(
-                            ((int)tilePos.X + xOff) * Tile.Size,
-                            ((int)tilePos.Y + 1f) * Tile.Size);
-
-                        if (entity is Player)
-                        {
-                            Editor.World.Player.SetFeetPos(pos);
-                        }
-                        else
-                        {
-                            Editor.World.SpawnEntity(entity, pos);
-                        }
-
-                        _disableLeftClickTemporarily = true;
-                    }
-                }
-
-                Editor.Dirty();
+        private void HandlePlacing(Entity? entityUnderMouse, int tx, int ty)
+        {
+            if (!Raylib.IsMouseButtonDown(MouseButton.Left) || _disableLeftClickTemporarily)
+                return;
+            
+            if (entityUnderMouse is not null)
+            {
+                SelectedEntity = entityUnderMouse;
+                return;
             }
 
+            if (Editor.ActiveSelector is TileWindow tileWindow)
+            {
+                PlaceTile(tileWindow, tx, ty);
+            }
+            else if (Editor.ActiveSelector is EntityWindow entityWindow)
+            {
+                PlaceEntity(entityWindow, tx, ty);
+            }
+
+            Editor.Dirty();
+        }
+
+        private void PlaceTile(TileWindow tileWindow, int tx, int ty)
+        {
+            Tile? tile = Editor.World.SetTile(tx, ty, tileWindow.PlaceSelected(Editor.World, tx, ty));
+            if (tile is ContainerTile ct)
+            {
+                ct.SetItem(Editor.PropertyWindow.ContainerTileItem);
+
+                if (Editor.PropertyWindow.ContainerTileHidden)
+                    ct.SetHidden();
+            }
+
+            UpdateRule(Editor.World, tx, ty);
+        }
+
+        private void PlaceEntity(EntityWindow entityWindow, int tx, int ty)
+        {
+            Entity entity = entityWindow.PlaceSelected(Editor.World, tx, ty);
+            Vector2 worldPos = ScreenToWorld(GetMousePositionInsideEditor());
+            Vector2 tilePos = worldPos / Tile.Size;
+            float xFrac = tilePos.X - (int)tilePos.X;
+            float xOff = 0.5f;
+            if (xFrac < 1f / 4f)
+            {
+                xOff = 0f;
+            }
+            else if (xFrac > 3f / 4f)
+            {
+                xOff = 1f;
+            }
+
+            Vector2 pos = new(
+                ((int)tilePos.X + xOff) * Tile.Size,
+                ((int)tilePos.Y + 1f) * Tile.Size);
+
+            if (entity is Player)
+            {
+                Editor.World.Player.SetFeetPos(pos);
+                SelectedEntity = Editor.World.Player;
+            }
+            else
+            {
+                SelectedEntity = Editor.World.SpawnEntity(entity, pos);
+            }
+
+            _disableLeftClickTemporarily = true;
+        }
+
+        private void HandleDeleting(Entity? entityUnderMouse, int tx, int ty)
+        {
             if (Raylib.IsMouseButtonDown(MouseButton.Right) && !_disableRightClickTemporarily)
             {
                 if (entityUnderMouse is null)
@@ -173,16 +213,8 @@
                     Editor.World.Entities.Remove(entityUnderMouse);
                     _disableRightClickTemporarily = true;
                 }
-            }
 
-            if (Raylib.IsMouseButtonUp(MouseButton.Left))
-            {
-                _disableLeftClickTemporarily = false;
-            }
-            
-            if (Raylib.IsMouseButtonUp(MouseButton.Right))
-            {
-                _disableRightClickTemporarily = false;
+                DeselectEntity();
             }
         }
 
@@ -278,6 +310,17 @@
                     DrawGrid();
                 
                 Editor.World.Draw(default, editor: true);
+                if (SelectedEntity is not null)
+                {
+                    const float Scale = 1.5f;
+                    Rectangle rect = SelectedEntity.Rect;
+                    rect.X -= (rect.Width * Scale - rect.Width) / 2f;
+                    rect.Y -= (rect.Height * Scale - rect.Height) / 2f;
+                    rect.Width *= Scale;
+                    rect.Height *= Scale;
+
+                    Raylib.DrawRectanglePro(rect, Vector2.Zero, 0f, Color.Blue.Alpha(0.5f));
+                }
                 
                 Raylib.EndMode2D();
             }

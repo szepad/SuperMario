@@ -14,7 +14,7 @@
         public static readonly Sprite BrickSpriteUg = new("question", new Animation(1, 16, 16, 80, 1f));
         public static readonly Sprite BrickSpriteCastle = new("question", new Animation(1, 16, 16, 96, 1f));
 
-        public static readonly Sprite CoinSprite = new("coin", new Animation(3, 16, 16, 0, 0.15f));
+        public static readonly Sprite CoinSprite = new("items", new Animation(3, 16, 16, 0, 0.15f));
         public static readonly Sprite HudCoinSprite = new("hud_coin", new Animation(3, 16, 8, 0, 0.15f));
 
         public Vector2 SpriteOffset;

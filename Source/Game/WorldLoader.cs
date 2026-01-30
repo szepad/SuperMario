@@ -44,7 +44,7 @@
                 if (entity is Player)
                     continue;
 
-                writer.WriteLine($"{entity.GetType().FullName};{(int)entity.Position.X};{(int)entity.Position.Y}");
+                writer.WriteLine($"{entity.GetType().FullName};{(int)entity.Position.X};{(int)entity.Position.Y};{entity.SaveCustomData()}");
             }
         }
 
@@ -121,7 +121,7 @@
                 if (string.IsNullOrWhiteSpace(line))
                     continue;
 
-                string[] data = line.Split(';');
+                string[] data = line.Split(';', 4);
                 Type? type = Type.GetType(data[0]);
                 if (type is null)
                 {
@@ -137,6 +137,7 @@
                 }
 
                 entity.SetPosition(int.Parse(data[1]), int.Parse(data[2]));
+                entity.LoadCustomData(data[3]);
                 world.SpawnEntity(entity);
             }
 
