@@ -13,3 +13,5 @@ anim,Mario2.BrickTile,0,False;anim,Mario2.BrickTile,0,False;simple,-1,False;simp
 anim,Mario2.BrickTile,0,False;anim,Mario2.BrickTile,0,False;simple,-1,False;simple,-1,False;simple,-1,False;anim,Mario2.BrickTile,0,False;anim,Mario2.BrickTile,0,False;anim,Mario2.BrickTile,0,False;anim,Mario2.BrickTile,0,False;anim,Mario2.BrickTile,0,False;anim,Mario2.BrickTile,0,False;simple,-1,False;simple,-1,False;simple,-1,False;simple,-1,False;simple,-1,False;
 simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;
 simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;
+Mario2.WarpExit;192;704;hell
+Mario2.WarpPipe;256;704;levels/01.lvl,dbg
