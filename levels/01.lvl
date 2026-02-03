@@ -32,5 +32,6 @@ Mario2.Koopa;6848;704;
 Mario2.Goomba;1408;704;
 Mario2.Flagpole;12696;128;
 Mario2.CastleEntrance;13088;704;
-Mario2.WarpPipe;3680;448;,hello
-Mario2.WarpExit;10464;576;helloe
+Mario2.WarpPipe;3680;448;levels/bonus01.lvl,hell
+Mario2.WarpExit;10464;576;hello
+Mario2.WarpExit;3520;256;dbg

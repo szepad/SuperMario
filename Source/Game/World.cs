@@ -23,6 +23,9 @@ namespace Mario2
         public event Action? OnLevelEnd;
         private bool _levelEndInvoked;
 
+        public event Action<WarpPipe>? OnPipeLoadSublevel;
+
+        public string LoadedPath { get; init; } = string.Empty;
         public int TimeLeft { get; set; } = 400;
         public int Cols { get; private set; } = 100;
         public WorldBackground Background { get; private set; }
@@ -46,8 +49,6 @@ namespace Mario2
 
         private readonly EffectPool _effectPool = new();
 
-        private bool _hasStarted;
-
         public World()
         {
             Player = new Player(this);
@@ -68,9 +69,6 @@ namespace Mario2
 
         public void Start()
         {
-            if (_hasStarted) return;
-            _hasStarted = true;
-
             SoundManager.PlayMusic(Music);
         }
 
@@ -179,17 +177,24 @@ namespace Mario2
 
         public void HandlePipeTransition(WarpPipe pipe)
         {
-            WarpExit? exit = (WarpExit?)Entities.FirstOrDefault(
-                ent => ent is WarpExit exit && ent != pipe 
+            if (pipe.Destination == string.Empty || Path.GetFullPath(pipe.Destination) == Path.GetFullPath(LoadedPath))
+            {
+                WarpExit? exit = (WarpExit?)Entities.FirstOrDefault(
+                ent => ent is WarpExit exit && ent != pipe
                 && exit.Tag == pipe.Tag);
 
-            if (exit is null)
-            {
-                exit = new WarpExit(this);
-                exit.SetFeetPos(pipe.Feet);
-            }
+                if (exit is null)
+                {
+                    exit = new WarpExit(this) { Tag = pipe.Tag };
+                    exit.SetFeetPos(pipe.Feet);
+                }
 
-            Player.StartCutscene(new PipeExitCutscene(Player, exit));
+                Player.StartCutscene(new PipeExitCutscene(Player, exit));
+            }
+            else
+            {
+                OnPipeLoadSublevel?.Invoke(pipe);
+            }
         }
 
         public void SpawnEffect(Vector2 position, EffectData data) => SpawnEffect(position, Vector2.Zero, data);

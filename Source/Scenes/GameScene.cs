@@ -22,6 +22,8 @@
         private const float PlayerDeathReloadTime = 5f;
         private float _playerDeathTimer;
 
+        private readonly Dictionary<string, World> _loadedSubWorlds = new();
+
         protected override void OnLoad()
         {
             SoundManager.StopMusic();
@@ -34,7 +36,7 @@
                 return;
             }
 
-            Load(() => SessionManager.LoadNext(out _world));
+            LoadNext();
         }
 
         private void ResetCamera()
@@ -56,7 +58,8 @@
             if (loaded is not null)
             {
                 _world = loaded;
-                _world.Start();
+                AssignWorldEvents();
+                StartWorld();
             }
             else if (ParentScene is null)
             {
@@ -66,29 +69,70 @@
             {
                 ParentScene.UnloadSubScene();
             }
-
-            ResetCamera();
         }
 
         private void Load(Func<SessionLoadResult> loader)
         {
+            SoundManager.StopMusic();
             _state = State.Loading;
             _loadTimer = LoadTime;
+            _loadedSubWorlds.Clear();
 
             if (loader.Invoke() != SessionLoadResult.Success)
             {
                 Game.Instance.LoadScene(new TitleScene());
-                return;
             }
+            else
+            {
+                _loadedSubWorlds[Path.GetFullPath(_world.LoadedPath)] = _world;
+                AssignWorldEvents();
+            }
+        }
 
+        private void LoadNext() => Load(() => SessionManager.LoadNext(out _world));
+        private void Reload() => Load(() => SessionManager.LoadCurrent(out _world));
+
+        private void AssignWorldEvents() 
+        {
             _world.OnPlayerDeath += () => _playerDeathTimer = PlayerDeathReloadTime;
             _world.OnLevelEnd += World_OnLevelEnd;
+            _world.OnPipeLoadSublevel += World_OnPipeLoadSublevel;
+        }
+
+        private void StartWorld()
+        {
+            _world.Start();
             ResetCamera();
         }
 
         private void World_OnLevelEnd()
         {
-            Load(() => SessionManager.LoadNext(out _world));
+            LoadNext();
+        }
+
+        private void World_OnPipeLoadSublevel(WarpPipe pipe)
+        {
+            if (_loadedSubWorlds.TryGetValue(Path.GetFullPath(pipe.Destination), out World? loaded))
+            {
+                _world = loaded;
+            }
+            else
+            {
+                World? world = WorldLoader.Deserialize(pipe.Destination, out _);
+                if (world is null)
+                {
+                    pipe.Destination = string.Empty;
+                    _world.HandlePipeTransition(pipe);
+                    return;
+                }
+
+                _loadedSubWorlds[Path.GetFullPath(world.LoadedPath)] = world;
+                _world = world;
+                AssignWorldEvents();
+            }
+
+            StartWorld();
+            _world.HandlePipeTransition(pipe);
         }
 
         protected override void OnUpdate()
@@ -106,7 +150,7 @@
             if (_loadTimer <= 0f)
             {
                 _state = State.Gameplay;
-                _world.Start();
+                StartWorld();
             }
         }
 
@@ -121,7 +165,7 @@
                 _playerDeathTimer -= Time.DeltaTime;
                 if (_playerDeathTimer <= 0f)
                 {
-                    Load(() => SessionManager.LoadCurrent(out _world));
+                    Reload();
                 }
             }
             else if (Input.IsKeyPressed(KeyboardKey.Escape))

@@ -70,7 +70,7 @@
         private static World DeserializeImpl(string path)
         {
             using StreamReader reader = new(path);
-            World world = new();
+            World world = new() { LoadedPath = Path.GetFullPath(path) };
 
             // Meta
             int[] meta = [..reader.ReadLine()!.Split(";").Select(int.Parse)];
