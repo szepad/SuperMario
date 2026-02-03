@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Mario2
 {
@@ -28,6 +29,7 @@ namespace Mario2
         public string LoadedPath { get; init; } = string.Empty;
         public int TimeLeft { get; set; } = 400;
         public int Cols { get; private set; } = 100;
+        public Vector2 PlayerSpawnPosition { get; set; }
         public WorldBackground Background { get; private set; }
         public ParallaxBackground Parallax { get; private set; }
         public MusicName Music { get; private set; } = MusicName.None;
@@ -185,11 +187,19 @@ namespace Mario2
 
                 if (exit is null)
                 {
-                    exit = new WarpExit(this) { Tag = pipe.Tag };
-                    exit.SetFeetPos(pipe.Feet);
+                    //exit = new WarpExit(this) { Tag = pipe.Tag };
+                    //exit.SetFeetPos(pipe.Feet);
+                    ResetPlayerStatus();
+                    Player.SetPosition(PlayerSpawnPosition);
+                    
+                    // Snap player onto the tile if he's standing inside it
+                    Player.OldPosition.Y--;
+                    Player.HandleCollisions(false);
                 }
-
-                Player.StartCutscene(new PipeExitCutscene(Player, exit));
+                else
+                {
+                    Player.StartCutscene(new PipeExitCutscene(Player, exit));
+                }
             }
             else
             {
@@ -207,6 +217,16 @@ namespace Mario2
         {
             sprite.SetFrame(_globalQuestionTileAnim.CurrentFrame);
             sprite.SetFrameTimer(_globalQuestionTileAnim.CurrentFrameTimer);
+        }
+
+        private void ResetPlayerStatus()
+        {
+            Player.EndCutscene();
+            Player.IsCollidable = true;
+            Player.IsHittable = true;
+            Player.Gravity = Entity.DefaultGravity;
+            Player.LayerDepth = LayerDepth.Player;
+            Player.Velocity = Vector2.Zero;
         }
 
         public void Update(Camera2D camera)
@@ -353,10 +373,14 @@ namespace Mario2
             }
         }
 
+        public void SetCameraPosition(ref Camera2D camera, float x)
+        {
+            camera.Target.X = x;
+            ClampCameraInsideLevelBounds(ref camera);
+        }
+
         public void HandleCameraFollow(ref Camera2D camera)
         {
-            const float HalfX = Game.Width / 2f;
-            
             if (CameraStyle == CameraStyle.Follow)
             {
                 const float LookAhead = Tile.Size;
@@ -371,7 +395,12 @@ namespace Mario2
                 camera.Target.X += CameraAutoScrollSpeed * Time.DeltaTime;
             }
 
-            // Clamp inside level bounds
+            ClampCameraInsideLevelBounds(ref camera);
+        }
+
+        private void ClampCameraInsideLevelBounds(ref Camera2D camera)
+        {
+            const float HalfX = Game.Width / 2f;
             camera.Target.X = Helper.Clamp(camera.Target.X, HalfX, Cols * Tile.Size - HalfX);
         }
 

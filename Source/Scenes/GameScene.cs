@@ -58,6 +58,7 @@
             if (loaded is not null)
             {
                 _world = loaded;
+                _loadedSubWorlds[Path.GetFullPath(_world.LoadedPath)] = _world;
                 AssignWorldEvents();
                 StartWorld();
             }
@@ -123,6 +124,7 @@
                 {
                     pipe.Destination = string.Empty;
                     _world.HandlePipeTransition(pipe);
+                    _world.SetCameraPosition(ref _camera, 0f);
                     return;
                 }
 
@@ -133,6 +135,7 @@
 
             StartWorld();
             _world.HandlePipeTransition(pipe);
+            _world.SetCameraPosition(ref _camera, 0f);
         }
 
         protected override void OnUpdate()

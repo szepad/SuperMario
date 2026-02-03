@@ -76,7 +76,8 @@
             int[] meta = [..reader.ReadLine()!.Split(";").Select(int.Parse)];
             world.SetCols(meta[0]);
             world.SetBackground((WorldBackground)meta[1]);
-            world.Player.SetPosition(meta[2], meta[3]);
+            world.PlayerSpawnPosition = new Vector2(meta[2], meta[3]);
+            world.Player.SetPosition(world.PlayerSpawnPosition);
             world.SetMusic((MusicName)meta[4]);
 
             // Tiles

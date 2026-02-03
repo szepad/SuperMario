@@ -12,6 +12,7 @@ namespace Mario2
         
         public WorldWindow WorldWindow { get; private set; }
         public TileWindow TileWindow { get; private set; }
+        public TilesetRawWindow TilesetRawWindow { get; private set; }
         public EditorWindow ActiveSelector { get; private set; }
 
         public EntityWindow EntityWindow { get; private set; }
@@ -46,11 +47,13 @@ namespace Mario2
 
             WorldWindow = new WorldWindow(this);
             TileWindow = new TileWindow(this);
+            TilesetRawWindow = new TilesetRawWindow(this);
             EntityWindow = new EntityWindow(this);
             PropertyWindow = new PropertyWindow(this);
 
             _windowRenderQueue.Add(WorldWindow);
             _windowRenderQueue.Add(TileWindow);
+            _windowRenderQueue.Add(TilesetRawWindow);
             _windowRenderQueue.Add(EntityWindow);
             _windowRenderQueue.Add(PropertyWindow);
 

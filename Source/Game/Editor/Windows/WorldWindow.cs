@@ -126,6 +126,15 @@
             {
                 _disableRightClickTemporarily = false;
             }
+
+            if (SelectedEntity is not null)
+            {
+                const float MoveOffset = 8f * Game.TextureScale;
+                if (Raylib.IsKeyPressed(KeyboardKey.Left)) SelectedEntity.Position.X -= MoveOffset;
+                if (Raylib.IsKeyPressed(KeyboardKey.Right)) SelectedEntity.Position.X += MoveOffset;
+                if (Raylib.IsKeyPressed(KeyboardKey.Up)) SelectedEntity.Position.Y -= MoveOffset;
+                if (Raylib.IsKeyPressed(KeyboardKey.Down)) SelectedEntity.Position.Y += MoveOffset;
+            }
         }
 
         private void HandlePlacing(Entity? entityUnderMouse, int tx, int ty)
@@ -142,6 +151,10 @@
             if (Editor.ActiveSelector is TileWindow tileWindow)
             {
                 PlaceTile(tileWindow, tx, ty);
+            }
+            else if (Editor.ActiveSelector is TilesetRawWindow tileRawWindow)
+            {
+                PlaceTileRaw(tileRawWindow, tx, ty);
             }
             else if (Editor.ActiveSelector is EntityWindow entityWindow)
             {
@@ -163,6 +176,11 @@
             }
 
             UpdateRule(Editor.World, tx, ty);
+        }
+
+        private void PlaceTileRaw(TilesetRawWindow tileRawWindow, int tx, int ty)
+        {
+            Editor.World.SetTile(tx, ty, tileRawWindow.PlaceSelected(Editor.World, tx, ty));
         }
 
         private void PlaceEntity(EntityWindow entityWindow, int tx, int ty)

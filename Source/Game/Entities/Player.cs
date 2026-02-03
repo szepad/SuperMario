@@ -151,6 +151,11 @@ namespace Mario2
             cutscene.Start();
         }
 
+        public void EndCutscene()
+        {
+            _cutscene = null;
+        }
+
         public void TakeDamage()
         {
             if (IsInvincible)
