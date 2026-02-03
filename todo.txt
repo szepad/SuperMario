@@ -77,8 +77,9 @@
 	[ ] Adjust for big mario's sprites 
 [x] Fix music looping stuff
 [x] Sublevels
-[ ] Pipe into sublevel, with no found tag, handle that case
-[ ] Raw tile placing from the tileset tex itself inside tile selector (with a toggle button)
+[x] Pipe into sublevel, with no found tag, handle that case
+[x] Raw tile placing from the tileset tex itself inside tile selector (with a toggle button)
+[ ] Horizontal pipe entering
 [ ] Jump higher linearly based on movement speed (max get on 5 blocks high)
 [ ] Title screen
 [ ] Luigi

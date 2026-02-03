@@ -18,6 +18,7 @@ namespace Mario2
             Player.Gravity = 0f;
             Player.PlayAnim(PlayerAnim.Idle);
             Player.Sprite.FlipX = false;
+            Player.Velocity = Vector2.Zero;
         }
 
         private void ExitState()

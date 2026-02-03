@@ -121,7 +121,7 @@
             }
         }
 
-        protected void HandleCollisions(bool horizontal)
+        public void HandleCollisions(bool horizontal)
         {
             if (!IsCollidable)
                 return;
@@ -191,7 +191,7 @@
             });
         }
 
-        protected List<Tile> GetTilesForCollisionCheck()
+        public List<Tile> GetTilesForCollisionCheck()
         {
             List<Tile> tilesToCheck = new(capacity: 16);
             Vector2 min = Vector2.Min(OldPosition, Position);
@@ -218,7 +218,7 @@
             return tilesToCheck;
         }
 
-        protected void EnumerateCollisionTiles(List<Tile> tiles, Action<Tile, Rectangle> OnBroadCheck)
+        public void EnumerateCollisionTiles(List<Tile> tiles, Action<Tile, Rectangle> OnBroadCheck)
         {
             foreach (Tile tile in tiles)
             {
