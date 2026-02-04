@@ -13,4 +13,4 @@ anim,Mario2.BrickTile,0,False;simple,-1,False;simple,-1,False;simple,-1,False;an
 anim,Mario2.BrickTile,0,False;simple,-1,False;simple,-1,False;simple,-1,False;anim,Mario2.BrickTile,0,False;anim,Mario2.BrickTile,0,False;anim,Mario2.BrickTile,0,False;anim,Mario2.BrickTile,0,False;anim,Mario2.BrickTile,0,False;anim,Mario2.BrickTile,0,False;anim,Mario2.BrickTile,0,False;simple,-1,False;simple,-1,False;simple,34,True;simple,35,True;simple,36,True;
 simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;simple,1,True;
 simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;simple,9,True;
-Mario2.WarpPipe;192;704;levels/01.lvl,bonus01
+Mario2.WarpPipe;768;704;levels/01.lvl,bonus01,1

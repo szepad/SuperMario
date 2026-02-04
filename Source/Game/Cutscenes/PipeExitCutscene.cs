@@ -25,7 +25,7 @@ namespace Mario2
         {
             Player.Position.Y -= 32f.Scale() * Time.DeltaTime;
             Player.OldPosition.Y = Player.Position.Y;
-            if (Player.Feet.Y <= _exit.Feet.Y + 1f.Scale())
+            if (Player.Feet.Y <= _exit.Feet.Y + 0.5f.Scale())
             {
                 IsFinished = true;
                 Player.LayerDepth = LayerDepth.Player;

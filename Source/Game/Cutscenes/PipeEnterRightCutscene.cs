@@ -1,6 +1,6 @@
 ﻿namespace Mario2
 {
-    public class PipeEnterCutscene(Player player, WarpPipe pipe)
+    public class PipeEnterRightCutscene(Player player, WarpPipe pipe)
         : Cutscene<SingleCutsceneState>(player)
     {
         private readonly WarpPipe _pipe = pipe;
@@ -10,8 +10,9 @@
         public override void Start()
         {
             SoundManager.PlaySound(Sounds.PlayerWarp);
-            Player.PlayAnim(PlayerAnim.Emote);
-            Player.Sprite.SetFrame(1);
+            Player.PlayAnim(PlayerAnim.Run);
+            Player.SetRunAnimFrameTimes(0.1f);
+            Player.Sprite.FlipX = false;
             Player.IsCollidable = false;
             Player.IsHittable = false;
             Player.Gravity = 0f;
@@ -21,9 +22,9 @@
 
         private void EnterState()
         {
-            Player.Position.Y += 32f.Scale() * Time.DeltaTime;
+            Player.Position.X += 16f.Scale() * Time.DeltaTime;
 
-            if (Player.Position.Y >= _pipe.Feet.Y + 8f.Scale())
+            if (Player.Position.X >= _pipe.Rect.X + _pipe.Rect.Width + 8f.Scale())
             {
                 IsFinished = true;
                 Player.World.HandlePipeTransition(_pipe);

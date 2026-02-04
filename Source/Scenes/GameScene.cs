@@ -113,6 +113,7 @@
 
         private void World_OnPipeLoadSublevel(WarpPipe pipe)
         {
+            World prev = _world;
             if (_loadedSubWorlds.TryGetValue(Path.GetFullPath(pipe.Destination), out World? loaded))
             {
                 _world = loaded;
@@ -133,7 +134,11 @@
                 AssignWorldEvents();
             }
 
+            _world.ResetPlayer();
+            _world.Player.SetStateInstantNoSideFx(prev.Player.State);
+
             StartWorld();
+            
             _world.HandlePipeTransition(pipe);
             _world.SetCameraPosition(ref _camera, 0f);
         }

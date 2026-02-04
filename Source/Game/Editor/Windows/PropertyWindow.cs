@@ -15,6 +15,7 @@
 
         private string _warpPipeDest = string.Empty;
         private string _warpPipeTag = string.Empty;
+        private int _warpPipeDir;
 
         public override void Update()
         {
@@ -150,6 +151,13 @@
                 if (Gui.InputText("Tag", ref _warpPipeTag, 10))
                 {
                     pipe.Tag = _warpPipeTag;
+                }
+
+                _warpPipeDir = (int)pipe.Dir;
+                string[] choices = Enum.GetNames<PipeDirection>();
+                if (Gui.Combo("Dir", ref _warpPipeDir, choices, choices.Length))
+                {
+                    pipe.Dir = (PipeDirection)_warpPipeDir;
                 }
             }
             else if (sel is WarpExit exit)
