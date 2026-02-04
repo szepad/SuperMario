@@ -34,7 +34,7 @@ namespace Mario2
         public ParallaxBackground Parallax { get; private set; }
         public MusicName Music { get; private set; } = MusicName.None;
 
-        public Player Player { get; }
+        public Player Player { get; private set; }
         public Tile[,] Tiles { get; private set; }
         public List<Entity> Entities { get; } = [];
 
@@ -53,10 +53,7 @@ namespace Mario2
 
         public World()
         {
-            Player = new Player(this);
-            Entities.Add(Player);
-            Player.Activate();
-            Player.OnDeath += TryInvokePlayerDeath;
+            ResetPlayer();
 
             Tiles = new Tile[Rows, Cols];
             Clear(Tiles);
@@ -67,6 +64,20 @@ namespace Mario2
 
             _starFlag.Add("flag", new Animation(4, 16, 16, 0, 0.15f));
             _starFlag.Origin = new Vector2(Tile.Size / 2f, 0f);
+        }
+
+        [MemberNotNull(nameof(Player))]
+        public void ResetPlayer()
+        {
+            if (Player is not null && Entities.Contains(Player))
+            {
+                Entities.Remove(Player);
+            }
+
+            Player = new Player(this);
+            Entities.Add(Player);
+            Player.Activate();
+            Player.OnDeath += TryInvokePlayerDeath;
         }
 
         public void Start()
@@ -189,7 +200,6 @@ namespace Mario2
                 {
                     //exit = new WarpExit(this) { Tag = pipe.Tag };
                     //exit.SetFeetPos(pipe.Feet);
-                    ResetPlayerStatus();
                     Player.SetPosition(PlayerSpawnPosition);
                     
                     // Snap player onto the tile if he's standing inside it
@@ -217,16 +227,6 @@ namespace Mario2
         {
             sprite.SetFrame(_globalQuestionTileAnim.CurrentFrame);
             sprite.SetFrameTimer(_globalQuestionTileAnim.CurrentFrameTimer);
-        }
-
-        private void ResetPlayerStatus()
-        {
-            Player.EndCutscene();
-            Player.IsCollidable = true;
-            Player.IsHittable = true;
-            Player.Gravity = Entity.DefaultGravity;
-            Player.LayerDepth = LayerDepth.Player;
-            Player.Velocity = Vector2.Zero;
         }
 
         public void Update(Camera2D camera)

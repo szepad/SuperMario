@@ -147,6 +147,7 @@ namespace Mario2
 
         public void StartCutscene(ICutscene cutscene)
         {
+            EndStar(true, music: false);
             _cutscene = cutscene;
             cutscene.Start();
         }
@@ -188,6 +189,30 @@ namespace Mario2
 
             SoundManager.StopMusic();
             SoundManager.PlaySound(Sounds.PlayerDie);
+        }
+
+        public void SetStateInstantNoSideFx(PlayerState state)
+        {
+            switch (state)
+            {
+                case PlayerState.Small:
+                    ForceStandUp();
+                    SetSmallStateVars();
+                    ChangePalette(PlayerPalette.Normal);
+                    break;
+                case PlayerState.Big:
+                    SetBigStateVarsX();
+                    SetBigStateVarsY();
+                    ChangePalette(PlayerPalette.Normal);
+                    break;
+                case PlayerState.Fire:
+                    SetBigStateVarsX();
+                    SetBigStateVarsY();
+                    ChangePalette(PlayerPalette.Fire);
+                    break;
+            }
+
+            State = state;
         }
 
         private void SetSmallStateVars()
@@ -285,11 +310,16 @@ namespace Mario2
             SoundManager.PlayMusic(MusicName.Invincible);
         }
 
-        private void EndStar()
+        private void EndStar(bool checkIfStarman, bool music = true)
         {
+            if (checkIfStarman && !IsStarman)
+                return;
+
             _useStarVisuals = false;
             ChangePalette(State == PlayerState.Fire ? PlayerPalette.Fire : PlayerPalette.Normal);
-            SoundManager.PlayMusic(World.Music);
+
+            if (music) SoundManager.PlayMusic(World.Music);
+            else SoundManager.StopMusic();
         }
 
         private void ChangePalette(PlayerPalette palette)
@@ -379,6 +409,7 @@ namespace Mario2
             {
                 if (IsCutscenePlaying)
                 {
+                    UpdateVisualLogic();
                     _cutscene.Update();
                     if (_cutscene.IsFinished)
                     {
@@ -430,7 +461,7 @@ namespace Mario2
             _starmanTimer -= Time.DeltaTime;
             if (_starmanTimer <= 0f)
             {
-                EndStar();
+                EndStar(false);
             }
         }
 
@@ -708,9 +739,9 @@ namespace Mario2
 
         public override void Draw()
         {
+            Raylib.BeginShaderMode(_paletteShader);
             Raylib.SetShaderValueTexture(_paletteShader, _paletteSamplerLoc, _palette);
             Raylib.SetShaderValue(_paletteShader, _paletteOpacityLoc, Sprite.Opacity, ShaderUniformDataType.Float);
-            Raylib.BeginShaderMode(_paletteShader);
 
             if (IsInvincible)
             {
@@ -743,6 +774,31 @@ namespace Mario2
                     ct.OnHit(this);
                 }
             }
+            else if (side == CollisionSide.Right)
+            {
+                if (IsGrounded && CollidingWithPipeEntity(out WarpPipe? pipe) 
+                    && pipe.Dir == PipeDirection.Right
+                    && _inputDir > 0f)
+                {
+                    StartCutscene(new PipeEnterRightCutscene(this, pipe));
+                }
+            }
+        }
+
+        private bool CollidingWithPipeEntity([NotNullWhen(true)] out WarpPipe? pipe)
+        {
+            foreach (Entity entity in World.Entities)
+            {
+                if (entity is WarpPipe pipeCast &&
+                    Raylib.CheckCollisionRecs(Rect, entity.Rect))
+                {
+                    pipe = pipeCast;
+                    return true;
+                }
+            }
+
+            pipe = null;
+            return false;
         }
 
         protected override void OnTileOverlap(Tile tile)
@@ -770,11 +826,14 @@ namespace Mario2
                 }
                 else if (other is WarpPipe pipe)
                 {
-                    const float EnterThreshold = 4f * Game.TextureScale;
-                    if (IsGrounded && Input.IsKeyPressed(KeyboardKey.Down)
-                        && MathF.Abs(pipe.Feet.X - Feet.X) < EnterThreshold)
+                    if (pipe.Dir == PipeDirection.Down)
                     {
-                        StartCutscene(new PipeEnterCutscene(this, pipe));
+                        const float EnterThreshold = 4f * Game.TextureScale;
+                        if (IsGrounded && Input.IsKeyPressed(KeyboardKey.Down)
+                            && MathF.Abs(pipe.Feet.X - Feet.X) < EnterThreshold)
+                        {
+                            StartCutscene(new PipeEnterDownCutscene(this, pipe));
+                        }
                     }
                 }
             }

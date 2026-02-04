@@ -67,19 +67,21 @@
 [x] Star music
 [ ] Cutscenes
 	[x] Api
-	[x] Flagpole
+	[ ] Flagpole
+		[ ] Score reward
 	[x] Pipe
 		[x] WarpPipe entity
 		[x] Property window for destination
 		[x] Enter cutscene
 		[x] PipeExit entity
 	[ ] Level Pipe intro (like 1-2)
-	[ ] Adjust for big mario's sprites 
+	[ ] Adjust for big mario's sprites
 [x] Fix music looping stuff
 [x] Sublevels
 [x] Pipe into sublevel, with no found tag, handle that case
 [x] Raw tile placing from the tileset tex itself inside tile selector (with a toggle button)
-[ ] Horizontal pipe entering
+[x] Horizontal pipe entering
+[x] Pipe should transfer player state
 [ ] Jump higher linearly based on movement speed (max get on 5 blocks high)
 [ ] Title screen
 [ ] Luigi
