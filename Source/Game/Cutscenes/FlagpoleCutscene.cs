@@ -47,7 +47,15 @@
 
         public override void Start()
         {
-            Player.Position.X = Player.OldPosition.X = _flagpole.Position.X - 8f.Scale();
+            if (Player.State == PlayerState.Small)
+            {
+                Player.Position.X = Player.OldPosition.X = _flagpole.Position.X - 8f.Scale();
+            }
+            else
+            {
+                Player.Position.X = Player.OldPosition.X = _flagpole.Position.X - 11f.Scale();
+            }
+
             Player.Velocity = Vector2.Zero;
             Player.Gravity = 0f;
             Player.Sprite.FlipX = false;

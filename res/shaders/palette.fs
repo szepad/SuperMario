@@ -15,6 +15,6 @@ out vec4 finalColor;
 void main()
 {
     vec4 texel = texture(texture0, fragTexCoord);
-    finalColor = texture(palette, vec2(texel.r + 1/15f * 0.5f, 0));
+    finalColor = texture(palette, vec2(texel.r + 1.0/15.0 * 0.5, 0));
     finalColor.a = texel.a * opacity;
 }

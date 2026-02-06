@@ -75,7 +75,7 @@
 		[x] Enter cutscene
 		[x] PipeExit entity
 	[ ] Level Pipe intro (like 1-2)
-	[ ] Adjust for big mario's sprites
+	[x] Adjust for big mario's sprites
 [x] Fix music looping stuff
 [x] Sublevels
 [x] Pipe into sublevel, with no found tag, handle that case
