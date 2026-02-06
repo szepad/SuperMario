@@ -366,7 +366,7 @@ namespace Mario2
             Position.Y += Size.Y;
         }
 
-        private void TryStandUp()
+        public void TryStandUp()
         {
             if (!_isCrouching)
                 return;
@@ -388,7 +388,7 @@ namespace Mario2
             }
         }
 
-        private void ForceStandUp()
+        public void ForceStandUp()
         {
             if (!_isCrouching) return;
             _isCrouching = false;
@@ -829,7 +829,7 @@ namespace Mario2
                     if (pipe.Dir == PipeDirection.Down)
                     {
                         const float EnterThreshold = 4f * Game.TextureScale;
-                        if (IsGrounded && Input.IsKeyPressed(KeyboardKey.Down)
+                        if (IsGrounded && Input.IsKeyDown(KeyboardKey.Down)
                             && MathF.Abs(pipe.Feet.X - Feet.X) < EnterThreshold)
                         {
                             StartCutscene(new PipeEnterDownCutscene(this, pipe));

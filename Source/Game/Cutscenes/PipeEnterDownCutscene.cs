@@ -5,11 +5,14 @@
     {
         private readonly WarpPipe _pipe = pipe;
 
+        private float _waitTimer = 1f;
+
         public override Action GetFunction(SingleCutsceneState _) => EnterState;
 
         public override void Start()
         {
             SoundManager.PlaySound(Sounds.PlayerWarp);
+            Player.ForceStandUp();
             Player.PlayAnim(PlayerAnim.Emote);
             Player.Sprite.SetFrame(1);
             Player.IsCollidable = false;
@@ -21,12 +24,18 @@
 
         private void EnterState()
         {
-            Player.Position.Y += 32f.Scale() * Time.DeltaTime;
-
-            if (Player.Position.Y >= _pipe.Feet.Y + 8f.Scale())
+            if (Player.Position.Y >= _pipe.Feet.Y + 16f.Scale())
             {
-                IsFinished = true;
-                Player.World.HandlePipeTransition(_pipe);
+                _waitTimer -= Time.DeltaTime;
+                if (_waitTimer <= 0f)
+                {
+                    IsFinished = true;
+                    Player.World.HandlePipeTransition(_pipe);
+                }
+            }
+            else
+            {
+                Player.Position.Y += 32f.Scale() * Time.DeltaTime;
             }
         }
     }
