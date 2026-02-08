@@ -50,35 +50,35 @@
             _ => OneUp,
         };
 
-        //public static int GetFlagpoleScore(Player player, Flagpole flagpole)
-        //{
-        //    float feetY = player.Position.Y + player.Size.Y;
-        //    float flagpoleY = flagpole.Position.Y;
-        //    float flagpoleHeight = flagpole.Size.Y;
-        //    float normalizedY = feetY - flagpoleY;
+        public static int GetFlagpoleScore(Player player, Flagpole flagpole)
+        {
+            float feetY = player.Position.Y + player.Size.Y;
+            float flagpoleY = flagpole.Position.Y;
+            float flagpoleHeight = flagpole.Size.Y;
+            float normalizedY = feetY - flagpoleY;
 
-        //    if (normalizedY <= flagpoleHeight / 6f)
-        //    {
-        //        return 5000;
-        //    }
-        //    else if (normalizedY <= flagpoleHeight / 5f * 2f)
-        //    {
-        //        return 2000;
-        //    }
-        //    else if (normalizedY <= flagpoleHeight / 5f * 3f)
-        //    {
-        //        return 800;
-        //    }
-        //    else if (normalizedY <= flagpoleHeight / 5f * 4f)
-        //    {
-        //        return 400;
-        //    }
-        //    else if (normalizedY <= flagpoleHeight)
-        //    {
-        //        return 100;
-        //    }
+            if (normalizedY <= flagpoleHeight / 6f)
+            {
+                return 5000;
+            }
+            else if (normalizedY <= flagpoleHeight / 5f * 2f)
+            {
+                return 2000;
+            }
+            else if (normalizedY <= flagpoleHeight / 5f * 3f)
+            {
+                return 800;
+            }
+            else if (normalizedY <= flagpoleHeight / 5f * 4f)
+            {
+                return 400;
+            }
+            else if (normalizedY <= flagpoleHeight)
+            {
+                return 100;
+            }
 
-        //    return 0;
-        //}
+            return 0;
+        }
     }
 }

@@ -783,9 +783,11 @@ namespace Mario2
                     StartCutscene(new PipeEnterRightCutscene(this, pipe));
                 }
             }
+
+            _cutscene?.OnTileCollision(tile, side);
         }
 
-        private bool CollidingWithPipeEntity([NotNullWhen(true)] out WarpPipe? pipe)
+        public bool CollidingWithPipeEntity([NotNullWhen(true)] out WarpPipe? pipe)
         {
             foreach (Entity entity in World.Entities)
             {

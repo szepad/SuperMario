@@ -2,14 +2,20 @@
 {
     public class ScoreText : Entity
     {
-        private float _speed;
-        private float _lifeTimer;
+        public float Speed { get; set; }
+        public float LifeTimer { get; set; }
+
+        public int Points { get; }
 
         public ScoreText(World world, int points, Vector2 pos,
             float lifeTime = ScoreRewards.NormalLifeTime, 
             float speed = ScoreRewards.NormalSpeed)
             : base(world)
         {
+            Speed = speed;
+            LifeTimer = lifeTime;
+            Points = points;
+
             SetPosition(pos);
             SpriteOffset = new Vector2(10f, 5f).Scale();
 
@@ -32,8 +38,6 @@
             Gravity = 0f;
             IsHittable = false;
             IsCollidable = false;
-            _speed = speed;
-            _lifeTimer = lifeTime;
         }
 
         protected override void OnSpawn()
@@ -43,9 +47,9 @@
 
         public override void Update()
         {
-            Position.Y -= _speed * Time.DeltaTime;
-            _lifeTimer -= Time.DeltaTime;
-            if (_lifeTimer <= 0f)
+            Position.Y -= Speed * Time.DeltaTime;
+            LifeTimer -= Time.DeltaTime;
+            if (LifeTimer <= 0f)
             {
                 Destroy();
             }
