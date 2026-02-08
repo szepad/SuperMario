@@ -6,6 +6,7 @@
         private int _colsInputVal = 0;
         private int _bgVal;
         private int _musicVal;
+        private bool _pipeIntro;
 
         public ItemType ContainerTileItem => (ItemType)_ctItemIndex;
         private int _ctItemIndex;
@@ -90,6 +91,14 @@
                 Editor.Dirty();
             }
 
+            // Pipe Intro
+            _pipeIntro = Editor.World.IsPipeIntro;
+            if (Gui.Checkbox("Pipe Intro", ref _pipeIntro))
+            {
+                Editor.World.IsPipeIntro = _pipeIntro;
+                Editor.Dirty();
+            }
+
             // Spacing
             Gui.Dummy(new Vector2(0f, 20f));
         }
@@ -145,12 +154,14 @@
                 if (Gui.InputText("Dest", ref _warpPipeDest, 30))
                 {
                     pipe.Destination = _warpPipeDest;
+                    Editor.Dirty();
                 }
 
                 _warpPipeTag = pipe.Tag;
                 if (Gui.InputText("Tag", ref _warpPipeTag, 10))
                 {
                     pipe.Tag = _warpPipeTag;
+                    Editor.Dirty();
                 }
 
                 _warpPipeDir = (int)pipe.Dir;
@@ -158,6 +169,7 @@
                 if (Gui.Combo("Dir", ref _warpPipeDir, choices, choices.Length))
                 {
                     pipe.Dir = (PipeDirection)_warpPipeDir;
+                    Editor.Dirty();
                 }
             }
             else if (sel is WarpExit exit)
@@ -167,6 +179,7 @@
                 if (Gui.InputText("Tag", ref _warpPipeTag, 10))
                 {
                     exit.Tag = _warpPipeTag;
+                    Editor.Dirty();
                 }
             }
         }

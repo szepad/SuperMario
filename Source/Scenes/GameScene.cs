@@ -102,8 +102,32 @@
 
         private void StartWorld()
         {
-            _world.Start();
-            ResetCamera();
+            if (_world.IsPipeIntro)
+            {
+                _world.IsPipeIntro = false;
+                string dest = _world.LoadedPath;
+                if (!LoadSublevel(Path.Combine("levels", "pipe_intro.lvl")))
+                {
+                    StartWorld();
+                    return;
+                }
+
+                foreach (Entity entity in _world.Entities)
+                {
+                    if (entity is WarpPipe pipe)
+                    {
+                        pipe.Destination = dest;
+                        break;
+                    }
+                }
+
+                _world.Player.StartCutscene(new PipeIntroCutscene(_world.Player));
+            }
+            else
+            {
+                _world.Start();
+                ResetCamera();
+            }
         }
 
         private void World_OnLevelEnd()
@@ -113,20 +137,30 @@
 
         private void World_OnPipeLoadSublevel(WarpPipe pipe)
         {
+            if (!LoadSublevel(pipe.Destination))
+            {
+                pipe.Destination = string.Empty;
+            }
+
+            _world.HandlePipeTransition(pipe);
+            _world.SetCameraPosition(ref _camera, 0f);
+        }
+
+        private bool LoadSublevel(string path)
+        {
+            path = Path.GetFullPath(path);
+
             World prev = _world;
-            if (_loadedSubWorlds.TryGetValue(Path.GetFullPath(pipe.Destination), out World? loaded))
+            if (_loadedSubWorlds.TryGetValue(path, out World? loaded))
             {
                 _world = loaded;
             }
             else
             {
-                World? world = WorldLoader.Deserialize(pipe.Destination, out _);
+                World? world = WorldLoader.Deserialize(path, out _);
                 if (world is null)
                 {
-                    pipe.Destination = string.Empty;
-                    _world.HandlePipeTransition(pipe);
-                    _world.SetCameraPosition(ref _camera, 0f);
-                    return;
+                    return false;
                 }
 
                 _loadedSubWorlds[Path.GetFullPath(world.LoadedPath)] = world;
@@ -138,9 +172,8 @@
             _world.Player.SetStateInstantNoSideFx(prev.Player.State);
 
             StartWorld();
-            
-            _world.HandlePipeTransition(pipe);
-            _world.SetCameraPosition(ref _camera, 0f);
+
+            return true;
         }
 
         protected override void OnUpdate()

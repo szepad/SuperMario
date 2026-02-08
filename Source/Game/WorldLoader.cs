@@ -10,7 +10,7 @@
             using StreamWriter writer = new(path);
 
             // Meta
-            writer.WriteLine($"{world.Cols};{(int)world.Background};{world.Player.Position.X};{world.Player.Position.Y};{(int)world.Music}");
+            writer.WriteLine($"{world.Cols};{(int)world.Background};{world.Player.Position.X};{world.Player.Position.Y};{(int)world.Music};{world.IsPipeIntro}");
 
             // Tiles
             for (int row = 0; row < World.Rows; row++)
@@ -73,12 +73,13 @@
             World world = new() { LoadedPath = Path.GetFullPath(path) };
 
             // Meta
-            int[] meta = [..reader.ReadLine()!.Split(";").Select(int.Parse)];
-            world.SetCols(meta[0]);
-            world.SetBackground((WorldBackground)meta[1]);
-            world.PlayerSpawnPosition = new Vector2(meta[2], meta[3]);
+            string[] meta = reader.ReadLine()!.Split(";");
+            world.SetCols(int.Parse(meta[0]));
+            world.SetBackground((WorldBackground)int.Parse(meta[1]));
+            world.PlayerSpawnPosition = new Vector2(int.Parse(meta[2]), int.Parse(meta[3]));
             world.Player.SetPosition(world.PlayerSpawnPosition);
-            world.SetMusic((MusicName)meta[4]);
+            world.SetMusic((MusicName)int.Parse(meta[4]));
+            world.IsPipeIntro = Convert.ToBoolean(meta[5]);
 
             // Tiles
             for (int row = 0; row < World.Rows; row++)

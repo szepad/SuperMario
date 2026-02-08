@@ -33,6 +33,7 @@ namespace Mario2
         public WorldBackground Background { get; private set; }
         public ParallaxBackground Parallax { get; private set; }
         public MusicName Music { get; private set; } = MusicName.None;
+        public bool IsPipeIntro { get; set; }
 
         public Player Player { get; private set; }
         public Tile[,] Tiles { get; private set; }
@@ -78,6 +79,7 @@ namespace Mario2
             Entities.Add(Player);
             Player.Activate();
             Player.OnDeath += TryInvokePlayerDeath;
+            Player.SetPosition(PlayerSpawnPosition);
         }
 
         public void Start()
@@ -200,6 +202,9 @@ namespace Mario2
                 {
                     //exit = new WarpExit(this) { Tag = pipe.Tag };
                     //exit.SetFeetPos(pipe.Feet);
+                    PlayerState state = Player.State;
+                    ResetPlayer();
+                    Player.SetStateInstantNoSideFx(state);
                     Player.SetPosition(PlayerSpawnPosition);
                     
                     // Snap player onto the tile if he's standing inside it

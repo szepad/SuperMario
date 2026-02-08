@@ -65,16 +65,16 @@
 [x] Sounds
 [x] Music choice & save into file
 [x] Star music
-[ ] Cutscenes
+[x] Cutscenes
 	[x] Api
-	[ ] Flagpole
-		[ ] Score reward
+	[x] Flagpole
+		[x] Score reward
 	[x] Pipe
 		[x] WarpPipe entity
 		[x] Property window for destination
 		[x] Enter cutscene
 		[x] PipeExit entity
-	[ ] Level Pipe intro (like 1-2)
+	[x] Level Pipe intro (like 1-2)
 	[x] Adjust for big mario's sprites
 [x] Fix music looping stuff
 [x] Sublevels

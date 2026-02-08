@@ -14,5 +14,15 @@
         {
             
         }
+
+        public override void Draw()
+        {
+            if (Game.Instance.ActiveScene is EditorScene editor && editor.SubScene is null)
+            {
+                Raylib.DrawTextureEx(Assets.GetTex("editor_exit"), Position, 0f, Game.TextureScale, Color.White);
+            }
+
+            base.Draw();
+        }
     }
 }
