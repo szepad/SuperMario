@@ -173,6 +173,11 @@
 
                 if (Editor.PropertyWindow.ContainerTileHidden)
                     ct.SetHidden();
+
+                if (tile is BrickTile brick)
+                {
+                    brick.SetPalette(Editor.PropertyWindow.BrickTilePalette);
+                }
             }
 
             UpdateRule(Editor.World, tx, ty);

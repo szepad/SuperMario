@@ -1,6 +1,7 @@
 ﻿namespace Mario2
 {
-    public abstract class ContainerTile(bool isCollidable) : AnimatedTile(isCollidable)
+    public abstract class ContainerTile(bool isCollidable) 
+        : AnimatedTile(isCollidable)
     {
         public bool IsHittable { get; set; } = true;
         public bool IsBreakable { get; set; } = false;
@@ -172,6 +173,19 @@
         public override void Draw(int col, int row, float opacity = 1)
         {
             base.Draw(col, row, opacity);
+        }
+
+        public override string GetSaveData()
+        {
+            return $"{(int)ItemInside},{IsHidden}";
+        }
+
+        public override void LoadSaveData(string data)
+        {
+            string[] attr = data.Split(',');
+            SetItem((ItemType)int.Parse(attr[0]));
+            if (Convert.ToBoolean(attr[1]))
+                SetHidden();
         }
     }
 }

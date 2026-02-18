@@ -29,5 +29,8 @@ namespace Mario2
 
         public abstract void Update();
         public abstract void Draw(int col, int row, float opacity = 1f);
+
+        public virtual string GetSaveData() => string.Empty;
+        public virtual void LoadSaveData(string data) { }
     }
 }

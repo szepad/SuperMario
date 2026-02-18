@@ -55,7 +55,8 @@ namespace Mario2
 
         private float _inputDir;
 
-        private const float JumpForce = 180f * Game.TextureScale;
+        private const float MinJumpForce = 180f * Game.TextureScale;
+        private const float MaxJumpForce = 205f * Game.TextureScale;
         private const float MaxJumpTime = 0.3f;
         private float _jumpTimer;
         private bool _isJumping;
@@ -574,7 +575,9 @@ namespace Mario2
                 _coyoteTimer = 0f;
                 _jumpBuffer = 0f;
 
-                Velocity.Y = -JumpForce;
+                float t = Helper.Clamp01(MathF.Abs(Velocity.X) / MaxRunSpeed);
+                Velocity.Y = -Raymath.Lerp(MinJumpForce, MaxJumpForce, t);
+
                 _isJumping = true;
                 _hasJumped = true;
                 _jumpTimer = 0f;

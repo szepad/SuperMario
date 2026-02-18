@@ -82,6 +82,11 @@
 [x] Raw tile placing from the tileset tex itself inside tile selector (with a toggle button)
 [x] Horizontal pipe entering
 [x] Pipe should transfer player state
-[ ] Jump higher linearly based on movement speed (max get on 5 blocks high)
+[x] Underground rule tiles
+[x] Underground stuff
+[x] Jump higher linearly based on movement speed (max get on 5 blocks high)
+[ ] Brick debris should inherit palette
+[ ] Death sequence, also when falling downd:
+[ ] Pipe intro shouldn't play on respawn
 [ ] Title screen
 [ ] Luigi

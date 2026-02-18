@@ -14,6 +14,9 @@
         public bool ContainerTileHidden => _ctHidden;
         private bool _ctHidden;
 
+        public TilePalette BrickTilePalette => (TilePalette)_brickTilePaletteIndex;
+        private int _brickTilePaletteIndex;
+
         private string _warpPipeDest = string.Empty;
         private string _warpPipeTag = string.Empty;
         private int _warpPipeDir;
@@ -129,7 +132,8 @@
             if (Editor.ActiveSelector is not TileWindow tw)
                 return;
 
-            if (tw.Selected is InstanceTile<QuestionTile> || tw.Selected is InstanceTile<BrickTile>)
+            bool brick = tw.Selected is InstanceTile<BrickTile>;
+            if (tw.Selected is InstanceTile<QuestionTile> || brick)
             {
                 Gui.SeparatorText("Item Tile");
 
@@ -137,6 +141,12 @@
 
                 string[] choices = Enum.GetNames<ItemType>();
                 Gui.Combo("Item", ref _ctItemIndex, choices, choices.Length);
+
+                if (brick)
+                {
+                    choices = Enum.GetNames<TilePalette>();
+                    Gui.Combo("Palette", ref _brickTilePaletteIndex, choices, choices.Length);
+                }
             }
         }
 

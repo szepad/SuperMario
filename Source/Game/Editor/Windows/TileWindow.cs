@@ -14,6 +14,7 @@
             TileObjectDefs.Coin,
             TileObjectDefs.CastleSmall,
             TileObjectDefs.Flagpole,
+            TileObjectDefs.UndergroundFloor,
         ];
 
         public override void Update() { }
@@ -101,6 +102,29 @@
             [0b_1110] = new BasicTile(8, true, 0, 0),
             [0b_1111] = new BasicTile(9, true, 0, 0),
             [0b_1011] = new BasicTile(10, true, 0, 0),
+        });
+
+        public static readonly RuleTile UndergroundFloor = new(true, 7, 0, new()
+        {
+            [0b_0000] = new BasicTile(7, true, 0, 0),
+            [0b_0100] = new BasicTile(4, true, 0, 0),
+            [0b_0101] = new BasicTile(5, true, 0, 0),
+            [0b_0001] = new BasicTile(6, true, 0, 0),
+
+            [0b_0010] = new BasicTile(7, true, 0, 0),
+            [0b_0110] = new BasicTile(4, true, 0, 0),
+            [0b_0111] = new BasicTile(5, true, 0, 0),
+            [0b_0011] = new BasicTile(6, true, 0, 0),
+
+            [0b_1000] = new BasicTile(15, true, 0, 0),
+            [0b_1100] = new BasicTile(12, true, 0, 0),
+            [0b_1101] = new BasicTile(13, true, 0, 0),
+            [0b_1001] = new BasicTile(14, true, 0, 0),
+
+            [0b_1010] = new BasicTile(15, true, 0, 0),
+            [0b_1110] = new BasicTile(12, true, 0, 0),
+            [0b_1111] = new BasicTile(13, true, 0, 0),
+            [0b_1011] = new BasicTile(14, true, 0, 0),
         });
 
         public static readonly RuleTile GrassDecor = new(false, 0, 5, new()
