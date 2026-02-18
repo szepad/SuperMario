@@ -20,16 +20,11 @@
                     Tile tile = world.Tiles[row, col];
                     if (tile is SimpleTile st)
                     {
-                        writer.Write($"{TileSimpleAttr},{st.Id},{st.IsCollidable}");
+                        writer.Write($"{TileSimpleAttr},{st.Id},{st.IsCollidable},{st.GetSaveData()}");
                     }
                     else
                     {
-                        writer.Write($"{TileAnimAttr},{tile.GetType().FullName}");
-
-                        if (tile is ContainerTile ct)
-                        {
-                            writer.Write($",{(int)ct.ItemInside},{ct.IsHidden}");
-                        }
+                        writer.Write($"{TileAnimAttr},{tile.GetType().FullName},{tile.GetSaveData()}");
                     }
 
                     writer.Write(";");
@@ -95,6 +90,7 @@
                             int.Parse(attr[1]), 
                             Convert.ToBoolean(attr[2]));
 
+                        tile.LoadSaveData(attr[3]);
                         world.SetTile(col, row, tile.Id == -1 ? SimpleTile.Air : tile);
                     }
                     else if (attr[0] == TileAnimAttr)
@@ -102,15 +98,15 @@
                         Type? type = Type.GetType(attr[1]);
                         if (type is not null)
                         {
-                            Tile tile = (Tile)(Activator.CreateInstance(type) ?? SimpleTile.Air);
-                            world.SetTile(col, row, tile);
-
-                            if (tile is ContainerTile ct)
+                            string data = attr[2];
+                            for (int i = 3; i < attr.Length; i++)
                             {
-                                ct.SetItem((ItemType)int.Parse(attr[2]));
-                                if (Convert.ToBoolean(attr[3]))
-                                    ct.SetHidden();
+                                data += $",{attr[i]}";
                             }
+
+                            Tile tile = (Tile)(Activator.CreateInstance(type) ?? SimpleTile.Air);
+                            tile.LoadSaveData(data);
+                            world.SetTile(col, row, tile);
                         }
                     }
                 }
