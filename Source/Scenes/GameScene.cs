@@ -45,6 +45,7 @@
             _camera.Offset.X = Game.Width / 2f;
             _camera.Offset.Y = Game.Height - World.Rows * Tile.Size + Tile.Size;
             _world.HandleCameraFollow(ref _camera);
+            _world.UpdateParallax(_camera);
         }
 
         protected override void OnUnload()
@@ -170,6 +171,7 @@
 
             _world.ResetPlayer();
             _world.Player.SetStateInstantNoSideFx(prev.Player.State);
+            _world.TimeLeft = prev.TimeLeft;
 
             StartWorld();
 

@@ -8,7 +8,8 @@ namespace Mario2
         Underground,
         Castle,
         Water,
-        Night
+        Night,
+        Black
     }
 
     public static class WorldBackgroundExtension
@@ -25,6 +26,12 @@ namespace Mario2
 
                 parallax.AddLayer(new ParallaxLayer(
                     Assets.GetTex("bg_hills"), new Vector2(0f, 0f).Scale(), 0.5f));
+            }
+            else if (background == WorldBackground.Underground)
+            {
+                parallax = new ParallaxBackground(Color.Black);
+                parallax.AddLayer(new ParallaxLayer(Assets.GetTex("bg_underground"),
+                    new Vector2(0f, -16f).Scale(), 0.5f, 6, 0.9f));
             }
 
             return parallax;

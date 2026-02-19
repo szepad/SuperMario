@@ -85,8 +85,15 @@
 [x] Underground rule tiles
 [x] Underground stuff
 [x] Jump higher linearly based on movement speed (max get on 5 blocks high)
-[ ] Brick debris should inherit palette
-[ ] Death sequence, also when falling downd:
+[x] Brick debris should inherit palette
+[x] Time
+[x] Sublevel transfer time
+[x] Underground background
+[ ] Animated background (underground lantern, later waterfalls)
+[ ] Hurry Time on 100 with different music
+[ ] Reverb? on underground sfx
+[ ] Death sequence, also when falling down
 [ ] Pipe intro shouldn't play on respawn
 [ ] Title screen
+[ ] Platforms (constant vertical, constant horiz, falling, connected)
 [ ] Luigi

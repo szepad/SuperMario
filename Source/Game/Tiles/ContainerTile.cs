@@ -159,11 +159,22 @@
             {
                 entity.World.SetTile(Col, Row, SimpleTile.Air);
 
+                EffectData effectData = EffectData.BrickOw;
+                if (this is BrickTile brick)
+                {
+                    effectData = brick.Palette switch
+                    {
+                        TilePalette.Underground => EffectData.BrickUg,
+                        TilePalette.Castle => EffectData.BrickCastle,
+                        _ => EffectData.BrickOw
+                    };
+                }
+
                 Vector2 center = new Vector2(Col + 0.5f, Row + 0.5f) * Size;
-                entity.World.SpawnEffect(center, new Vector2(-25f, -121f).Scale() * 1.75f, EffectData.Brick);
-                entity.World.SpawnEffect(center, new Vector2(-33f, -175f).Scale() * 1.75f, EffectData.Brick);
-                entity.World.SpawnEffect(center, new Vector2(25f, -121f).Scale() * 1.75f, EffectData.Brick);
-                entity.World.SpawnEffect(center, new Vector2(33f, -175f).Scale() * 1.75f, EffectData.Brick);
+                entity.World.SpawnEffect(center, new Vector2(-25f, -121f).Scale() * 1.75f, effectData);
+                entity.World.SpawnEffect(center, new Vector2(-33f, -175f).Scale() * 1.75f, effectData);
+                entity.World.SpawnEffect(center, new Vector2(25f, -121f).Scale() * 1.75f, effectData);
+                entity.World.SpawnEffect(center, new Vector2(33f, -175f).Scale() * 1.75f, effectData);
 
                 SoundManager.PlaySound(Sounds.BrickBreak);
                 SessionManager.GetScoreWithoutText(ScoreRewards.BrickBreak);

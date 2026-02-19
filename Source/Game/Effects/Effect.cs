@@ -4,7 +4,9 @@
     {
         public const string AnimSkid = "skid";
         public const string AnimHit = "hit";
-        public const string AnimBrick = "brick";
+        public const string AnimBrickOw = "brick_ow";
+        public const string AnimBrickUg = "brick_ug";
+        public const string AnimBrickCastle = "brick_castle";
 
         public bool IsInUse => _lifeTimer > 0f;
         
@@ -20,7 +22,9 @@
         {
             _sprite.Add(AnimSkid, new Animation(4, 10, 10, 0, 0.075f, isLooped: false));
             _sprite.Add(AnimHit, new Animation(7, 29, 28, 10, 0.025f, isLooped: false));
-            _sprite.Add(AnimBrick, new Animation(4, 8, 8, 38, 0.075f, isLooped: true));
+            _sprite.Add(AnimBrickOw, new Animation(4, 8, 8, 38, 0.075f, isLooped: true));
+            _sprite.Add(AnimBrickUg, new Animation(4, 8, 8, 46, 0.075f, isLooped: true));
+            _sprite.Add(AnimBrickCastle, new Animation(4, 8, 8, 54, 0.075f, isLooped: true));
         }
 
         public void Init(Vector2 position, Vector2 velocity, EffectData data)

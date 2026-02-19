@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Mario2.Editor
+﻿namespace Mario2.Editor
 {
     public abstract record PrefabAction;
 
@@ -33,13 +31,17 @@ namespace Mario2.Editor
                         bool stop;
                         int x = col;
                         int y = row;
+
+                        const int MaxIter = 100;
+                        int iterCount = 0;
                         do
                         {
                             stop = !PlaceTile(world, x, y, tileAction);
                             x += recurse.OffX;
                             y += recurse.OffY;
+                            iterCount++;
                         }
-                        while (!stop);
+                        while (!stop && iterCount < MaxIter);
                     }
                     else
                     {

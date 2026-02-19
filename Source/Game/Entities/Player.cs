@@ -173,7 +173,7 @@ namespace Mario2
             }
         }
 
-        private void Die()
+        public void Die()
         {
             if (IsDead) return;
             IsDead = true;
@@ -182,8 +182,7 @@ namespace Mario2
             IsCollidable = false;
             Velocity = Vector2.Zero;
             Gravity = 0f;
-            SetSmallStateVars();
-            State = PlayerState.Small;
+            SetStateInstantNoSideFx(PlayerState.Small);
             PlayAnim(PlayerAnim.Death);
 
             OnDeath?.Invoke();

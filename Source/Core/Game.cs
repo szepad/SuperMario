@@ -119,6 +119,9 @@ namespace Mario2
                 else if (Input.IsKeyPressed(KeyboardKey.Three)) Time.DebugTimeScale = 1f / 3f;
                 else if (Input.IsKeyPressed(KeyboardKey.Four)) Time.DebugTimeScale = 1f / 10f;
                 else if (Input.IsKeyPressed(KeyboardKey.Five)) Time.DebugTimeScale = 1f / 50f;
+                else if (Input.IsKeyPressed(KeyboardKey.Six)) Time.DebugTimeScale = 2f;
+                else if (Input.IsKeyPressed(KeyboardKey.Seven)) Time.DebugTimeScale = 5f;
+                else if (Input.IsKeyPressed(KeyboardKey.Eight)) Time.DebugTimeScale = 50f;
             }
 
             Time.Progress();
