@@ -73,7 +73,7 @@
             Gui.EndDisabled();
 
             // Background
-            string[] bgChoices = ["Sky", "Underground", "Castle", "Water", "Night"];
+            string[] bgChoices = Enum.GetNames<WorldBackground>();
             Gui.Text("Background");
             Gui.SetNextItemWidth(110f);
             Gui.SameLine();

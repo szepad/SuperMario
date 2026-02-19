@@ -15,6 +15,7 @@
             TileObjectDefs.CastleSmall,
             TileObjectDefs.Flagpole,
             TileObjectDefs.UndergroundFloor,
+            TileObjectDefs.BlockUg,
         ];
 
         public override void Update() { }
@@ -23,6 +24,7 @@
     public static class TileObjectDefs
     {
         public static readonly BasicTile Block = new(16, true, 0, 2);
+        public static readonly BasicTile BlockUg = new(20, true, 4, 2);
         public static readonly BasicTile QuestionTile_Empty = new(18, true, 2, 2);
 
         public static readonly InstanceTile<QuestionTile> QuestionTile = new(1, 2);

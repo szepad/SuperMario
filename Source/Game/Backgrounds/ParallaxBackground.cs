@@ -14,12 +14,10 @@
         {
             foreach (ParallaxLayer layer in Layers)
             {
-                //layer.Position = new Vector2(
-                //    camera.Target.X - camera.Target.X * layer.Speed,
-                //    camera.Target.Y
-                //    ) - layer.Offset - new Vector2(camera.Offset.X, 0f);
-
-                layer.Position = -(camera.Target - camera.Offset) * layer.Speed;
+                layer.Position = new Vector2(
+                    -(camera.Target.X - camera.Offset.X) * layer.Speed,
+                    -(camera.Target.Y - camera.Offset.Y)
+                    );
             }
         }
 
@@ -27,7 +25,12 @@
         {
             foreach (ParallaxLayer layer in Layers)
             {
-                Raylib.DrawTextureEx(layer.Tex, layer.Position - layer.Offset, 0f, Game.TextureScale, Color.White);
+                for (int i = 0; i < layer.RepeatCount; i++)
+                {
+                    Vector2 pos = layer.Position - layer.Offset;
+                    Raylib.DrawTextureEx(layer.Tex, new Vector2(pos.X + layer.Tex.Width * Game.TextureScale * i,
+                        pos.Y), 0f, Game.TextureScale, Color.White.Alpha(layer.Opacity));
+                }
             }
         }
     }

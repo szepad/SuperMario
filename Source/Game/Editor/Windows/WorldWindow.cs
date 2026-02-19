@@ -104,6 +104,23 @@
             {
                 _isPanning = false;
             }
+
+            HandleKeyboardControls();
+        }
+
+        private void HandleKeyboardControls()
+        {
+            if (SelectedEntity is not null)
+                return;
+
+            float panSpeed = 256f.Scale();
+            if (Raylib.IsKeyDown(KeyboardKey.LeftShift))
+                panSpeed *= 10f;
+
+            if (Raylib.IsKeyDown(KeyboardKey.Left)) _camera.Target.X -= panSpeed * Time.DeltaTime;
+            if (Raylib.IsKeyDown(KeyboardKey.Right)) _camera.Target.X += panSpeed * Time.DeltaTime;
+            if (Raylib.IsKeyDown(KeyboardKey.Up)) _camera.Target.Y -= panSpeed * Time.DeltaTime;
+            if (Raylib.IsKeyDown(KeyboardKey.Down)) _camera.Target.Y += panSpeed * Time.DeltaTime;
         }
 
         private void HandleEditing()

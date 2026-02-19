@@ -52,6 +52,9 @@ namespace Mario2
 
         private readonly EffectPool _effectPool = new();
 
+        private const float TimerTickRate = 0.4f;
+        private float _timerTickTimer = TimerTickRate;
+
         public World()
         {
             ResetPlayer();
@@ -242,6 +245,7 @@ namespace Mario2
             if (!IsFrozen)
             {
                 UpdateEntities(camera);
+                UpdateTime();
             }
             else
             {
@@ -345,6 +349,25 @@ namespace Mario2
                     }
 
                     Entities.RemoveAt(i);
+                }
+            }
+        }
+
+        private void UpdateTime()
+        {
+            if (Player.IsCutscenePlaying)
+                return;
+
+            _timerTickTimer -= Time.DeltaTime;
+            if (_timerTickTimer <= 0f)
+            {
+                _timerTickTimer = TimerTickRate;
+                TimeLeft--;
+
+                if (TimeLeft <= 0)
+                {
+                    TimeLeft = 0;
+                    Player.Die();
                 }
             }
         }

@@ -11,7 +11,8 @@
         public void OnTileCollision(Tile tile, CollisionSide side);
     }
 
-    public abstract class Cutscene<TEnum>(Player player) : ICutscene where TEnum : struct, Enum
+    public abstract class Cutscene<TEnum>(Player player)
+        : ICutscene where TEnum : struct, Enum
     {
         public Player Player { get; } = player;
         public TEnum State { get; protected set; }
