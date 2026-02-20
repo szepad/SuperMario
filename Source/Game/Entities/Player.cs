@@ -101,6 +101,10 @@ namespace Mario2
         private const float FireballCooldown = 0.1f;
         private float _throwFireballCooldown = 0f;
 
+        private const float DeathJumpTime = 0.35f;
+        private const float DeathJumpForce = 270f * Game.TextureScale;
+        private float _deathJumpTimer;
+
         private ICutscene? _cutscene;
 
         public Player(World world) : base(world)
@@ -173,11 +177,13 @@ namespace Mario2
             }
         }
 
+        // This method isn't called if player has fallen off of the screen
         public void Die()
         {
             if (IsDead) return;
             IsDead = true;
 
+            _deathJumpTimer = DeathJumpTime;
             IsHittable = false;
             IsCollidable = false;
             Velocity = Vector2.Zero;
@@ -186,9 +192,6 @@ namespace Mario2
             PlayAnim(PlayerAnim.Death);
 
             OnDeath?.Invoke();
-
-            SoundManager.StopMusic();
-            SoundManager.PlaySound(Sounds.PlayerDie);
         }
 
         public void SetStateInstantNoSideFx(PlayerState state)
@@ -424,6 +427,18 @@ namespace Mario2
                     HandleFireballThrowing();
                     UpdateVisualLogic();
                     HandleAnimations();
+                }
+            }
+            else
+            {
+                if (_deathJumpTimer > 0f)
+                {
+                    _deathJumpTimer -= Time.DeltaTime;
+                    if (_deathJumpTimer <= 0f)
+                    {
+                        Gravity = DefaultGravity;
+                        Velocity.Y = -DeathJumpForce;
+                    }
                 }
             }
 

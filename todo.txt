@@ -89,10 +89,12 @@
 [x] Time
 [x] Sublevel transfer time
 [x] Underground background
+[x] Death sequence, also when falling down
+[ ] Fix jumping over flagpole
 [ ] Animated background (underground lantern, later waterfalls)
+[ ] Enemy underground palette
 [ ] Hurry Time on 100 with different music
 [ ] Reverb? on underground sfx
-[ ] Death sequence, also when falling down
 [ ] Pipe intro shouldn't play on respawn
 [ ] Title screen
 [ ] Platforms (constant vertical, constant horiz, falling, connected)

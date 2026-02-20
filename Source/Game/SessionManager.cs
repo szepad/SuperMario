@@ -15,7 +15,7 @@
 
         // Session data
         public static int CurrentLevel { get; private set; } = 0;
-        public static int Lives { get; private set; } = 5;
+        public static int Lives { get; private set; }
         public static int Score { get; private set; }
         public static int Coins { get; private set; }
         
@@ -27,7 +27,7 @@
         public static void Reset()
         {
             CurrentLevel = 0;
-            Lives = 5;
+            Lives = 2;
             Score = 0;
             Coins = 0;
         }
@@ -77,6 +77,11 @@
         {
             Lives++;
             SoundManager.PlaySound(Sounds.ExtraLife);
+        }
+
+        public static void LoseLife()
+        {
+            Lives--;
         }
         
         public static void GetScoreWithoutText(int points)

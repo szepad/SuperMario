@@ -30,8 +30,12 @@ namespace Mario2
             else if (background == WorldBackground.Underground)
             {
                 parallax = new ParallaxBackground(Color.Black);
-                parallax.AddLayer(new ParallaxLayer(Assets.GetTex("bg_underground"),
-                    new Vector2(0f, -16f).Scale(), 0.5f, 6, 0.9f));
+                ParallaxLayer bg = parallax.AddLayer(new ParallaxLayer(Assets.GetTex("bg_underground"),
+                    new Vector2(0f, -16f).Scale(), 0.5f, 6, 1f));
+
+                bg.AnimatedObjects.Add(new ParallaxAnimatedObject(
+                    new Sprite("lantern", new Animation(8, 32, 32, 0, 0.15f)), 
+                    [new Vector2(96f, 48f), new Vector2(352f, 48f)]));
             }
 
             return parallax;
