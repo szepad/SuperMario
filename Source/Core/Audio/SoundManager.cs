@@ -20,7 +20,7 @@
         {
             if (_musicLoaded)
             {
-                Raylib.SetMusicVolume(_music, 0.75f * Game.Instance.Settings.MusicVolume * Helper.Clamp01(MusicVolumeScaler));
+                Raylib.SetMusicVolume(_music, Game.Instance.Settings.MusicVolume * Helper.Clamp01(MusicVolumeScaler));
             }
         }
 

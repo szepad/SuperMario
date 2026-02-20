@@ -355,7 +355,7 @@ namespace Mario2
 
         private void UpdateTime()
         {
-            if (Player.IsCutscenePlaying)
+            if (Player.IsCutscenePlaying || Player.IsDead || Player.IsDestroyed)
                 return;
 
             _timerTickTimer -= Time.DeltaTime;
@@ -376,6 +376,9 @@ namespace Mario2
         {
             if (_playerDeathInvoked) return;
             _playerDeathInvoked = true;
+
+            SoundManager.StopMusic();
+            SoundManager.PlaySound(Sounds.PlayerDie);
 
             OnPlayerDeath?.Invoke();
         }

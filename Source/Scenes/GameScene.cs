@@ -16,7 +16,7 @@
 
         private State _state = State.Loading;
 
-        private const float LoadTime = 1f;
+        private const float LoadTime = 2.2f;
         private float _loadTimer;
 
         private const float PlayerDeathReloadTime = 5f;
@@ -33,10 +33,11 @@
             {
                 HandleEditorPlaytest();
                 _state = State.Gameplay;
-                return;
             }
-
-            LoadNext();
+            else
+            {
+                LoadNext();
+            }
         }
 
         private void ResetCamera()
@@ -178,6 +179,25 @@
             return true;
         }
 
+        private void OnPlayerDeath()
+        {
+            if (_insideEditor)
+            {
+                ParentScene?.UnloadSubScene();
+                return;
+            }
+
+            SessionManager.LoseLife();
+            if (SessionManager.Lives <= 0)
+            {
+                Game.Instance.LoadScene(new GameOverScene());
+            }
+            else
+            {
+                Reload();
+            }
+        }
+
         protected override void OnUpdate()
         {
             switch (_state)
@@ -208,7 +228,7 @@
                 _playerDeathTimer -= Time.DeltaTime;
                 if (_playerDeathTimer <= 0f)
                 {
-                    Reload();
+                    OnPlayerDeath();
                 }
             }
             else if (Input.IsKeyPressed(KeyboardKey.Escape))
@@ -239,7 +259,7 @@
             Raylib.DrawTexturePro(Assets.GetTex("entity_selector"), new Rectangle(0, 0, 16, 16),
                 new Rectangle(new Vector2(97f + 4f, 80f + OffsetYFromOriginal).Scale(), new Vector2(16f).Scale()), Vector2.Zero, 0f, Color.White);
 
-            Text.Draw($"*{"1".PadLeft(2, ' ')}",
+            Text.Draw($"*{SessionManager.Lives.ToString().PadLeft(2, ' ')}",
                 new Vector2(128f, 87f + OffsetYFromOriginal).Scale());
         }
 
