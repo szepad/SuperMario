@@ -12,9 +12,14 @@
         Bonus,
         UndergroundIntro,
 
+        OverworldHurry,
+        UndergroundHurry,
+        CastleHurry,
+        WaterHurry,
+        BonusHurry,
+
         // Event based
         Invincible,
-        Warning,
         Bowser,
         BowserFinal,
         LevelClear,
