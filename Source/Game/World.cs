@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Raylib_cs;
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Mario2
@@ -55,6 +56,12 @@ namespace Mario2
         private const float TimerTickRate = 0.4f;
         private float _timerTickTimer = TimerTickRate;
 
+        private bool _hurryStarted;
+        private const int HurryTime = 100;
+
+        private const float WarningSoundTime = 2f;
+        private float _warningSoundTimer;
+
         public World()
         {
             ResetPlayer();
@@ -87,7 +94,28 @@ namespace Mario2
 
         public void Start()
         {
-            SoundManager.PlayMusic(Music);
+            PlayMusic();
+        }
+
+        public void PlayMusic()
+        {
+            if (TimeLeft < HurryTime)
+            {
+                _hurryStarted = true;
+                PlayHurryMusic();
+            }
+            else
+            {
+                SoundManager.PlayMusic(Music);
+            }
+        }
+
+        private void PlayHurryMusic()
+        {
+            if (Enum.TryParse($"{Music}Hurry", out MusicName hurry))
+            {
+                SoundManager.PlayMusic(hurry);
+            }
         }
 
         [MemberNotNull(nameof(Parallax))]
@@ -263,6 +291,15 @@ namespace Mario2
 
             _effectPool.Update();
             UpdateTiles(camera);
+
+            if (_hurryStarted && _warningSoundTimer > 0f)
+            {
+                _warningSoundTimer -= Time.DeltaTime;
+                if (_warningSoundTimer <= 0f && SoundManager.CurrentMusic != MusicName.Invincible)
+                {
+                    PlayHurryMusic();
+                }
+            }
         }
 
         private void UpdateEntities(Camera2D camera)
@@ -369,7 +406,25 @@ namespace Mario2
                     TimeLeft = 0;
                     Player.Die();
                 }
+                else if (TimeLeft < HurryTime)
+                {
+                    StartHurry();
+                }
             }
+        }
+
+        private void StartHurry()
+        {
+            if (_hurryStarted) return;
+            _hurryStarted = true;
+
+            if (SoundManager.CurrentMusic != MusicName.Invincible)
+            {
+                SoundManager.StopMusic();
+            }
+
+            SoundManager.PlaySound(Sounds.Warning);
+            _warningSoundTimer = WarningSoundTime;
         }
 
         private void TryInvokePlayerDeath()
@@ -445,7 +500,7 @@ namespace Mario2
             Parallax.Draw();
         }
 
-        public void Draw(Camera2D camera, bool editor = false)
+        public void Draw(Camera2D camera, bool editor = false, bool tileCulling = true)
         {
             if (DrawStarFlag)
             {
@@ -469,7 +524,7 @@ namespace Mario2
                 }
             }
 
-            DrawTiles(camera, editor);
+            DrawTiles(camera, editor, tileCulling);
 
             for (int i = lastBg + 1; i < drawList.Count; i++)
             {
@@ -490,9 +545,9 @@ namespace Mario2
             return (minX, maxX);
         }
 
-        private void DrawTiles(Camera2D camera, bool editor)
+        private void DrawTiles(Camera2D camera, bool editor, bool tileCulling)
         {
-            (int minX, int maxX) = editor ? (0, Cols) : GetTileXBoundsOnCamera(camera);
+            (int minX, int maxX) = (editor || !tileCulling) ? (0, Cols) : GetTileXBoundsOnCamera(camera);
 
             for (int y = 0; y < Rows; y++)
             {

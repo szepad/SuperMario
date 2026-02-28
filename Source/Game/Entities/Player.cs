@@ -46,8 +46,8 @@ namespace Mario2
         [MemberNotNullWhen(true, nameof(_cutscene))]
         public bool IsCutscenePlaying => _cutscene is not null;
 
-        private const float MaxWalkSpeed = 93.6f * Game.TextureScale;
-        private const float MaxRunSpeed = 153.6f * Game.TextureScale;
+        private const float MaxWalkSpeed = 80f * Game.TextureScale;
+        private const float MaxRunSpeed = 150f * Game.TextureScale;
         private const float WalkAccel = 160f * Game.TextureScale;
         private const float RunAccel = 170f * Game.TextureScale;
         private const float StopFriction = 300f * Game.TextureScale;
@@ -321,7 +321,7 @@ namespace Mario2
             _useStarVisuals = false;
             ChangePalette(State == PlayerState.Fire ? PlayerPalette.Fire : PlayerPalette.Normal);
 
-            if (music) SoundManager.PlayMusic(World.Music);
+            if (music) World.PlayMusic();
             else SoundManager.StopMusic();
         }
 

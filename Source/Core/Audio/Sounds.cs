@@ -36,5 +36,6 @@
         ShellCombo08,
         ShellHit,
         Swim,
+        Warning,
     }
 }

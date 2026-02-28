@@ -27,7 +27,7 @@
         public static void Reset()
         {
             CurrentLevel = 0;
-            Lives = 2;
+            Lives = 5;
             Score = 0;
             Coins = 0;
         }

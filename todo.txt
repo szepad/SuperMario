@@ -90,10 +90,13 @@
 [x] Sublevel transfer time
 [x] Underground background
 [x] Death sequence, also when falling down
+[x] Hurry Time on 100 with different music
+[ ] Keyboard controlled option menu
+[ ] Title scene
+[ ] Midway
 [ ] Fix jumping over flagpole
 [ ] Animated background (underground lantern, later waterfalls)
 [ ] Enemy underground palette
-[ ] Hurry Time on 100 with different music
 [ ] Reverb? on underground sfx
 [ ] Pipe intro shouldn't play on respawn
 [ ] Title screen

@@ -3,6 +3,8 @@
     public static class SoundManager
     {
         public static MusicName CurrentMusic { get; private set; } = MusicName.None;
+        public static float TimeSinceMusicStart { get; private set; }
+
         private static Music _music;
         private static bool _musicLoaded;
 
@@ -59,6 +61,8 @@
 
                 Raylib.PlayMusicStream(_music);
                 CurrentMusic = music;
+
+                TimeSinceMusicStart = 0f;
             }
             else
             {
@@ -74,6 +78,7 @@
                 return;
 
             Raylib.UpdateMusicStream(_music);
+            TimeSinceMusicStart += Time.DeltaTime;
         }
 
         public static void StopMusic()
@@ -108,7 +113,8 @@
             if (!_musicLoaded)
                 return true;
 
-            return Raylib.GetMusicTimePlayed(_music) == 0;
+            const float Threshold = 0.5f;
+            return Raylib.GetMusicTimePlayed(_music) == 0f && TimeSinceMusicStart > Threshold;
         }
 
         public static void PlaySoundRandomPitch(Sounds name, float pitchVariance = 0.1f, float volume = 1f)

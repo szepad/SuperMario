@@ -77,7 +77,7 @@
             settings.SetVsync(true);
             settings.SetFps(Raylib.GetMonitorRefreshRate(Raylib.GetCurrentMonitor()));
             Raylib.SetMasterVolume(1f);
-            settings.SetIntegerScale(true);
+            settings.SetIntegerScale(false);
             settings.SetSoundVolume(1f);
             settings.SetMusicVolume(1f);
         }
