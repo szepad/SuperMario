@@ -91,7 +91,7 @@
 [x] Underground background
 [x] Death sequence, also when falling down
 [x] Hurry Time on 100 with different music
-[ ] Keyboard controlled option menu
+[x] Keyboard controlled option menu
 [ ] Title scene
 [ ] Midway
 [ ] Fix jumping over flagpole
@@ -99,6 +99,5 @@
 [ ] Enemy underground palette
 [ ] Reverb? on underground sfx
 [ ] Pipe intro shouldn't play on respawn
-[ ] Title screen
 [ ] Platforms (constant vertical, constant horiz, falling, connected)
 [ ] Luigi
