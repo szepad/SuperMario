@@ -1,10 +1,24 @@
 ﻿namespace Mario2
 {
-    public sealed record UIRangeButton(string Label, Action<UIRangeButton>? OnValueChanged,
-        float Min = 0f, float Max = 1f, float Curr = 0f, float Vel = 0.5f)
-        : UIWidget(Label, Vector2.Zero)
+    public sealed class UIRangeButton : UIWidget
     {
-        public float Value { get; private set; } = Curr;
+        public event Action<UIRangeButton>? OnValueChanged;
+
+        public float Min { get; private set; }
+        public float Max { get; private set; }
+        public float Vel { get; private set; }
+        public float Value { get; private set; }
+
+        public UIRangeButton(string label, Action<UIRangeButton>? onValueChanged,
+            float min = 0f, float max = 1f, float value = 0f, float vel = 0.5f) : base(label, Vector2.Zero)
+        {
+            Min = min;
+            Max = max;
+            Vel = vel;
+            Value = value;
+
+            OnValueChanged += onValueChanged;
+        }
 
         public override void Update()
         {
@@ -29,8 +43,13 @@
 
         public override void DrawCursor()
         {
-            Raylib.DrawCircleV(Position - MarkerOffset, 2f.Scale(), Color.Red);
-            Raylib.DrawCircleV(Position + MarkerOffset, 2f.Scale(), Color.Red);
+            Raylib.DrawTextureEx(Assets.GetTex("cursor"),
+                Position - MarkerOffset - new Vector2(4f).Scale(),
+                0f, Game.TextureScale, Color.White);
+
+            Raylib.DrawTextureEx(Assets.GetTex("cursor"),
+                Position + MarkerOffset - new Vector2(4f).Scale(),
+                0f, Game.TextureScale, Color.White);
         }
     }
 }

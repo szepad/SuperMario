@@ -14,10 +14,10 @@
         public static int GetWidth(string text) =>
             (int)Raylib.MeasureTextEx(Assets.Font, text, FontSize, 0f).X;
 
-        public static void Draw(string text, Vector2 pos, Pivot pivot = Pivot.TopLeft)
-            => Draw(text, pos.X, pos.Y, pivot);
+        public static void Draw(string text, Vector2 pos, Pivot pivot = Pivot.TopLeft, bool greyed = false)
+            => Draw(text, pos.X, pos.Y, pivot, greyed);
 
-        public static void Draw(string text, float x, float y, Pivot pivot = Pivot.TopLeft)
+        public static void Draw(string text, float x, float y, Pivot pivot = Pivot.TopLeft, bool greyed = false)
         {
             text = text.ToUpper();
             int width = GetWidth(text);
@@ -42,8 +42,9 @@
                 yoff = FontSize;
             }
 
-            Raylib.DrawTextEx(Assets.Font, text, new Vector2((int)(x - xoff), (int)(y - yoff)), 
-                FontSize, 0, Color.White);
+            Raylib.DrawTextEx(Assets.Font, text, 
+                new Vector2((int)(x - xoff), (int)(y - yoff)), 
+                FontSize, 0, greyed ? Color.White.Alpha(0.5f) : Color.White);
         }
     }
 }

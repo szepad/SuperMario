@@ -1,8 +1,15 @@
 ﻿namespace Mario2
 {
-    public sealed record UIPressButton(string Label, Action<UIPressButton>? OnSelect)
-        : UIWidget(Label, Vector2.Zero)
+    public sealed class UIPressButton : UIWidget
     {
+        public event Action<UIPressButton>? OnSelect;
+
+        public UIPressButton(string label, Action<UIPressButton>? onSelect) 
+            : base(label, Vector2.Zero)
+        {
+            OnSelect += onSelect;
+        }
+
         public override void Update()
         {
             if (Raylib.IsKeyPressed(KeyboardKey.Enter))
@@ -13,11 +20,9 @@
 
         public override void DrawCursor()
         {
-            Raylib.DrawCircleV(Position - MarkerOffset, 2f.Scale(), Color.Red);
-
-            //Raylib.DrawTextureEx(Assets.GetTex("cursor"),
-            //    button.Position - offset - new Vector2(4f).Scale(),
-            //    0f, Game.TextureScale, Color.White);
+            Raylib.DrawTextureEx(Assets.GetTex("cursor"),
+                Position - MarkerOffset - new Vector2(4f).Scale(),
+                0f, Game.TextureScale, Color.White);
         }
     }
 }

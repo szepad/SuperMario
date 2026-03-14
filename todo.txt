@@ -92,7 +92,7 @@
 [x] Death sequence, also when falling down
 [x] Hurry Time on 100 with different music
 [x] Keyboard controlled option menu
-[ ] Title scene
+[x] Title scene
 [ ] Midway
 [ ] Fix jumping over flagpole
 [ ] Animated background (underground lantern, later waterfalls)

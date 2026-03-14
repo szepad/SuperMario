@@ -40,7 +40,7 @@ namespace Mario2
         public bool IsDead { get; private set; }
         public PlayerState State { get; private set; } = PlayerState.Small;
 
-        public bool IsInvincible => _iFrameTimer > 0f;
+        public bool IsInvincible => _iFrameTimer > 0f || _invAfterStomp > 0f;
         public bool IsStarman => _starmanTimer > 0f;
 
         [MemberNotNullWhen(true, nameof(_cutscene))]
@@ -106,6 +106,12 @@ namespace Mario2
         private float _deathJumpTimer;
 
         private ICutscene? _cutscene;
+
+        // Player should be invincible for a short time after stomping an enemy
+        // Because his velocity is set upwards, but if he collided with 2 enemies
+        // At once, the second one will kill him.
+        private const float InvincibilityAfterStomp = 0.1f;
+        private float _invAfterStomp;
 
         public Player(World world) : base(world)
         {
@@ -405,6 +411,7 @@ namespace Mario2
         public override void Update()
         {
             _isSkidding = false;
+            _invAfterStomp -= Time.DeltaTime;
 
             HandleStateChangeCallbacks();
 
@@ -914,6 +921,7 @@ namespace Mario2
                 enemy.Stomp(this);
                 Velocity.Y = -StompBounce;
                 DisableOverlapUntilCollisionLeave(enemy);
+                _invAfterStomp = InvincibilityAfterStomp;
             }
             else
             {

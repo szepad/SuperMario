@@ -18,7 +18,7 @@
             _buttons.Add(new UIPressButton("Editor", Button_Editor));
             _buttons.Add(new UIPressButton("Settings", Button_Settings));
             _buttons.Add(new UIPressButton("Exit", Button_Exit));
-            _buttons.PlaceVertically(new Vector2(Game.Width / 2f, Game.Height * 0.4f/*0.575f*/));
+            _buttons.PlaceVertically(new Vector2(Game.Width / 2f, Game.Height * 0.575f));
         }
 
         private void Button_Play(UIPressButton self)
@@ -62,17 +62,17 @@
         {
             Raylib.ClearBackground(Color.Black);
 
-            //if (_world is not null)
-            //{
-            //    Raylib.ClearBackground(_world.Parallax.ClearColor);
-            //    Raylib.BeginMode2D(new Camera2D(new Vector2(0f, Tile.Size), Vector2.Zero, 0f, 1f));
-            //    _world.DrawBackground();
-            //    _world.Draw(default, tileCulling: false);
-            //    Raylib.EndMode2D();
-            //}
+            if (_world is not null)
+            {
+                Raylib.ClearBackground(_world.Parallax.ClearColor);
+                Raylib.BeginMode2D(new Camera2D(new Vector2(0f, Tile.Size), Vector2.Zero, 0f, 1f));
+                _world.DrawBackground();
+                _world.Draw(default, tileCulling: false);
+                Raylib.EndMode2D();
+            }
 
-            //Raylib.DrawTextureEx(Assets.GetTex("title"), Vector2.Zero, 0f,
-            //    Game.TextureScale, Color.White);
+            Raylib.DrawTextureEx(Assets.GetTex("title"), Vector2.Zero, 0f,
+                Game.TextureScale, Color.White);
 
             _buttons.Draw();
         }
