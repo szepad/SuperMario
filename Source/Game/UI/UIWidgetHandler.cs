@@ -5,6 +5,9 @@
         public IEnumerable<UIWidget> Widgets => _widgets;
         private readonly List<UIWidget> _widgets = [];
 
+        public UIWidget? Selected => (_selectedIndex >= 0 && _selectedIndex < _widgets.Count)
+                ? _widgets[_selectedIndex] : null;
+
         private int _selectedIndex;
 
         public UIWidget? this[Index index]
@@ -41,19 +44,37 @@
 
             if (Raylib.IsKeyPressed(KeyboardKey.Up))
             {
-                _selectedIndex--;
-                if (_selectedIndex < 0)
-                    _selectedIndex = _widgets.Count - 1;
+                MoveCursorUp();   
             }
 
             if (Raylib.IsKeyPressed(KeyboardKey.Down))
             {
-                _selectedIndex++;
-                if (_selectedIndex >= _widgets.Count)
-                    _selectedIndex = 0;
+                MoveCursorDown();
             }
 
             this[_selectedIndex]?.Update();
+        }
+
+        public void MoveCursorUp()
+        {
+            _selectedIndex--;
+            if (_selectedIndex < 0)
+                _selectedIndex = _widgets.Count - 1;
+
+            if (Selected is not null && Selected.IsGreyedOut
+                && _widgets.Any(w => !w.IsGreyedOut))
+                MoveCursorUp();
+        }
+
+        public void MoveCursorDown()
+        {
+            _selectedIndex++;
+            if (_selectedIndex >= _widgets.Count)
+                _selectedIndex = 0;
+
+            if (Selected is not null && Selected.IsGreyedOut
+                && _widgets.Any(w => !w.IsGreyedOut))
+                MoveCursorDown();
         }
 
         public void Draw()

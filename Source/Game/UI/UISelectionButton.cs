@@ -1,11 +1,21 @@
 ﻿namespace Mario2
 {
-    public sealed record UISelectionButton<T>(string Label, T[] Selection,
-        Action<UISelectionButton<T>, T> OnValueChanged, int CurrIndex = 0)
-        : UIWidget(Label, Vector2.Zero)
+    public sealed class UISelectionButton<T> : UIWidget
     {
-        public int CurrIndex { get; private set; } = CurrIndex;
+        public event Action<UISelectionButton<T>, T>? OnValueChanged;
+
+        public T[] Selection { get; private set; }
+        public int CurrIndex { get; private set; }
         public T Curr => Selection[CurrIndex];
+
+        public UISelectionButton(string label, T[] selection,
+            Action<UISelectionButton<T>, T> onValueChanged, int currIndex = 0) 
+            : base(label, Vector2.Zero)
+        {
+            Selection = selection;
+            CurrIndex = currIndex;
+            OnValueChanged += onValueChanged;
+        }
 
         private T Next()
         {
@@ -30,8 +40,13 @@
 
         public override void DrawCursor()
         {
-            Raylib.DrawCircleV(Position - MarkerOffset, 2f.Scale(), Color.Red);
-            Raylib.DrawCircleV(Position + MarkerOffset, 2f.Scale(), Color.Red);
+            Raylib.DrawTextureEx(Assets.GetTex("cursor"),
+                Position - MarkerOffset - new Vector2(4f).Scale(),
+                0f, Game.TextureScale, Color.White);
+
+            Raylib.DrawTextureEx(Assets.GetTex("cursor"),
+                Position + MarkerOffset - new Vector2(4f).Scale(),
+                0f, Game.TextureScale, Color.White);
         }
     }
 }

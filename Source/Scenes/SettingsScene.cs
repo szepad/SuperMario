@@ -12,6 +12,9 @@
         private string Label_Fps => $"FPS {_settings.TargetFps}";
         private string Label_VolumeMaster => $"Volume {(int)(Raylib.GetMasterVolume() * 100f)}";
 
+        private readonly UISelectionButton<int> _fpsButton;
+        private bool FpsButtonGreyedOut => _settings.IsVsync;
+
         private static readonly int[] _fpsSelection = [
             0, 10, 20, 30, 60, 75, 100, 120, 144, 165, 200, 240, 360
         ];
@@ -22,9 +25,15 @@
 
             _buttons.Add(new UIPressButton(Label_Fullscreen, Button_Fullscreen));
             _buttons.Add(new UIPressButton(Label_VSync, Button_VSync));
-            _buttons.Add(new UISelectionButton<int>(Label_Fps, _fpsSelection, Button_Fps, 
-                CurrIndex: _fpsSelection.IndexOf(_settings.TargetFps)));
-            _buttons.Add(new UIRangeButton(Label_VolumeMaster, Button_VolumeMaster, Curr: Raylib.GetMasterVolume()));
+            _fpsButton = (UISelectionButton<int>)_buttons.Add(
+                new UISelectionButton<int>(Label_Fps, _fpsSelection, Button_Fps,
+                currIndex: _fpsSelection.IndexOf(_settings.TargetFps))
+            {
+                IsGreyedOut = FpsButtonGreyedOut
+            });
+
+            _buttons.Add(new UIRangeButton(Label_VolumeMaster, Button_VolumeMaster,
+                value: Raylib.GetMasterVolume()));
 
             _buttons.Add(new UIPressButton("Back", _ => Button_Back()));
             _buttons.PlaceVertically(new Vector2(Game.Width / 2f, Game.Height * 0.4f));
@@ -73,6 +82,7 @@
         protected override void OnUpdate()
         {
             _buttons.Update();
+            _fpsButton.IsGreyedOut = FpsButtonGreyedOut;
 
             if (Input.IsKeyPressed(KeyboardKey.Escape))
                 Button_Back();
