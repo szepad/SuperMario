@@ -8,6 +8,7 @@
         public Vector2 OldPosition;
         public Vector2 Velocity;
         public Vector2 Size;
+        public Vector2 SizeOffset;
         public Vector2 SpriteOffset;
         public Vector2 HitboxSize;
         public Vector2 HitboxOffset;
@@ -17,15 +18,17 @@
 
         public Sprite Sprite { get; set; } = new();
 
-        public Rectangle Rect => new(Position, Size);
+        public Rectangle Rect => new(Position - SizeOffset, Size);
+        public Rectangle OldRect => new(OldPosition - SizeOffset, Size);
         public Rectangle Hitbox => new(Position + HitboxOffset, HitboxSize);
-        public Vector2 Center => Position + Size / 2f;
-        public Vector2 Feet => new(Position.X + Size.X / 2f, Position.Y + Size.Y);
-        public Vector2 Head => new(Position.X + Size.X / 2f, Position.Y);
+        public Vector2 Center => Position - SizeOffset + Size / 2f;
+        public Vector2 Feet => new(Position.X - SizeOffset.X + Size.X / 2f, Position.Y - SizeOffset.Y + Size.Y);
+        public Vector2 Head => new(Position.X - SizeOffset.X + Size.X / 2f, Position.Y - SizeOffset.Y);
 
         public LayerDepth LayerDepth { get; set; } = LayerDepth.Normal;
         public bool IsCollidable { get; set; } = true;
         public bool IsHittable { get; set; } = true;
+        public bool IsSolid { get; set; } = false;
         public bool IsGrounded { get; private set; }
         public bool IsSpawned { get; private set; }
         public bool IsDestroyed { get; private set; }
@@ -41,8 +44,8 @@
         public void SetFeetPos(Vector2 pos)
         {
             Position = OldPosition = new Vector2(
-                pos.X - Size.X / 2f,
-                pos.Y - Size.Y
+                pos.X + SizeOffset.X - Size.X / 2f,
+                pos.Y + SizeOffset.Y - Size.Y
             );
         }
 
@@ -131,6 +134,118 @@
                 IsGrounded = false;
             }
 
+            ResolveTileCollisions(horizontal);
+            ResolveSolidEntityCollisions(horizontal);
+            //HandleEntityPushing(horizontal);
+        }
+
+        private void ResolveSolidEntityCollisions(bool horizontal)
+        {
+            // Solids can't collide with each other
+            if (IsSolid || !IsCollidable)
+                return;
+
+            foreach (Entity other in World.Entities)
+            {
+                if (!other.IsSolid || other == this)
+                    continue;
+
+                // Broad phase
+                if (!Raylib.CheckCollisionRecs(Rect, other.Rect))
+                    continue;
+
+                if (horizontal)
+                {
+                    if (OldRect.X >= other.OldRect.X + other.OldRect.Size.X && Rect.X < other.Rect.X + other.Rect.Size.X)
+                    {
+                        // Left collision
+                        OldPosition.X = Position.X = other.Rect.X + other.Rect.Width + SizeOffset.X;
+                        Velocity.X = other.Velocity.X;
+                        OnSolidEntityCollision(other, CollisionSide.Left);
+                    }
+                    else if (OldRect.X + OldRect.Size.X <= other.OldRect.X && Rect.X + Rect.Size.X > other.Rect.X)
+                    {
+                        // Right collision
+                        OldPosition.X = Position.X = other.Rect.X - Size.X + SizeOffset.X;
+                        Velocity.X = other.Velocity.X;
+                        OnSolidEntityCollision(other, CollisionSide.Right);
+                    }
+                }
+                else
+                {
+                    if (OldRect.Y >= other.OldRect.Y + other.OldRect.Size.Y && Rect.Y < other.Rect.Y + other.Rect.Size.Y)
+                    {
+                        // Top collision
+                        OldPosition.Y = Position.Y = other.Rect.Y + other.Rect.Height + SizeOffset.Y;
+                        Velocity.Y = other.Velocity.Y;
+                        OnSolidEntityCollision(other, CollisionSide.Top);
+                    }
+                    else if (OldRect.Y + OldRect.Size.Y <= other.OldRect.Y && Rect.Y + Rect.Size.Y > other.Rect.Y)
+                    {
+                        // Bottom collision
+                        OldPosition.Y = Position.Y = other.Rect.Y - Size.Y + SizeOffset.Y;
+                        Velocity.Y = other.Velocity.Y;
+                        IsGrounded = true;
+                        OnSolidEntityCollision(other, CollisionSide.Bottom);
+
+
+                    }
+                }
+            }
+        }
+
+        private void HandleEntityPushing(bool horizontal)
+        {
+            if (!IsSolid)
+                return;
+
+            foreach (Entity other in World.Entities)
+            {
+                if (other.IsSolid || other == this)
+                    continue;
+
+                if (!Raylib.CheckCollisionRecs(Rect, other.Rect))
+                    continue;
+
+                if (horizontal)
+                {
+                    if (Position.X < OldPosition.X)
+                    {
+                        // Push to the left
+                        other.Position.X = other.OldPosition.X = Rect.X - other.Size.X + other.SizeOffset.X;
+                        other.Velocity.X = 0f;
+                        other.OnSolidEntityCollision(this, CollisionSide.Right);
+                    }
+                    else if (Position.X > OldPosition.X)
+                    {
+                        // Push to the right
+                        other.Position.X = other.OldPosition.X = Rect.X + Size.X + other.SizeOffset.X;
+                        other.Velocity.X = 0f;
+                        other.OnSolidEntityCollision(this, CollisionSide.Left);
+                    }
+                }
+                else
+                {
+                    if (Position.Y < OldPosition.Y)
+                    {
+                        // Push up
+                        other.Position.Y = other.OldPosition.Y = Rect.Y - other.Size.Y + other.SizeOffset.Y;
+                        other.Velocity.Y = 0f;
+                        other.OnSolidEntityCollision(this, CollisionSide.Bottom);
+                    }
+                    else if (Position.Y > OldPosition.Y)
+                    {
+                        // Push down
+                        other.Position.Y = other.OldPosition.Y = Rect.Y + Size.Y + other.SizeOffset.Y;
+                        other.Velocity.Y = 0f;
+                        other.OnSolidEntityCollision(this, CollisionSide.Top);
+                    }
+                }
+            }
+        }
+
+        private void ResolveTileCollisions(bool horizontal)
+        {
             List<Tile> tilesToCheck = GetTilesForCollisionCheck();
             EnumerateCollisionTiles(tilesToCheck, (tile, tileRect) =>
             {
@@ -140,7 +255,7 @@
                     {
                         const float MaxYBias = 3f * Game.TextureScale;
                         float yBias = Position.Y + Size.Y - tileRect.Y;
-                        if (yBias >= 0 && yBias <= MaxYBias 
+                        if (yBias >= 0 && yBias <= MaxYBias
                             && MathF.Abs(Velocity.X) > 140f * Game.TextureScale
                             && (tile is not ContainerTile ct || !ct.IsHidden))
                         {
@@ -151,14 +266,14 @@
                             if (Position.X < OldPosition.X && !tile.CollisionExclude.Contains(CollisionSide.Right))
                             {
                                 // Left collision
-                                OldPosition.X = Position.X = tileRect.X + tileRect.Width;
+                                OldPosition.X = Position.X = tileRect.X + tileRect.Width + SizeOffset.X;
                                 Velocity.X = 0f;
                                 OnTileCollision(tile, CollisionSide.Left);
                             }
                             else if (Position.X > OldPosition.X && !tile.CollisionExclude.Contains(CollisionSide.Left))
                             {
                                 // Right collision
-                                OldPosition.X = Position.X = tileRect.X - Rect.Width;
+                                OldPosition.X = Position.X = tileRect.X - Rect.Width + SizeOffset.X;
                                 Velocity.X = 0f;
                                 OnTileCollision(tile, CollisionSide.Right);
                             }
@@ -170,7 +285,7 @@
                             (Position.Y > OldPosition.Y && !tile.CollisionExclude.Contains(CollisionSide.Top)))
                         {
                             // Bottom collision
-                            OldPosition.Y = Position.Y = tileRect.Y - Rect.Height;
+                            OldPosition.Y = Position.Y = tileRect.Y - Rect.Height + SizeOffset.Y;
                             Velocity.Y = 0f;
                             IsGrounded = true;
                             OnTileCollision(tile, CollisionSide.Bottom);
@@ -178,7 +293,7 @@
                         else if (Position.Y < OldPosition.Y && !tile.CollisionExclude.Contains(CollisionSide.Bottom))
                         {
                             // Top collision
-                            OldPosition.Y = Position.Y = tileRect.Y + tileRect.Height;
+                            OldPosition.Y = Position.Y = tileRect.Y + tileRect.Height + SizeOffset.Y;
                             Velocity.Y = 0f;
                             OnTileCollision(tile, CollisionSide.Top);
                         }
@@ -301,6 +416,7 @@
         protected virtual void OnTileCollision(Tile tile, CollisionSide side) { }
         protected virtual void OnTileOverlap(Tile tile) { }
         protected virtual void OnEntityOverlap(Entity other) { }
+        protected virtual void OnSolidEntityCollision(Entity other, CollisionSide side) { }
 
         public virtual string SaveCustomData() => string.Empty;
         public virtual void LoadCustomData(string data) { }

@@ -18,6 +18,7 @@ namespace Mario2.Editor
             Editor.PropertyWindow.ClearSettings();
             Editor.CleanDirty();
             Editor.WorldWindow.FocusCameraOn(Editor.World.Player);
+            Editor.WorldWindow.DeselectEntity();
         }
 
         public void AskOpen()
@@ -41,6 +42,7 @@ namespace Mario2.Editor
                 EditorScene.RecentlyOpened = path;
                 Editor.CleanDirty();
                 Editor.WorldWindow.FocusCameraOn(world.Player);
+                Editor.WorldWindow.DeselectEntity();
             }
             else if (failEx is not null)
             {

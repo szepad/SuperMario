@@ -7,8 +7,8 @@
 
         public abstract List<ISelectableObject<T>> Selectables { get; }
         
+        public const int TileSizePx = 16;
         private float _tileSizeScale = 1f;
-        private const int TileSizePx = 16;
 
         public ISelectableObject<T> Selected => Selectables[SelectedIndex];
 

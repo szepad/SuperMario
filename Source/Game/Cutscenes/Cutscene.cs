@@ -9,6 +9,7 @@
         public void Start();
         public void Update();
         public void OnTileCollision(Tile tile, CollisionSide side);
+        public void OnSolidEntityCollision(Entity other, CollisionSide side);
     }
 
     public abstract class Cutscene<TEnum>(Player player)
@@ -31,5 +32,6 @@
         }
 
         public virtual void OnTileCollision(Tile tile, CollisionSide side) { }
+        public virtual void OnSolidEntityCollision(Entity other, CollisionSide side) { }
     }
 }

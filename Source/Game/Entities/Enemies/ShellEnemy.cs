@@ -107,6 +107,18 @@
 
         protected override void OnTileCollision(Tile tile, CollisionSide side)
         {
+            OnSolidHit(side);
+            base.OnTileCollision(tile, side);
+        }
+
+        protected override void OnSolidEntityCollision(Entity other, CollisionSide side)
+        {
+            OnSolidHit(side);
+            base.OnSolidEntityCollision(other, side);
+        }
+
+        private void OnSolidHit(CollisionSide side)
+        {
             if (side == CollisionSide.Bottom && State == ShellState.Shell)
             {
                 // Landed from tile bounce
@@ -121,8 +133,6 @@
                 World.SpawnEffect(Center + new Vector2(dir * Tile.Size / 2f, 0f), EffectData.Hit);
                 SoundManager.PlaySound(Sounds.PlayerHitBlock);
             }
-
-            base.OnTileCollision(tile, side);
         }
 
         protected override void OnStomp(Entity stomper)

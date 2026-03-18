@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using static System.Net.WebRequestMethods;
 
 namespace Mario2
 {
@@ -809,6 +810,17 @@ namespace Mario2
             }
 
             _cutscene?.OnTileCollision(tile, side);
+        }
+
+        protected override void OnSolidEntityCollision(Entity other, CollisionSide side)
+        {
+            if (side == CollisionSide.Top)
+            {
+                StopJump();
+                SoundManager.PlaySound(Sounds.PlayerHitBlock);
+            }
+            
+            _cutscene?.OnSolidEntityCollision(other, side);
         }
 
         public bool CollidingWithPipeEntity([NotNullWhen(true)] out WarpPipe? pipe)

@@ -21,6 +21,9 @@
         private string _warpPipeTag = string.Empty;
         private int _warpPipeDir;
 
+        private int _platformTypeVal;
+        private int _platformDirVal;
+
         public override void Update()
         {
             
@@ -189,6 +192,24 @@
                 if (Gui.InputText("Tag", ref _warpPipeTag, 10))
                 {
                     exit.Tag = _warpPipeTag;
+                    Editor.Dirty();
+                }
+            }
+            else if (sel is ConstantPlatform platform)
+            {
+                _platformTypeVal = (int)platform.Type;
+                string[] choices = Enum.GetNames<PlatformType>();
+                if (Gui.Combo("Size", ref _platformTypeVal, choices, choices.Length))
+                {
+                    platform.Resize((PlatformType)_platformTypeVal);
+                    Editor.Dirty();
+                }
+
+                _platformDirVal = (int)platform.Dir;
+                choices = Enum.GetNames<PlatformDirection>();
+                if (Gui.Combo("Direction", ref _platformDirVal, choices, choices.Length))
+                {
+                    platform.Dir = (PlatformDirection)_platformDirVal;
                     Editor.Dirty();
                 }
             }

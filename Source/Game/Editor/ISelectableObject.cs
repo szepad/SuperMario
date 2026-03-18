@@ -6,6 +6,8 @@
         public int PreviewCol { get; }
         public int PreviewRow { get; }
 
+        public int Index => PreviewRow * Tileset.Width / SelectorWindow<T>.TileSizePx + PreviewCol;
+
         public abstract T OnPlace(World world, int col, int row);
     }
 }

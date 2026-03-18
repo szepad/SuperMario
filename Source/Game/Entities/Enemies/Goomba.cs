@@ -2,6 +2,8 @@
 {
     public class Goomba : Enemy
     {
+        public Palette Palette { get; private set; } = Palette.Overworld; 
+
         public const float WalkSpeed = Tile.Size * 2f;
         private float _deathTimer = 1f;
 
@@ -16,6 +18,17 @@
             Sprite.Add("stomp", new Animation(1, 16, 16, 16, 0.1f));
 
             SetAi(new GoombaAi(this, WalkSpeed));
+        }
+
+        public void SetPalette(Palette palette)
+        {
+            Palette = palette;
+            switch (palette)
+            {
+                case Palette.Overworld: Sprite.SetSheet("goomba"); break;
+                case Palette.Underground: Sprite.SetSheet("goomba_ug"); break;
+                case Palette.Castle: Sprite.SetSheet("goomba_castle"); break;
+            }
         }
 
         protected override void OnStomp(Entity stomper)
@@ -38,6 +51,19 @@
             }
 
             base.Update();
+        }
+
+        public override string SaveCustomData()
+        {
+            return Palette.ToString();
+        }
+
+        public override void LoadCustomData(string data)
+        {
+            if (Enum.TryParse(data, out Palette palette))
+            {
+                SetPalette(palette);
+            }
         }
     }
 }
