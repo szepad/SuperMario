@@ -18,6 +18,7 @@
         public virtual void OnDie() { }
 
         public virtual void OnTileCollision(Tile tile, CollisionSide side) { }
+        public virtual void OnSolidEntityCollision(Entity other, CollisionSide side) { }
         public virtual void OnTileOverlap(Tile tile) { }
         public virtual void OnEntityOverlap(Entity other) { }
 

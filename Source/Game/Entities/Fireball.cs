@@ -63,6 +63,12 @@
         }
 
         protected override void OnTileCollision(Tile tile, CollisionSide side)
+            => OnSolidHit(side);
+
+        protected override void OnSolidEntityCollision(Entity other, CollisionSide side)
+            => OnSolidHit(side);
+
+        private void OnSolidHit(CollisionSide side)
         {
             if (side == CollisionSide.Bottom)
             {

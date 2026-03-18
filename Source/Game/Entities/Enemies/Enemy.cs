@@ -128,6 +128,11 @@
             Ai.OnTileCollision(tile, side);
         }
 
+        protected override void OnSolidEntityCollision(Entity other, CollisionSide side)
+        {
+            Ai.OnSolidEntityCollision(other, side);
+        }
+
         protected override void OnTileOverlap(Tile tile)
         {
             Ai.OnTileOverlap(tile);

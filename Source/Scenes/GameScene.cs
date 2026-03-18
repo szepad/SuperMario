@@ -2,6 +2,8 @@
 {
     public class GameScene(string path = "") : Scene
     {
+        public const int CameraOffsetY = Tile.Size;
+
         private enum State
         {
             Loading,
@@ -44,7 +46,7 @@
         {
             _camera = new(Vector2.Zero, Vector2.Zero, 0f, 1f);
             _camera.Offset.X = Game.Width / 2f;
-            _camera.Offset.Y = Game.Height - World.Rows * Tile.Size + Tile.Size;
+            _camera.Offset.Y = CameraOffsetY;
             _world.HandleCameraFollow(ref _camera);
             _world.UpdateParallax(_camera);
         }

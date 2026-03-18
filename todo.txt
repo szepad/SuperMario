@@ -93,10 +93,16 @@
 [x] Hurry Time on 100 with different music
 [x] Keyboard controlled option menu
 [x] Title scene
+[x] Animated background (underground lantern, later waterfalls)
+[x] Enemy underground palette
+[-] Tile selector done with reflection
+[x] Platforms (Solid entities)
+[ ] Entity inertia (platform)
+[ ] Teal Koopa (palette change for koopa)
+[ ] Red Koopa (new class for RedKoopa inherits from koopa and only the ai is overridden and sprite)
+[ ] Piranha plant
 [ ] Midway
 [ ] Fix jumping over flagpole
-[ ] Animated background (underground lantern, later waterfalls)
-[ ] Enemy underground palette
 [ ] Reverb? on underground sfx
 [ ] Pipe intro shouldn't play on respawn
 [ ] Platforms (constant vertical, constant horiz, falling, connected)
