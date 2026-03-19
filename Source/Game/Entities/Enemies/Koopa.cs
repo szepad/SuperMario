@@ -2,8 +2,8 @@
 {
     public class Koopa : ShellEnemy
     {
-        protected override EnemyAi NormalAi { get; }
-
+        public Palette Palette { get; private set; } = Palette.Overworld; 
+        
         private const float SpriteOffsetYNormal = 8f * Game.TextureScale;
         private const float SpriteOffsetYFlip = -2f * Game.TextureScale;
 
@@ -23,6 +23,17 @@
             NormalAi = new GoombaAi(this, Goomba.WalkSpeed);
         }
 
+        public virtual void SetPalette(Palette palette)
+        {
+            Palette = palette;
+            switch (palette)
+            {
+                case Palette.Overworld: Sprite.SetSheet("koopa"); break;
+                case Palette.Underground: Sprite.SetSheet("koopa_ug"); break;
+                case Palette.Castle: Sprite.SetSheet("koopa_castle"); break;
+            }
+        }
+
         public override void Update()
         {
             FlipTowardsVelocity();
@@ -33,6 +44,19 @@
         {
             SpriteOffset.Y = Sprite.FlipY ? SpriteOffsetYFlip : SpriteOffsetYNormal;
             base.Draw();
+        }
+
+        public override string SaveCustomData()
+        {
+            return Palette.ToString();
+        }
+
+        public override void LoadCustomData(string data)
+        {
+            if (Enum.TryParse(data, out Palette palette))
+            {
+                SetPalette(palette);
+            }
         }
     }
 }
