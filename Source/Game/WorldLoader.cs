@@ -36,7 +36,7 @@
             // Entities
             foreach (Entity entity in world.Entities)
             {
-                if (entity is Player)
+                if (!entity.IsEditorSaveable)
                     continue;
 
                 writer.WriteLine($"{entity.GetType().FullName};{(int)entity.Position.X};{(int)entity.Position.Y};{entity.SaveCustomData()}");

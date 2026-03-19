@@ -29,6 +29,7 @@
         public bool IsCollidable { get; set; } = true;
         public bool IsHittable { get; set; } = true;
         public bool IsSolid { get; set; } = false;
+        public bool IsEditorSaveable { get; set; } = true;
         public bool IsGrounded { get; private set; }
         public bool IsSpawned { get; private set; }
         public bool IsDestroyed { get; private set; }
