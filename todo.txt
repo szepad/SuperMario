@@ -100,11 +100,11 @@
 [x] Entity inertia (platform)
 [x] Teal Koopa (palette change for koopa)
 [x] Red Koopa (new class for RedKoopa inherits from koopa and only the ai is overridden and sprite)
-[ ] Piranha plant
+[x] Piranha plant
 [ ] Back to sub-world option for pipe entrance (should be used in bonus rooms)
 [ ] Midway
+[ ] Player status between levels 
 [ ] Fix jumping over flagpole
 [ ] Reverb? on underground sfx
 [ ] Pipe intro shouldn't play on respawn
-[ ] Platforms (constant vertical, constant horiz, falling, connected)
 [ ] Luigi

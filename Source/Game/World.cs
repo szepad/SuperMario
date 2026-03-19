@@ -62,6 +62,8 @@ namespace Mario2
         private const float WarningSoundTime = 2f;
         private float _warningSoundTimer;
 
+        private bool _spawnedPiranhaPlants;
+
         public World()
         {
             ResetPlayer();
@@ -95,6 +97,7 @@ namespace Mario2
         public void Start()
         {
             PlayMusic();
+            TrySpawnPiranhaPlants();
         }
 
         public void PlayMusic()
@@ -108,6 +111,27 @@ namespace Mario2
             {
                 SoundManager.PlayMusic(Music);
             }
+        }
+
+        private void TrySpawnPiranhaPlants()
+        {
+            if (_spawnedPiranhaPlants || SessionManager.CurrentLevel == 1) return;
+            _spawnedPiranhaPlants = true;
+
+            const int PipeId = 24;
+            for (int row = 0; row < Rows; row++)
+            {
+                for (int col = 0; col < Cols; col++)
+                {
+                    if (GetTile(col, row, out Tile tile) && tile is SimpleTile st
+                        && st.Id == PipeId)
+                    {
+                        PiranhaPlant plant = new(this);
+                        plant.SetPosition(new Vector2(col, row) * Tile.Size + new Vector2(8f, 2f).Scale());
+                        SpawnEntity(plant);
+                    }
+                }
+            }    
         }
 
         private void PlayHurryMusic()

@@ -57,6 +57,8 @@
             IsCollidable = false;
             Velocity.Y = -DieBounceForce;
             Sprite.FlipY = true;
+            LayerDepth = LayerDepth.Normal;
+            Gravity = DefaultGravity;
 
             OnDie();
             Ai.OnDie();

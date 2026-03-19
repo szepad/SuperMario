@@ -115,6 +115,8 @@ namespace Mario2
 
         public Player(World world) : base(world)
         {
+            IsEditorSaveable = false;
+
             SetSmallStateVars();
             LayerDepth = LayerDepth.Player;
 
