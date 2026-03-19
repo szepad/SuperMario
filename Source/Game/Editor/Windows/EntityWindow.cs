@@ -40,8 +40,15 @@ namespace Mario2.Editor
         });
 
         public static readonly EntityObject<Koopa> Koopa = new(4, 0);
-        public static readonly EntityObject<WarpPipe> Pipe = new(5, 0);
-        public static readonly EntityObject<WarpExit> WarpExit = new(6, 0);
-        public static readonly EntityObject<ConstantPlatform> ConstantPlatform = new(7, 0);
+        public static readonly EntityObject<Koopa> KoopaTeal = new(5, 0, koopa =>
+        {
+            koopa.SetPalette(Palette.Underground);
+        });
+
+        public static readonly EntityObject<RedKoopa> KoopaRed = new(6, 0);
+
+        public static readonly EntityObject<WarpPipe> Pipe = new(7, 0);
+        public static readonly EntityObject<WarpExit> WarpExit = new(0, 1);
+        public static readonly EntityObject<ConstantPlatform> ConstantPlatform = new(1, 1);
     }
 }

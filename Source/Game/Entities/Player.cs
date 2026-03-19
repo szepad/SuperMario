@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using static System.Net.WebRequestMethods;
 
 namespace Mario2
 {

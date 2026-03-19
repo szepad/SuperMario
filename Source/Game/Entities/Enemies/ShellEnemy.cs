@@ -18,7 +18,7 @@
         protected const string ShellSpinAnim = "shell_spin";
         protected const string WakeUpAnim = "wake_up";
 
-        protected abstract EnemyAi NormalAi { get; }
+        protected EnemyAi NormalAi { get; set; }
         private readonly EnemyAi _spinAi;
 
         private const float StandUpTime = 10f;
@@ -32,6 +32,8 @@
             {
                 ChangeDirOnEnemyOverlap = false
             };
+
+            NormalAi = new DummyAi(this);
         }
 
         protected override void OnActivate()

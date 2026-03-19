@@ -52,6 +52,7 @@
         private readonly List<Entity> _overlapDisabled = [];
 
         private bool _steppedUpFromHorizontalCollision;
+        private float _platformInertiaX;
 
         public void Spawn()
         {
@@ -111,7 +112,8 @@
             _steppedUpFromHorizontalCollision = false;
 
             OldPosition = Position;
-            Position.X += Velocity.X * Time.DeltaTime;
+            Position.X += (Velocity.X + _platformInertiaX) * Time.DeltaTime;
+            _platformInertiaX = 0f;
             HandleCollisions(horizontal: true);
             Position.Y += Velocity.Y * Time.DeltaTime;
             HandleCollisions(horizontal: false);
@@ -136,7 +138,6 @@
 
             ResolveTileCollisions(horizontal);
             ResolveSolidEntityCollisions(horizontal);
-            //HandleEntityPushing(horizontal);
         }
 
         private void ResolveSolidEntityCollisions(bool horizontal)
@@ -186,59 +187,8 @@
                         OldPosition.Y = Position.Y = other.Rect.Y - Size.Y + SizeOffset.Y;
                         Velocity.Y = other.Velocity.Y;
                         IsGrounded = true;
+                        _platformInertiaX = other.Velocity.X;
                         OnSolidEntityCollision(other, CollisionSide.Bottom);
-
-
-                    }
-                }
-            }
-        }
-
-        private void HandleEntityPushing(bool horizontal)
-        {
-            if (!IsSolid)
-                return;
-
-            foreach (Entity other in World.Entities)
-            {
-                if (other.IsSolid || other == this)
-                    continue;
-
-                if (!Raylib.CheckCollisionRecs(Rect, other.Rect))
-                    continue;
-
-                if (horizontal)
-                {
-                    if (Position.X < OldPosition.X)
-                    {
-                        // Push to the left
-                        other.Position.X = other.OldPosition.X = Rect.X - other.Size.X + other.SizeOffset.X;
-                        other.Velocity.X = 0f;
-                        other.OnSolidEntityCollision(this, CollisionSide.Right);
-                    }
-                    else if (Position.X > OldPosition.X)
-                    {
-                        // Push to the right
-                        other.Position.X = other.OldPosition.X = Rect.X + Size.X + other.SizeOffset.X;
-                        other.Velocity.X = 0f;
-                        other.OnSolidEntityCollision(this, CollisionSide.Left);
-                    }
-                }
-                else
-                {
-                    if (Position.Y < OldPosition.Y)
-                    {
-                        // Push up
-                        other.Position.Y = other.OldPosition.Y = Rect.Y - other.Size.Y + other.SizeOffset.Y;
-                        other.Velocity.Y = 0f;
-                        other.OnSolidEntityCollision(this, CollisionSide.Bottom);
-                    }
-                    else if (Position.Y > OldPosition.Y)
-                    {
-                        // Push down
-                        other.Position.Y = other.OldPosition.Y = Rect.Y + Size.Y + other.SizeOffset.Y;
-                        other.Velocity.Y = 0f;
-                        other.OnSolidEntityCollision(this, CollisionSide.Top);
                     }
                 }
             }
