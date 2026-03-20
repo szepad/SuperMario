@@ -9,6 +9,9 @@
 
         public override Action GetFunction(SingleCutsceneState _) => EnterState;
 
+        private float _startY;
+        private float _endY;
+
         public override void Start()
         {
             SoundManager.PlaySound(Sounds.PlayerWarp);
@@ -21,12 +24,14 @@
             Player.Gravity = 0f;
             Player.Velocity = Vector2.Zero;
             Player.LayerDepth = LayerDepth.Background;
-            Player.Position.Y -= Game.TextureScale;
+
+            _startY = Player.Rect.Y;
+            _endY = _startY - 2f.Scale();
         }
 
         private void EnterState()
         {
-            if (Player.Position.X >= _pipe.Rect.X + _pipe.Rect.Width + 8f.Scale())
+            if (Player.Rect.X >= _pipe.Rect.X + _pipe.Rect.Width + 8f.Scale())
             {
                 _waitTimer -= Time.DeltaTime;
                 if (_waitTimer <= 0f)
@@ -38,6 +43,10 @@
             else
             {
                 Player.Position.X += 16f.Scale() * Time.DeltaTime;
+
+                float relPlayerX = Player.Rect.X + Player.Size.X - (_pipe.Rect.X + _pipe.Rect.Width);
+                float t = Helper.Clamp01(relPlayerX / _pipe.Rect.Width);
+                Player.Position.Y = Raymath.Lerp(_startY, _endY, t);
             }
         }
     }

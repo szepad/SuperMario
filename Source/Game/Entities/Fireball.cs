@@ -100,6 +100,10 @@
                         ScoreRewards.ShorterLifeTime, ScoreRewards.FasterSpeed);
                 }
             }
+            else if (other is Flagpole)
+            {
+                Impact();
+            }
         }
 
         public override void OnCameraLeaveX()

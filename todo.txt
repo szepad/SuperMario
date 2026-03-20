@@ -103,9 +103,13 @@
 [x] Piranha plant
 [x] Back to sub-world option for pipe entrance (should be used in bonus rooms)
 [x] Midway
-[ ] Piranha plant shouldn't spawn in pipe intro
-[ ] Player status between levels 
-[ ] Fix jumping over flagpole
+[x] Pipe intro shouldn't play on respawn
+[x] Piranha plant shouldn't spawn in pipe intro
+[x] Player status between levels 
+[x] Fix jumping over flagpole
+[ ] Waterfall background
+[ ] Parakoopa
+[ ] Star flag on big castle
+[ ] Warp Zone
 [ ] Reverb? on underground sfx
-[ ] Pipe intro shouldn't play on respawn
 [ ] Luigi

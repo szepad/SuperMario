@@ -136,7 +136,9 @@
 
         private void World_OnLevelEnd()
         {
+            PlayerState playerState = _world.Player.State;
             LoadNext();
+            _world.Player.SetStateInstantNoSideFx(playerState);
         }
 
         private void World_OnPipeLoadSublevel(WarpPipe pipe)

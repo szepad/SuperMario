@@ -861,6 +861,7 @@ namespace Mario2
             {
                 if (other is Flagpole flag)
                 {
+                    flag.OnHit();
                     StartCutscene(new FlagpoleCutscene(this, flag));
                 }
                 else if (other is WarpPipe pipe)
