@@ -51,5 +51,6 @@ namespace Mario2.Editor
         public static readonly EntityObject<WarpExit> WarpExit = new(0, 1);
         public static readonly EntityObject<ConstantPlatform> ConstantPlatform = new(1, 1);
         public static readonly EntityObject<Midway> Midway = new(2, 1, unique: true);
+        public static readonly EntityObject<NoPlant> NoPlant = new(3, 1);
     }
 }

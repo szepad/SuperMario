@@ -128,12 +128,18 @@ namespace Mario2
             {
                 for (int col = 0; col < Cols; col++)
                 {
-                    if (GetTile(col, row, out Tile tile) && tile is SimpleTile st
+                    if (GetTile(col, row, out Tile tile) 
+                        && tile is SimpleTile st
                         && st.Id == PipeId)
                     {
                         PiranhaPlant plant = new(this);
                         plant.SetPosition(new Vector2(col, row) * Tile.Size + new Vector2(8f, 2f).Scale());
-                        SpawnEntity(plant);
+
+                        if (!_entities.Where(e => e is NoPlant)
+                            .Any(e => Vector2.Distance(e.Feet, plant.Head) <= Tile.Size))
+                        {
+                            SpawnEntity(plant);
+                        }
                     }
                 }
             }    

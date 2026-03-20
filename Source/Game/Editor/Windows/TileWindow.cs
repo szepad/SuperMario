@@ -16,6 +16,8 @@
             TileObjectDefs.Flagpole,
             TileObjectDefs.UndergroundFloor,
             TileObjectDefs.BlockUg,
+            TileObjectDefs.Tree,
+            TileObjectDefs.TreeTrunk,
         ];
 
         public override void Update() { }
@@ -139,6 +141,7 @@
             [0b_0101] = new InstanceTile<GrassDecorTileMiddle>(0, 0),
             [0b_1101] = new InstanceTile<GrassDecorTileMiddle>(0, 0),
             [0b_0111] = new InstanceTile<GrassDecorTileMiddle>(0, 0),
+            [0b_1010] = new InstanceTile<GrassDecorTileMiddle>(0, 0),
 
             [0b_0100] = new InstanceTile<GrassDecorTileLeft>(0, 0),
             [0b_1100] = new InstanceTile<GrassDecorTileLeft>(0, 0),
@@ -150,5 +153,51 @@
             [0b_1011] = new InstanceTile<GrassDecorTileRight>(0, 0),
             [0b_0011] = new InstanceTile<GrassDecorTileRight>(0, 0),
         }, ConnectToSolid: true);
+
+        public static readonly RuleTile Tree = new(true, 2, 5, new()
+        {
+            [0b_0000] = new BasicTile(42, true, 0, 0),
+            [0b_1000] = new BasicTile(42, true, 0, 0),
+            [0b_1010] = new BasicTile(42, true, 0, 0),
+            [0b_0010] = new BasicTile(42, true, 0, 0),
+            
+            [0b_0101] = new BasicTile(42, true, 0, 0),
+            [0b_1101] = new BasicTile(42, true, 0, 0),
+            [0b_1111] = new BasicTile(42, true, 0, 0),
+            [0b_0111] = new BasicTile(42, true, 0, 0),
+
+            [0b_0100] = new BasicTile(41, true, 0, 0),
+            [0b_1100] = new BasicTile(41, true, 0, 0),
+            [0b_1110] = new BasicTile(41, true, 0, 0),
+            [0b_0110] = new BasicTile(41, true, 0, 0),
+
+            [0b_0001] = new BasicTile(43, true, 0, 0),
+            [0b_1001] = new BasicTile(43, true, 0, 0),
+            [0b_1011] = new BasicTile(43, true, 0, 0),
+            [0b_0011] = new BasicTile(43, true, 0, 0),
+        });
+
+        public static readonly RuleTile TreeTrunk = new(false, 7, 5, new()
+        {
+            [0b_0000] = new BasicTile(47, false, 0, 0),
+            [0b_1000] = new BasicTile(47, false, 0, 0),
+            [0b_1010] = new BasicTile(47, false, 0, 0),
+            [0b_0010] = new BasicTile(47, false, 0, 0),
+
+            [0b_0100] = new BasicTile(44, false, 0, 0),
+            [0b_1100] = new BasicTile(44, false, 0, 0),
+            [0b_1110] = new BasicTile(44, false, 0, 0),
+            [0b_0110] = new BasicTile(44, false, 0, 0),
+
+            [0b_0001] = new BasicTile(46, false, 0, 0),
+            [0b_1001] = new BasicTile(46, false, 0, 0),
+            [0b_1011] = new BasicTile(46, false, 0, 0),
+            [0b_0011] = new BasicTile(46, false, 0, 0),
+
+            [0b_0101] = new BasicTile(45, false, 0, 0),
+            [0b_1101] = new BasicTile(45, false, 0, 0),
+            [0b_1111] = new BasicTile(45, false, 0, 0),
+            [0b_0111] = new BasicTile(45, false, 0, 0),
+        });
     }
 }

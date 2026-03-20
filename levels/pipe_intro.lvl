@@ -14,3 +14,4 @@ simple,80,False,;simple,81,False,;simple,82,False,;simple,83,False,;simple,84,Fa
 simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;
 simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;
 Mario2.WarpPipe;576;704;,,1,False
+Mario2.NoPlant;800;448;

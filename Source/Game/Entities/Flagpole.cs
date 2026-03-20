@@ -21,9 +21,30 @@
 
         }
 
+        public void OnHit()
+        {
+            if (!IsHittable) return;
+            IsHittable = false;
+
+            for (int i = World.Entities.Count - 1; i >= 0; i--)
+            {
+                if (World.Entities[i] is Enemy enemy)
+                {
+                    enemy.Destroy();
+                    World.SpawnEntity(new CoinPickup(World), enemy.Feet);
+                }
+            }    
+        }
+
         public override void Update()
         {
             SpriteOffset.Y = -FlagRelY;
+
+            if (IsHittable && World.Player.Center.X > Rect.X + Rect.Width)
+            {
+                World.Player.SetFeetPos(Rect.X + Rect.Width, World.Player.Feet.Y);
+                World.Player.Velocity.X = 0f;
+            }
 
             base.Update();
         }

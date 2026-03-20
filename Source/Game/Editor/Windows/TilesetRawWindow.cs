@@ -8,13 +8,14 @@ namespace Mario2.Editor
         private static readonly int[] _notCollidableIds =
         [
             29, 37, 40,
+            44, 45, 46, 47,
             49, 50, 51, 52,
             57, 58, 59, 60,
             64, 65, 66, 67, 68, 69,
             72, 73, 74, 75, 76, 77,
             80, 81, 82, 83, 84, 85,
-            88, 89, 90, 91, 92,
-            96, 97, 98, 99, 100,
+            88, 89, 90, 91, 92, 93, 94,
+            96, 97, 98, 99, 100, 101, 102,
         ];
 
         public TilesetRawWindow(EditorScene editor)
