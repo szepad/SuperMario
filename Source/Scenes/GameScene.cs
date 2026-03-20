@@ -95,7 +95,7 @@
         }
 
         private void LoadNext() => Load(() => SessionManager.LoadNext(out _world));
-        private void Reload() => Load(() => SessionManager.LoadCurrent(out _world));
+        private void Reload() => Load(() => SessionManager.Reload(out _world));
 
         private void AssignWorldEvents() 
         {
@@ -106,7 +106,7 @@
 
         private void StartWorld()
         {
-            if (_world.IsPipeIntro)
+            if (_world.IsPipeIntro && !SessionManager.Reloaded)
             {
                 _world.IsPipeIntro = false;
                 string dest = _world.LoadedPath;
@@ -168,6 +168,7 @@
                 }
 
                 _loadedSubWorlds[Path.GetFullPath(world.LoadedPath)] = world;
+                world.ParentWorldPath = _world.LoadedPath;
                 _world = world;
                 AssignWorldEvents();
             }
@@ -196,6 +197,16 @@
             }
             else
             {
+                Midway? mid = (Midway?)_world.Entities.FirstOrDefault(e => e is Midway);
+                if (mid is not null && _world.Player.Center.X > mid.Center.X)
+                {
+                    SessionManager.ReachMid();
+                }
+                else
+                {
+                    SessionManager.ClearMid();
+                }
+
                 Reload();
             }
         }

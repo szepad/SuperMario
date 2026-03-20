@@ -27,7 +27,7 @@ namespace Mario2.Editor
 
     public static class EntityObjectDefs
     {
-        public static readonly EntityObject<Player> Player = new(0, 0);
+        public static readonly EntityObject<Player> Player = new(0, 0, unique: true);
         public static readonly EntityObject<Goomba> Goomba = new(1, 0);
         public static readonly EntityObject<Goomba> Goomba_Ug = new(2, 0, goomba =>
         {
@@ -50,5 +50,6 @@ namespace Mario2.Editor
         public static readonly EntityObject<WarpPipe> Pipe = new(7, 0);
         public static readonly EntityObject<WarpExit> WarpExit = new(0, 1);
         public static readonly EntityObject<ConstantPlatform> ConstantPlatform = new(1, 1);
+        public static readonly EntityObject<Midway> Midway = new(2, 1, unique: true);
     }
 }

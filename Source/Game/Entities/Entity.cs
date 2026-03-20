@@ -32,6 +32,7 @@
         public bool IsEditorSaveable { get; set; } = true;
         public bool IsGrounded { get; private set; }
         public bool IsSpawned { get; private set; }
+        public bool CanBeDestroyed { get; set; } = true;
         public bool IsDestroyed { get; private set; }
         public bool IsActive { get; private set; }
 
@@ -65,7 +66,7 @@
 
         public void Destroy()
         {
-            if (IsDestroyed) return;
+            if (IsDestroyed || !CanBeDestroyed) return;
             IsDestroyed = true;
 
             OnDestroy();
@@ -336,8 +337,14 @@
                 return;
 
             Sprite.Draw(Position - SpriteOffset);
+
+            if (Game.Instance.ActiveScene is EditorScene editor && editor.SubScene is null)
+                DrawEditor();
+
             DrawDebug();
         }
+
+        protected virtual void DrawEditor() { }
 
         protected virtual void DrawDebug()
         {

@@ -225,10 +225,19 @@
                 ((int)tilePos.X + xOff) * Tile.Size,
                 ((int)tilePos.Y + 1f) * Tile.Size);
 
-            if (entity is Player)
+            if (entityWindow.Selected is EntityObjectBase entObj
+                && entObj.Unique)
             {
-                Editor.World.Player.SetFeetPos(pos);
-                SelectedEntity = Editor.World.Player;
+                Entity? found = Editor.World.Entities.FirstOrDefault(curr => curr.GetType() == entity.GetType());
+                if (found is not null)
+                {
+                    found.SetFeetPos(pos);
+                    SelectedEntity = found;
+                }
+                else
+                {
+                    SelectedEntity = Editor.World.SpawnEntity(entity, pos);
+                }
             }
             else
             {
@@ -250,7 +259,7 @@
                 }
                 else if (entityUnderMouse is not Player)
                 {
-                    Editor.World.Entities.Remove(entityUnderMouse);
+                    Editor.World.RemoveEntity(entityUnderMouse);
                     _disableRightClickTemporarily = true;
                 }
 

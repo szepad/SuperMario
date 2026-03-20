@@ -20,6 +20,7 @@
         private string _warpPipeDest = string.Empty;
         private string _warpPipeTag = string.Empty;
         private int _warpPipeDir;
+        private bool _warpPipeReturn;
 
         private int _platformTypeVal;
         private int _platformDirVal;
@@ -164,11 +165,17 @@
                 Gui.SeparatorText("Warp Pipe");
                 
                 _warpPipeDest = pipe.Destination;
+                if (pipe.ReturnToSubworld) 
+                    Gui.BeginDisabled();
+
                 if (Gui.InputText("Dest", ref _warpPipeDest, 30))
                 {
                     pipe.Destination = _warpPipeDest;
                     Editor.Dirty();
                 }
+
+                if (pipe.ReturnToSubworld) 
+                    Gui.EndDisabled();
 
                 _warpPipeTag = pipe.Tag;
                 if (Gui.InputText("Tag", ref _warpPipeTag, 10))
@@ -184,10 +191,18 @@
                     pipe.Dir = (PipeDirection)_warpPipeDir;
                     Editor.Dirty();
                 }
+
+                _warpPipeReturn = pipe.ReturnToSubworld;
+                if (Gui.Checkbox("Return to Sub-world", ref _warpPipeReturn))
+                {
+                    pipe.ReturnToSubworld = _warpPipeReturn;
+                    Editor.Dirty();
+                }
             }
             else if (sel is WarpExit exit)
             {
                 Gui.SeparatorText("Pipe Exit");
+
                 _warpPipeTag = exit.Tag;
                 if (Gui.InputText("Tag", ref _warpPipeTag, 10))
                 {
@@ -197,6 +212,8 @@
             }
             else if (sel is ConstantPlatform platform)
             {
+                Gui.SeparatorText("Platform");
+                
                 _platformTypeVal = (int)platform.Type;
                 string[] choices = Enum.GetNames<PlatformType>();
                 if (Gui.Combo("Size", ref _platformTypeVal, choices, choices.Length))

@@ -28,6 +28,8 @@ namespace Mario2
         public event Action<WarpPipe>? OnPipeLoadSublevel;
 
         public string LoadedPath { get; init; } = string.Empty;
+        public string ParentWorldPath { get; set; } = string.Empty;
+
         public int TimeLeft { get; set; } = 400;
         public int Cols { get; private set; } = 100;
         public Vector2 PlayerSpawnPosition { get; set; }
@@ -38,7 +40,9 @@ namespace Mario2
 
         public Player Player { get; private set; }
         public Tile[,] Tiles { get; private set; }
-        public List<Entity> Entities { get; } = [];
+
+        public IReadOnlyList<Entity> Entities => _entities;
+        private readonly List<Entity> _entities = [];
 
         public bool DrawStarFlag { get; set; }
         public Vector2 StarFlagPosition;
@@ -82,13 +86,13 @@ namespace Mario2
         [MemberNotNull(nameof(Player))]
         public void ResetPlayer()
         {
-            if (Player is not null && Entities.Contains(Player))
+            if (Player is not null && _entities.Contains(Player))
             {
-                Entities.Remove(Player);
+                _entities.Remove(Player);
             }
 
             Player = new Player(this);
-            Entities.Add(Player);
+            _entities.Add(Player);
             Player.Activate();
             Player.OnDeath += TryInvokePlayerDeath;
             Player.SetPosition(PlayerSpawnPosition);
@@ -97,6 +101,7 @@ namespace Mario2
         public void Start()
         {
             PlayMusic();
+            TryTeleportToMidway();
             TrySpawnPiranhaPlants();
         }
 
@@ -132,6 +137,31 @@ namespace Mario2
                     }
                 }
             }    
+        }
+
+        private void TryTeleportToMidway()
+        {
+            if (!SessionManager.ReachedMidway)
+                return;
+
+            Midway? mid = (Midway?)_entities.FirstOrDefault(e => e is Midway);
+            if (mid is not null)
+            {
+                Player.SetFeetPos(mid.Feet);
+
+                // Enemies near shouldn't spawn
+                for (int i = _entities.Count - 1; i >= 0; i--)
+                {
+                    if (_entities[i] is not Enemy enemy)
+                        continue;
+
+                    const float SpawnThreshold = Tile.Size * 6f;
+                    if (MathF.Abs(mid.Feet.X - enemy.Feet.X) < SpawnThreshold)
+                    {
+                        RemoveEntity(enemy);
+                    }
+                }
+            }
         }
 
         private void PlayHurryMusic()
@@ -228,7 +258,7 @@ namespace Mario2
 
         public T SpawnEntity<T>(T entity) where T : Entity
         {
-            Entities.Add(entity);
+            _entities.Add(entity);
             entity.Spawn();
 
             if (entity is Fireball fireball)
@@ -240,6 +270,9 @@ namespace Mario2
             return entity;
         }
 
+        public void RemoveEntity(Entity entity)
+            => _entities.Remove(entity);
+
         public void Freeze(float time)
         {
             _freezeTimer = time;
@@ -247,9 +280,12 @@ namespace Mario2
 
         public void HandlePipeTransition(WarpPipe pipe)
         {
+            if (pipe.ReturnToSubworld)
+                pipe.Destination = ParentWorldPath;
+
             if (pipe.Destination == string.Empty || Path.GetFullPath(pipe.Destination) == Path.GetFullPath(LoadedPath))
             {
-                WarpExit? exit = (WarpExit?)Entities.FirstOrDefault(
+                WarpExit? exit = (WarpExit?)_entities.FirstOrDefault(
                 ent => ent is WarpExit exit && ent != pipe
                 && exit.Tag == pipe.Tag);
 
@@ -306,7 +342,7 @@ namespace Mario2
                 Player.UpdateVisualLogic();
                 Player.Sprite.Update();
 
-                foreach (Entity entity in Entities)
+                foreach (Entity entity in _entities)
                     if (entity is ScoreText)
                         entity.Update();
 
@@ -330,9 +366,9 @@ namespace Mario2
         {
             HandleEntityCameraLogic(camera);
 
-            for (int i = Entities.Count - 1; i >= 0; i--)
+            for (int i = _entities.Count - 1; i >= 0; i--)
             {
-                Entity entity = Entities[i];
+                Entity entity = _entities[i];
                 if (entity.IsActive)
                 {
                     entity.Update();
@@ -342,9 +378,9 @@ namespace Mario2
             RemoveDestroyedEntities();
 
             // Handle entity collisions after every entity has moved for the frame
-            for (int i = Entities.Count - 1; i >= 0; i--)
+            for (int i = _entities.Count - 1; i >= 0; i--)
             {
-                Entity entity = Entities[i];
+                Entity entity = _entities[i];
                 if (entity.IsActive)
                 {
                     entity.HandleEntityCollisions();
@@ -357,7 +393,7 @@ namespace Mario2
             float cameraLeft = camera.Target.X - camera.Offset.X;
             float cameraRight = camera.Target.X + camera.Offset.X;
 
-            foreach (Entity entity in Entities)
+            foreach (Entity entity in _entities)
             {
                 if (entity.IsActive)
                 {
@@ -395,9 +431,9 @@ namespace Mario2
 
         private void RemoveDestroyedEntities()
         {
-            for (int i = Entities.Count - 1; i >= 0; i--)
+            for (int i = _entities.Count - 1; i >= 0; i--)
             {
-                Entity entity = Entities[i];
+                Entity entity = _entities[i];
                 if (entity.IsDestroyed)
                 {
                     if (entity is Fireball fireball && !fireball.HasImpacted)
@@ -409,7 +445,7 @@ namespace Mario2
                         TryInvokePlayerDeath();
                     }
 
-                    Entities.RemoveAt(i);
+                    _entities.RemoveAt(i);
                 }
             }
         }
@@ -531,7 +567,7 @@ namespace Mario2
                 _starFlag.Draw(StarFlagPosition);
             }
 
-            List<Entity> drawList = [..Entities.OrderBy(x => x.LayerDepth)];
+            List<Entity> drawList = [.. _entities.OrderBy(x => x.LayerDepth)];
 
             int lastBg = -1;
             for (int i = 0; i < drawList.Count; i++)

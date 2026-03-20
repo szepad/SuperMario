@@ -14,10 +14,12 @@
         public static int LevelsPerWorld { get; private set; } = 4;
 
         // Session data
+        public static bool ReachedMidway { get; private set; }
         public static int CurrentLevel { get; private set; } = 0;
         public static int Lives { get; private set; }
         public static int Score { get; private set; }
         public static int Coins { get; private set; }
+        public static bool Reloaded { get; private set; }
         
         public static int CurrentWorld => (CurrentLevel - 1) / LevelsPerWorld + 1;
         public static int CurrentLevelDisplay => ((CurrentLevel - 1) % LevelsPerWorld) + 1;
@@ -30,11 +32,15 @@
             Lives = 5;
             Score = 0;
             Coins = 0;
+            ReachedMidway = false;
+            Reloaded = false;
         }
 
         public static SessionLoadResult LoadNext(out World world)
         {
             CurrentLevel++;
+            Reloaded = false;
+            ReachedMidway = false;
             if (CurrentLevel > LevelCount)
             {
                 world = new World();
@@ -44,7 +50,13 @@
             return LoadCurrent(out world);
         }
 
-        public static SessionLoadResult LoadCurrent(out World world)
+        public static SessionLoadResult Reload(out World world)
+        {
+            Reloaded = true;
+            return LoadCurrent(out world);
+        }
+
+        private static SessionLoadResult LoadCurrent(out World world)
         {
             world = new World();
             string name = $"{CurrentLevel.ToString().PadLeft(2, '0')}.lvl";
@@ -103,5 +115,11 @@
                 Score += points;
             }
         }
+
+        public static void ReachMid()
+            => ReachedMidway = true;
+
+        public static void ClearMid()
+            => ReachedMidway = false;
     }
 }

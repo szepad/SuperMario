@@ -13,4 +13,4 @@ simple,72,False,;simple,73,False,;simple,74,False,;simple,75,False,;simple,76,Fa
 simple,80,False,;simple,81,False,;simple,82,False,;simple,83,False,;simple,84,False,;simple,85,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,34,True,;simple,35,True,;simple,36,True,;simple,33,True,;simple,-1,False,;simple,-1,False,;
 simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;
 simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;
-Mario2.WarpPipe;576;704;,,1
+Mario2.WarpPipe;576;704;,,1,False
