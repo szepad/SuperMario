@@ -107,7 +107,9 @@
 [x] Piranha plant shouldn't spawn in pipe intro
 [x] Player status between levels 
 [x] Fix jumping over flagpole
-[ ] Waterfall background
+[x] Waterfall background
+[ ] Waterfall steam animated objects
+[ ] Ping pong platform
 [ ] Parakoopa
 [ ] Star flag on big castle
 [ ] Warp Zone

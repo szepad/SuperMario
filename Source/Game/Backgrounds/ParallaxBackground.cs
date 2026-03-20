@@ -20,7 +20,7 @@
                     -(camera.Target.Y - camera.Offset.Y)
                     );
 
-                layer.UpdateObjects();
+                layer.Update();
             }
         }
 
@@ -28,6 +28,8 @@
         {
             foreach (ParallaxLayer layer in Layers)
             {
+                layer.Palette?.Begin();
+
                 for (int i = 0; i < layer.RepeatCount; i++)
                 {
                     Vector2 pos = layer.Position - layer.Offset;
@@ -44,6 +46,8 @@
                         }
                     }
                 }
+
+                layer.Palette?.End();
             }
         }
     }
