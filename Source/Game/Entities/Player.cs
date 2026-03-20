@@ -81,10 +81,7 @@ namespace Mario2
         private float _skidEffectTimer;
         private const float SkidEffectTime = 0.075f;
 
-        private readonly Shader _paletteShader;
-        private readonly int _paletteSamplerLoc;
-        private readonly int _paletteOpacityLoc;
-        private Texture2D _palette;
+        private readonly PaletteShader _palette = new(Assets.GetTex("palette_mario"), 5);
 
         private bool _useStarVisuals;
         private int _starPaletteIndex = 0;
@@ -141,11 +138,6 @@ namespace Mario2
             Sprite.Add($"{PlayerAnim.Climb}_big", new Animation(2, 24, 32, 128 + 32 * 7, 0.15f));
             Sprite.Add($"{PlayerAnim.ClimbStop}_big", new Animation(1, 24, 32, 128 + 32 * 7, 0.15f));
             Sprite.Add($"{PlayerAnim.Emote}_big", new Animation(1, 24, 32, 128 + 32 * 8, 0.5f, isLooped: false));
-
-            Assets.TryGetShader("palette", out _paletteShader);
-            _paletteSamplerLoc = Raylib.GetShaderLocation(_paletteShader, "palette");
-            _paletteOpacityLoc = Raylib.GetShaderLocation(_paletteShader, "opacity");
-            _palette = Assets.GetTex("palette_mario");
         }
 
         protected override void OnSpawn()
@@ -335,13 +327,13 @@ namespace Mario2
 
         private void ChangePalette(PlayerPalette palette)
         {
-            _palette = palette switch
+            _palette.CurrentRow = palette switch
             {
-                PlayerPalette.Fire => Assets.GetTex("palette_mario_fire"),
-                PlayerPalette.Star1 => Assets.GetTex("palette_star_1"),
-                PlayerPalette.Star2 => Assets.GetTex("palette_star_2"),
-                PlayerPalette.Star3 => Assets.GetTex("palette_star_3"),
-                _ => Assets.GetTex("palette_mario")
+                PlayerPalette.Fire => 1,
+                PlayerPalette.Star1 => 2,
+                PlayerPalette.Star2 => 3,
+                PlayerPalette.Star3 => 4,
+                _ => 0
             };
         }
 
@@ -765,9 +757,7 @@ namespace Mario2
 
         public override void Draw()
         {
-            Raylib.BeginShaderMode(_paletteShader);
-            Raylib.SetShaderValueTexture(_paletteShader, _paletteSamplerLoc, _palette);
-            Raylib.SetShaderValue(_paletteShader, _paletteOpacityLoc, Sprite.Opacity, ShaderUniformDataType.Float);
+            _palette.Begin(Sprite.Opacity);
 
             if (IsInvincible)
             {
@@ -779,7 +769,7 @@ namespace Mario2
                 DoDraw();
             }
 
-            Raylib.EndShaderMode();
+            _palette.End();
             DrawDebug();
         }
 

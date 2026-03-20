@@ -22,7 +22,7 @@ namespace Mario2
 
         public static void Load(string root)
         {
-            Font = Raylib.LoadFont(Path.Combine("res", "font.png"));
+            Font = Raylib.LoadFont(Path.Combine("res", "hud", "font.png"));
 
             // Create placeholder texture
             Image img = Raylib.GenImageColor(16, 16, Color.Pink);
