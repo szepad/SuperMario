@@ -8,6 +8,7 @@
             IsCollidable = false;
             IsHittable = false;
             Gravity = 0f;
+            CanBeDestroyed = false;
         }
 
         protected override void OnSpawn()
@@ -15,14 +16,9 @@
             
         }
 
-        public override void Draw()
+        protected override void DrawEditor()
         {
-            if (Game.Instance.ActiveScene is EditorScene editor && editor.SubScene is null)
-            {
-                Raylib.DrawTextureEx(Assets.GetTex("editor_exit"), Position, 0f, Game.TextureScale, Color.White);
-            }
-
-            base.Draw();
+            Raylib.DrawTextureEx(Assets.GetTex("editor_exit"), Position, 0f, Game.TextureScale, Color.White);
         }
     }
 }

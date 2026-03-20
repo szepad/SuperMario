@@ -101,8 +101,9 @@
 [x] Teal Koopa (palette change for koopa)
 [x] Red Koopa (new class for RedKoopa inherits from koopa and only the ai is overridden and sprite)
 [x] Piranha plant
-[ ] Back to sub-world option for pipe entrance (should be used in bonus rooms)
-[ ] Midway
+[x] Back to sub-world option for pipe entrance (should be used in bonus rooms)
+[x] Midway
+[ ] Piranha plant shouldn't spawn in pipe intro
 [ ] Player status between levels 
 [ ] Fix jumping over flagpole
 [ ] Reverb? on underground sfx
