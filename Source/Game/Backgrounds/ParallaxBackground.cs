@@ -28,26 +28,7 @@
         {
             foreach (ParallaxLayer layer in Layers)
             {
-                layer.Palette?.Begin();
-
-                for (int i = 0; i < layer.RepeatCount; i++)
-                {
-                    Vector2 pos = layer.Position - layer.Offset;
-                    float repeatOffset = layer.Tex.Width * Game.TextureScale * i;
-
-                    Raylib.DrawTextureEx(layer.Tex, new Vector2(pos.X + repeatOffset,
-                        pos.Y), 0f, Game.TextureScale, Color.White.Alpha(layer.Opacity));
-
-                    foreach (ParallaxAnimatedObject obj in layer.AnimatedObjects)
-                    {
-                        foreach (Vector2 relPos in obj.RelativePositions)
-                        {
-                            obj.Sprite.Draw(pos + relPos.Scale() + new Vector2(repeatOffset, 0f), layer.Opacity);
-                        }
-                    }
-                }
-
-                layer.Palette?.End();
+                layer.Draw();
             }
         }
     }

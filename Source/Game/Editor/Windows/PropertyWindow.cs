@@ -22,8 +22,10 @@
         private int _warpPipeDir;
         private bool _warpPipeReturn;
 
-        private int _platformTypeVal;
-        private int _platformDirVal;
+        private int _platformType;
+        private int _platformDir;
+        private bool _platformAxis;
+        private float _platformOffset;
 
         public override void Update()
         {
@@ -163,9 +165,9 @@
             if (sel is WarpPipe pipe)
             {
                 Gui.SeparatorText("Warp Pipe");
-                
+
                 _warpPipeDest = pipe.Destination;
-                if (pipe.ReturnToSubworld) 
+                if (pipe.ReturnToSubworld)
                     Gui.BeginDisabled();
 
                 if (Gui.InputText("Dest", ref _warpPipeDest, 30))
@@ -174,7 +176,7 @@
                     Editor.Dirty();
                 }
 
-                if (pipe.ReturnToSubworld) 
+                if (pipe.ReturnToSubworld)
                     Gui.EndDisabled();
 
                 _warpPipeTag = pipe.Tag;
@@ -212,21 +214,47 @@
             }
             else if (sel is ConstantPlatform platform)
             {
-                Gui.SeparatorText("Platform");
-                
-                _platformTypeVal = (int)platform.Type;
+                Gui.SeparatorText("Platform - Constant");
+
+                _platformType = (int)platform.Type;
                 string[] choices = Enum.GetNames<PlatformType>();
-                if (Gui.Combo("Size", ref _platformTypeVal, choices, choices.Length))
+                if (Gui.Combo("Size", ref _platformType, choices, choices.Length))
                 {
-                    platform.Resize((PlatformType)_platformTypeVal);
+                    platform.Resize((PlatformType)_platformType);
                     Editor.Dirty();
                 }
 
-                _platformDirVal = (int)platform.Dir;
+                _platformDir = (int)platform.Dir;
                 choices = Enum.GetNames<PlatformDirection>();
-                if (Gui.Combo("Direction", ref _platformDirVal, choices, choices.Length))
+                if (Gui.Combo("Direction", ref _platformDir, choices, choices.Length))
                 {
-                    platform.Dir = (PlatformDirection)_platformDirVal;
+                    platform.Dir = (PlatformDirection)_platformDir;
+                    Editor.Dirty();
+                }
+            }
+            else if (sel is PingPongPlatform platform2)
+            {
+                Gui.SeparatorText("Platform - PingPong");
+
+                _platformType = (int)platform2.Type;
+                string[] choices = Enum.GetNames<PlatformType>();
+                if (Gui.Combo("Size", ref _platformType, choices, choices.Length))
+                {
+                    platform2.Resize((PlatformType)_platformType);
+                    Editor.Dirty();
+                }
+
+                _platformOffset = platform2.TileOffset;
+                if (Gui.InputFloat("Tile Offset", ref _platformOffset, 0.5f, 0.5f, "%.1f"))
+                {
+                    platform2.TileOffset = _platformOffset;
+                    Editor.Dirty();
+                }
+
+                _platformAxis = platform2.IsHorizontal;
+                if (Gui.Checkbox("Horizontal", ref _platformAxis))
+                {
+                    platform2.IsHorizontal = _platformAxis;
                     Editor.Dirty();
                 }
             }

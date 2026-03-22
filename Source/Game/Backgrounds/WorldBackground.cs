@@ -52,6 +52,8 @@ namespace Mario2
                 {
                     Palette = new PaletteShader(Assets.GetTex("palette_waterfall"), 8)
                 });
+
+                parallax.AddLayer(new WaterfallSteamParallaxLayer(new Vector2(0f, -152f).Scale(), 0.5f, 2));
             }
 
             return parallax;

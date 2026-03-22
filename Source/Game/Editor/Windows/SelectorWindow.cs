@@ -76,12 +76,16 @@
                 1f / (obj.Tileset.Width / src.Width),
                 1f / (obj.Tileset.Height / src.Height));
 
-            if (Gui.ImageButton($"tile,{obj.PreviewCol},{obj.PreviewRow}",
+            string name = obj.ContainedTypeName();
+            if (Gui.ImageButton($"tile,{name},{obj.PreviewCol},{obj.PreviewRow}",
                 (nint)obj.Tileset.Id, new Vector2(previewSize), uv0, uv1))
             {
                 SelectedIndex = itemIndex;
                 Editor.SetActiveSelector(this);
             }
+
+            //if (name != string.Empty)
+            //    Gui.SetItemTooltip(name);
         }
     }
 }
