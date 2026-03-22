@@ -108,10 +108,12 @@
 [x] Player status between levels 
 [x] Fix jumping over flagpole
 [x] Waterfall background
-[ ] Waterfall steam animated objects
+[x] Waterfall steam (inherit from ParallaxLayer and custom draw logic)
 [ ] Ping pong platform
 [ ] Parakoopa
+[ ] PropertyWindow cleanup
 [ ] Star flag on big castle
+[ ] Big mario peace sign when going inside castle bugged (also check small)
 [ ] Warp Zone
 [ ] Reverb? on underground sfx
 [ ] Luigi

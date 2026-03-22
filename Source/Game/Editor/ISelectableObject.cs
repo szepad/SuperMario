@@ -8,6 +8,9 @@
 
         public int Index => PreviewRow * Tileset.Width / SelectorWindow<T>.TileSizePx + PreviewCol;
 
+        public string ContainedTypeName() =>
+            GetType().GenericTypeArguments.FirstOrDefault()?.Name ?? string.Empty;
+
         public abstract T OnPlace(World world, int col, int row);
     }
 }

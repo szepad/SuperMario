@@ -1,4 +1,6 @@
-﻿namespace Mario2
+﻿using System.Reflection.Emit;
+
+namespace Mario2
 {
     public record ParallaxAnimatedObject(Sprite Sprite, List<Vector2> RelativePositions);
 
@@ -21,7 +23,7 @@
 
         private float _paletteCycleTimer;
 
-        public void Update()
+        public virtual void Update()
         {
             foreach (ParallaxAnimatedObject obj in AnimatedObjects)
             {
@@ -39,6 +41,39 @@
                     {
                         Palette.CurrentRow = 0;
                     }
+                }
+            }
+        }
+
+        public virtual void Draw()
+        {
+            Palette?.Begin();
+
+            for (int i = 0; i < RepeatCount; i++)
+            {
+                Vector2 pos = Position - Offset;
+                float repeatOffset = Tex.Width * Game.TextureScale * i;
+                pos.X += repeatOffset;
+
+                DrawBackgroundTexture(pos, Color.White.Alpha(Opacity));
+                DrawObjects(pos);
+            }
+
+            Palette?.End();
+        }
+
+        protected virtual void DrawBackgroundTexture(Vector2 pos, Color color)
+        {
+            Raylib.DrawTextureEx(Tex, pos, 0f, Game.TextureScale, color);
+        }
+
+        protected virtual void DrawObjects(Vector2 pos)
+        {
+            foreach (ParallaxAnimatedObject obj in AnimatedObjects)
+            {
+                foreach (Vector2 relPos in obj.RelativePositions)
+                {
+                    obj.Sprite.Draw(pos + relPos.Scale(), Opacity);
                 }
             }
         }
