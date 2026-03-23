@@ -1,4 +1,4 @@
-﻿namespace Mario2
+﻿namespace Mario2.Editor
 {
     public interface IEditProperty<T>
     {
@@ -11,22 +11,28 @@
         : IEditProperty<TProp> where TValue : notnull
     {
         public EditPropertyGroup<TProp>? Group { get; set; }
+        public Func<TProp, bool>? IsDisabled { get; init; }
+
         protected TValue CurrentValue = Default;
 
         protected abstract bool GuiFunction();
 
         public void Render(TProp property)
         {
+            bool disabled = IsDisabled?.Invoke(property) ?? false;
+
             CurrentValue = Getter.Invoke(property);
+            if (disabled)
+                Gui.BeginDisabled();
+
             if (GuiFunction())
             {
                 Setter.Invoke(property, CurrentValue);
                 Group?.Editor.Dirty();
             }
+
+            if (disabled)
+                Gui.EndDisabled();
         }
     }
-
-    //public record InputIntEditProperty(string Name) : EditProperty(Name);
-
-    //public record InputFloatEditProperty(string Name) : EditProperty(Name);
 }

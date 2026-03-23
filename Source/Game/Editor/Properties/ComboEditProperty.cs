@@ -1,4 +1,4 @@
-﻿namespace Mario2
+﻿namespace Mario2.Editor
 {
     public record ComboEditProperty<TProp, TEnum>(string Name, Func<TProp, TEnum> Getter, Action<TProp, TEnum> Setter)
         : EditProperty<TProp, TEnum>(Name, Getter, Setter, default) where TEnum : struct, Enum

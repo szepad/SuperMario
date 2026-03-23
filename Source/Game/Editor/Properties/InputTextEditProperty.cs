@@ -1,4 +1,4 @@
-﻿namespace Mario2
+﻿namespace Mario2.Editor
 {
     public record InputTextEditProperty<TProp>(string Name, Func<TProp, string> Getter,
         Action<TProp, string> Setter, uint MaxLength = 30)
