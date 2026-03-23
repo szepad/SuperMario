@@ -56,6 +56,15 @@
             }
         }
 
+        public void ChangeAnim(string name, Animation animation)
+        {
+            if (!_anims.ContainsKey(name))
+                return;
+
+            _anims[name] = animation;
+            ForcePlay(name);
+        }
+
         public void Play(string name)
         {
             if (CurrentAnimationName == name)

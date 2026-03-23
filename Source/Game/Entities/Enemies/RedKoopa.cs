@@ -1,6 +1,6 @@
 ﻿namespace Mario2
 {
-    public sealed class RedKoopa : Koopa
+    public class RedKoopa : Koopa
     {
         public RedKoopa(World world) 
             : base(world)
