@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Mario2
+﻿namespace Mario2
 {
     public enum WorldBackground
     {
