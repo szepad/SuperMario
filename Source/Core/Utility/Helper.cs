@@ -16,8 +16,22 @@
             return val;
         }
 
-        public static float Clamp01(float val) 
+        public static float Clamp01(float val)
             => Clamp(val, 0f, 1f);
+
+        public static Vector2 EaseInOut(Vector2 vec2)
+        {
+            return new Vector2(
+                EaseInOut(vec2.X),
+                EaseInOut(vec2.Y)
+                );
+        }
+
+        public static float EaseInOut(float t)
+        {
+            float sqr = t * t;
+            return sqr / (2f * (sqr - t) + 1f);
+        }
 
         public static bool GuiDisabledButton(string label, bool disabled)
         {

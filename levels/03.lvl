@@ -19,9 +19,12 @@ Mario2.CastleEntrance;10208;704;
 Mario2.RedKoopa;8512;704;Overworld
 Mario2.RedKoopa;7040;320;Overworld
 Mario2.RedKoopa;7296;256;Overworld
-Mario2.Goomba;5120;192;Overworld
+Mario2.Goomba;5120;256;Overworld
 Mario2.RedKoopa;4736;192;Overworld
 Mario2.Goomba;2816;128;Overworld
 Mario2.Goomba;2944;128;Overworld
 Mario2.RedKoopa;1920;192;Overworld
-Mario2.PingPongPlatform;832;432;Long,True,35
+Mario2.PingPongPlatform;3616;336;Long,False,80
+Mario2.PingPongPlatform;5600;464;Long,True,-30
+Mario2.PingPongPlatform;5920;528;Long,True,30
+Mario2.PingPongPlatform;8480;336;Long,True,-30

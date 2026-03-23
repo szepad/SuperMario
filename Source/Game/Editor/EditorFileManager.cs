@@ -15,7 +15,6 @@ namespace Mario2.Editor
         {
             Editor.World = new();
             Editor.FilePath = string.Empty;
-            Editor.PropertyWindow.ClearSettings();
             Editor.CleanDirty();
             Editor.WorldWindow.FocusCameraOn(Editor.World.Player);
             Editor.WorldWindow.DeselectEntity();
@@ -37,7 +36,6 @@ namespace Mario2.Editor
             {
                 Editor.World = world;
                 Editor.WorldWindow.AssignRuleTileRefs();
-                Editor.PropertyWindow.ReadSettings();
                 Editor.FilePath = path;
                 EditorScene.RecentlyOpened = path;
                 Editor.CleanDirty();

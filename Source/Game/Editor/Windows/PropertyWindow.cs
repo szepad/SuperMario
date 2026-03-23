@@ -1,7 +1,6 @@
 ﻿namespace Mario2.Editor
 {
-    public class PropertyWindow(EditorScene editor)
-        : EditorWindow(editor, "Properties")
+    public class PropertyWindow : EditorWindow
     {
         private int _colsInputVal = 0;
         private int _bgVal;
@@ -27,21 +26,53 @@
         private bool _platformAxis;
         private float _platformOffset;
 
+        private readonly EditPropertyGroup<World> _worldProps;
+        private readonly EditPropertyGroup<object> _tileProps;
+        private readonly Dictionary<Type, IEditPropertyGroup> _entityPropsByType;
+
+        public PropertyWindow(EditorScene editor)
+            : base(editor, "Properties")
+        {
+            _worldProps = new EditPropertyGroup<World>(string.Empty, Editor);
+            _tileProps = new EditPropertyGroup<object>(string.Empty, Editor);
+
+            _worldProps.Add(new ComboEditProperty<World, WorldBackground>("Background",
+                world => world.Background,
+                (world, val) => world.SetBackground(val)));
+
+            _worldProps.Add(new ComboEditProperty<World, MusicName>("Music",
+                world => world.Music,
+                (world, val) => world.SetMusic(val), 7));
+
+            _worldProps.Add(new CheckboxEditProperty<World>("Pipe Intro", 
+                world => world.IsPipeIntro,
+                (world, val) => world.IsPipeIntro = val));
+
+            _entityPropsByType = new()
+            {
+                [typeof(WarpPipe)] = new EditPropertyGroup<WarpPipe>("Warp Pipe", Editor)
+            };
+
+            _entityPropsByType[typeof(WarpPipe)].Add(new InputTextEditProperty<WarpPipe>("Dest",
+                pipe => pipe.Destination,
+                (pipe, val) => pipe.Destination = val, 30));
+
+            _entityPropsByType[typeof(WarpPipe)].Add(new InputTextEditProperty<WarpPipe>("Tag",
+                pipe => pipe.Tag,
+                (pipe, val) => pipe.Tag = val, 10));
+
+            _entityPropsByType[typeof(WarpPipe)].Add(new ComboEditProperty<WarpPipe, PipeDirection>("Dir",
+                pipe => pipe.Dir,
+                (pipe, val) => pipe.Dir = val));
+
+            _entityPropsByType[typeof(WarpPipe)].Add(new CheckboxEditProperty<WarpPipe>("Return to Sub-world",
+                pipe => pipe.ReturnToSubworld,
+                (pipe, val) => pipe.ReturnToSubworld = val));
+        }
+
         public override void Update()
         {
             
-        }
-
-        public void ReadSettings()
-        {
-            _bgVal = (int)Editor.World.Background;
-            _musicVal = (int)Editor.World.Music;
-        }
-
-        public void ClearSettings()
-        {
-            _bgVal = 0;
-            _musicVal = 0;
         }
 
         protected override void OnRender()
@@ -49,19 +80,15 @@
             WorldProperties();
             TileProperties();
             EntityProperties();
-
-            // Spacing
-            Gui.Dummy(new Vector2(0f, 20f));
         }
 
         private void WorldProperties()
         {
             Gui.SeparatorText("World");
-            Gui.Text(Editor.FilePath == string.Empty ? "unnamed" : Path.GetFileName(Editor.FilePath));
+            Gui.Text("File: " + (Editor.FilePath == string.Empty ? "unnamed" : Path.GetFileName(Editor.FilePath)));
             Gui.Dummy(new Vector2(0f, 2f));
             
-            // Cols
-            Gui.Text($"Cols: {Editor.World.Cols}");
+            Gui.Text($"Cols: {Editor.World.Cols}".PadRight(10));
             Gui.SameLine();
             if (Gui.Button("Change"))
             {
@@ -69,50 +96,18 @@
                 Gui.OpenPopup("Change Columns");
             }
 
-            ChangeColPopup();
+            HandleChangeColPopup();
 
-            // Rows
-            Gui.Text($"Rows: {World.Rows}");
+            Gui.Text($"Rows: {World.Rows}".PadRight(10));
             Gui.SameLine();
-            Gui.BeginDisabled();
-            Gui.Button("Change##2");
-            Gui.EndDisabled();
+            Helper.GuiDisabledButton("Change##2", true);
 
-            // Background
-            string[] bgChoices = Enum.GetNames<WorldBackground>();
-            Gui.Text("Background");
-            Gui.SetNextItemWidth(110f);
-            Gui.SameLine();
-            if (Gui.Combo("##combo_bg", ref _bgVal, bgChoices, bgChoices.Length))
-            {
-                Editor.World.SetBackground((WorldBackground)_bgVal);
-                Editor.Dirty();
-            }
+            _worldProps.Render(Editor.World);
 
-            // Music
-            string[] musicChoices = ["None", "Overworld", "Underground", "Castle", "Water", "Bonus", "Underground Intro"];
-            Gui.Text("Music");
-            Gui.SetNextItemWidth(110f);
-            Gui.SameLine();
-            if (Gui.Combo("##combo_music", ref _musicVal, musicChoices, musicChoices.Length))
-            {
-                Editor.World.SetMusic((MusicName)_musicVal);
-                Editor.Dirty();
-            }
-
-            // Pipe Intro
-            _pipeIntro = Editor.World.IsPipeIntro;
-            if (Gui.Checkbox("Pipe Intro", ref _pipeIntro))
-            {
-                Editor.World.IsPipeIntro = _pipeIntro;
-                Editor.Dirty();
-            }
-
-            // Spacing
             Gui.Dummy(new Vector2(0f, 20f));
         }
 
-        private void ChangeColPopup()
+        private void HandleChangeColPopup()
         {
             Vector2 center = Gui.GetMainViewport().GetCenter();
             Gui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f));
@@ -154,6 +149,8 @@
                     Gui.Combo("Palette", ref _brickTilePaletteIndex, choices, choices.Length);
                 }
             }
+
+            Gui.Dummy(new Vector2(0f, 20f));
         }
 
         private void EntityProperties()
@@ -162,102 +159,105 @@
             if (sel is null)
                 return;
 
-            if (sel is WarpPipe pipe)
-            {
-                Gui.SeparatorText("Warp Pipe");
+            if (_entityPropsByType.TryGetValue(sel.GetType(), out IEditPropertyGroup? group))
+                group.Render(sel);
 
-                _warpPipeDest = pipe.Destination;
-                if (pipe.ReturnToSubworld)
-                    Gui.BeginDisabled();
+            //if (sel is WarpPipe pipe)
+            //{
+            //    Gui.SeparatorText("Warp Pipe");
 
-                if (Gui.InputText("Dest", ref _warpPipeDest, 30))
-                {
-                    pipe.Destination = _warpPipeDest;
-                    Editor.Dirty();
-                }
+            //    _warpPipeDest = pipe.Destination;
+            //    if (pipe.ReturnToSubworld)
+            //        Gui.BeginDisabled();
 
-                if (pipe.ReturnToSubworld)
-                    Gui.EndDisabled();
+            //    if (Gui.InputText("Dest", ref _warpPipeDest, 30))
+            //    {
+            //        pipe.Destination = _warpPipeDest;
+            //        Editor.Dirty();
+            //    }
 
-                _warpPipeTag = pipe.Tag;
-                if (Gui.InputText("Tag", ref _warpPipeTag, 10))
-                {
-                    pipe.Tag = _warpPipeTag;
-                    Editor.Dirty();
-                }
+            //    if (pipe.ReturnToSubworld)
+            //        Gui.EndDisabled();
 
-                _warpPipeDir = (int)pipe.Dir;
-                string[] choices = Enum.GetNames<PipeDirection>();
-                if (Gui.Combo("Dir", ref _warpPipeDir, choices, choices.Length))
-                {
-                    pipe.Dir = (PipeDirection)_warpPipeDir;
-                    Editor.Dirty();
-                }
+            //    _warpPipeTag = pipe.Tag;
+            //    if (Gui.InputText("Tag", ref _warpPipeTag, 10))
+            //    {
+            //        pipe.Tag = _warpPipeTag;
+            //        Editor.Dirty();
+            //    }
 
-                _warpPipeReturn = pipe.ReturnToSubworld;
-                if (Gui.Checkbox("Return to Sub-world", ref _warpPipeReturn))
-                {
-                    pipe.ReturnToSubworld = _warpPipeReturn;
-                    Editor.Dirty();
-                }
-            }
-            else if (sel is WarpExit exit)
-            {
-                Gui.SeparatorText("Pipe Exit");
+            //    _warpPipeDir = (int)pipe.Dir;
+            //    string[] choices = Enum.GetNames<PipeDirection>();
+            //    if (Gui.Combo("Dir", ref _warpPipeDir, choices, choices.Length))
+            //    {
+            //        pipe.Dir = (PipeDirection)_warpPipeDir;
+            //        Editor.Dirty();
+            //    }
 
-                _warpPipeTag = exit.Tag;
-                if (Gui.InputText("Tag", ref _warpPipeTag, 10))
-                {
-                    exit.Tag = _warpPipeTag;
-                    Editor.Dirty();
-                }
-            }
-            else if (sel is ConstantPlatform platform)
-            {
-                Gui.SeparatorText("Platform - Constant");
+            //    _warpPipeReturn = pipe.ReturnToSubworld;
+            //    if (Gui.Checkbox("Return to Sub-world", ref _warpPipeReturn))
+            //    {
+            //        pipe.ReturnToSubworld = _warpPipeReturn;
+            //        Editor.Dirty();
+            //    }
+            //}
+            //else if (sel is WarpExit exit)
+            //{
+            //    Gui.SeparatorText("Pipe Exit");
 
-                _platformType = (int)platform.Type;
-                string[] choices = Enum.GetNames<PlatformType>();
-                if (Gui.Combo("Size", ref _platformType, choices, choices.Length))
-                {
-                    platform.Resize((PlatformType)_platformType);
-                    Editor.Dirty();
-                }
+            //    _warpPipeTag = exit.Tag;
+            //    if (Gui.InputText("Tag", ref _warpPipeTag, 10))
+            //    {
+            //        exit.Tag = _warpPipeTag;
+            //        Editor.Dirty();
+            //    }
+            //}
+            //else if (sel is ConstantPlatform platform)
+            //{
+            //    Gui.SeparatorText("Platform - Constant");
 
-                _platformDir = (int)platform.Dir;
-                choices = Enum.GetNames<PlatformDirection>();
-                if (Gui.Combo("Direction", ref _platformDir, choices, choices.Length))
-                {
-                    platform.Dir = (PlatformDirection)_platformDir;
-                    Editor.Dirty();
-                }
-            }
-            else if (sel is PingPongPlatform platform2)
-            {
-                Gui.SeparatorText("Platform - PingPong");
+            //    _platformType = (int)platform.Type;
+            //    string[] choices = Enum.GetNames<PlatformType>();
+            //    if (Gui.Combo("Size", ref _platformType, choices, choices.Length))
+            //    {
+            //        platform.Resize((PlatformType)_platformType);
+            //        Editor.Dirty();
+            //    }
 
-                _platformType = (int)platform2.Type;
-                string[] choices = Enum.GetNames<PlatformType>();
-                if (Gui.Combo("Size", ref _platformType, choices, choices.Length))
-                {
-                    platform2.Resize((PlatformType)_platformType);
-                    Editor.Dirty();
-                }
+            //    _platformDir = (int)platform.Dir;
+            //    choices = Enum.GetNames<PlatformDirection>();
+            //    if (Gui.Combo("Direction", ref _platformDir, choices, choices.Length))
+            //    {
+            //        platform.Dir = (PlatformDirection)_platformDir;
+            //        Editor.Dirty();
+            //    }
+            //}
+            //else if (sel is PingPongPlatform platform2)
+            //{
+            //    Gui.SeparatorText("Platform - PingPong");
 
-                _platformOffset = platform2.TileOffset;
-                if (Gui.InputFloat("Tile Offset", ref _platformOffset, 0.5f, 0.5f, "%.1f"))
-                {
-                    platform2.TileOffset = _platformOffset;
-                    Editor.Dirty();
-                }
+            //    _platformType = (int)platform2.Type;
+            //    string[] choices = Enum.GetNames<PlatformType>();
+            //    if (Gui.Combo("Size", ref _platformType, choices, choices.Length))
+            //    {
+            //        platform2.Resize((PlatformType)_platformType);
+            //        Editor.Dirty();
+            //    }
 
-                _platformAxis = platform2.IsHorizontal;
-                if (Gui.Checkbox("Horizontal", ref _platformAxis))
-                {
-                    platform2.IsHorizontal = _platformAxis;
-                    Editor.Dirty();
-                }
-            }
+            //    _platformOffset = platform2.TileOffset;
+            //    if (Gui.InputFloat("Tile Offset", ref _platformOffset, 0.5f, 0.5f, "%.1f"))
+            //    {
+            //        platform2.TileOffset = _platformOffset;
+            //        Editor.Dirty();
+            //    }
+
+            //    _platformAxis = platform2.IsHorizontal;
+            //    if (Gui.Checkbox("Horizontal", ref _platformAxis))
+            //    {
+            //        platform2.IsHorizontal = _platformAxis;
+            //        Editor.Dirty();
+            //    }
+            //}
         }
     }
 }
