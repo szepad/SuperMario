@@ -147,10 +147,14 @@
             if (SelectedEntity is not null)
             {
                 const float MoveOffset = 8f * Game.TextureScale;
+                Vector2 prevPos = SelectedEntity.Position;
                 if (Raylib.IsKeyPressed(KeyboardKey.Left)) SelectedEntity.Position.X -= MoveOffset;
                 if (Raylib.IsKeyPressed(KeyboardKey.Right)) SelectedEntity.Position.X += MoveOffset;
                 if (Raylib.IsKeyPressed(KeyboardKey.Up)) SelectedEntity.Position.Y -= MoveOffset;
                 if (Raylib.IsKeyPressed(KeyboardKey.Down)) SelectedEntity.Position.Y += MoveOffset;
+
+                if (prevPos != SelectedEntity.Position)
+                    Editor.Dirty();
             }
         }
 

@@ -1,4 +1,4 @@
-﻿namespace Mario2
+﻿namespace Mario2.Editor
 {
     public interface IEditPropertyGroup
     {
