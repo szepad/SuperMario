@@ -33,14 +33,15 @@
             if (IsStomped || !IsStompable) return;
             IsStomped = true;
 
-            OnStomp(stomper);
-            Ai.OnStomp(stomper);
-
             SoundManager.PlaySound(Sounds.EnemyStomp);
-            SessionManager.GetScore(World, ScoreRewards.GetEnemyStompScore(), Head,
-                ScoreRewards.ShorterLifeTime, ScoreRewards.FasterSpeed);
+            SessionManager.GetScore(World, 
+                (this is RedFlyingKoopa rfk && rfk.IsWinged) ? ScoreRewards.FlyingKoopaStomp : ScoreRewards.GetEnemyStompScore(),
+                Head, ScoreRewards.ShorterLifeTime, ScoreRewards.FasterSpeed);
 
             ScoreRewards.EnemyStompCount++;
+
+            OnStomp(stomper);
+            Ai.OnStomp(stomper);
         }
 
         public void ResetStomped()
@@ -112,7 +113,11 @@
 
         public override void Update()
         {
-            Ai.Update();
+            if (!IsDead)
+            {
+                Ai.Update();
+            }
+
             base.Update();
         }
 

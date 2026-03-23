@@ -15,6 +15,7 @@
         public const int BrickBreak = 50;
         public const int StarKill = 100;
         public const int TileBounceKill = 100;
+        public const int FlyingKoopaStomp = 400;
         public const int Coin = 200;
         public const int Fireball = 200;
         public const int Kick = 400;

@@ -27,6 +27,7 @@
                 [typeof(WarpExit)] = new EditPropertyGroup<WarpExit>("Warp Exit", Editor),
                 [typeof(ConstantPlatform)] = new EditPropertyGroup<ConstantPlatform>("Platform - Constant", Editor),
                 [typeof(PingPongPlatform)] = new EditPropertyGroup<PingPongPlatform>("Platform - Ping Pong", Editor),
+                [typeof(RedFlyingKoopa)] = new EditPropertyGroup<RedFlyingKoopa>("Red Koopa", Editor),
             };
 
             AddWorldProps();
@@ -34,6 +35,7 @@
             AddWarpExitProps();
             AddConstantPlatformProps();
             AddPingPongPlatformProps();
+            AddRedFlyingKoopaProps();
         }
 
         private void AddWorldProps()
@@ -102,6 +104,13 @@
 
             plat.Add(new CheckboxEditProperty<PingPongPlatform>("Is Horizontal",
                 p => p.IsHorizontal, (p, val) => p.IsHorizontal = val));
+        }
+
+        private void AddRedFlyingKoopaProps()
+        {
+            _entityPropsByType[typeof(RedFlyingKoopa)].Add(
+                new InputFloatEditProperty<RedFlyingKoopa>("Tile Offset",
+                k => k.TileOffset, (k, o) => k.TileOffset = o));
         }
 
         public override void Update()

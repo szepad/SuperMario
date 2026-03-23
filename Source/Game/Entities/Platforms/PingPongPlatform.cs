@@ -1,56 +1,22 @@
-﻿using System.Timers;
-
-namespace Mario2
+﻿namespace Mario2
 {
-    public class PingPongPlatform : Platform
+    public class PingPongPlatform(World world) : Platform(world)
     {
-        public float LerpTime { get; set; } = 3f;
-        public bool IsHorizontal { get; set; }
         public float TileOffset { get; set; }
+        public bool IsHorizontal { get; set; }
 
-        private Vector2 _start;
-        private Vector2 _end;
-
-        private float _timer;
-        private float _dir = 1f;
-
-        public PingPongPlatform(World world)
-            : base(world)
-        {
-
-        }
+        private readonly PingPongBehaviour _pingPong = new();
 
         protected override void OnSpawn()
         {
-            _start = Position;
-            _end = Position;
-
-            if (IsHorizontal) _end.X += TileOffset * Tile.Size;
-            else _end.Y += TileOffset * Tile.Size;
-
+            _pingPong.Setup(Position, TileOffset, IsHorizontal);
             base.OnSpawn();
         }
 
         public override void Update()
         {
-            _timer += Time.DeltaTime * _dir;
-
-            if (_timer >= LerpTime)
-            {
-                _timer = LerpTime;
-                _dir = -1f;
-            }
-            else if (_timer <= 0f)
-            {
-                _timer = 0f;
-                _dir = 1f;
-            }
-
-            Vector2 newPos = Vector2.Lerp(
-                _start, _end,
-                Helper.EaseInOut(_timer / LerpTime));
-
-            Velocity = (newPos - Position) / Time.DeltaTime;
+            _pingPong.Update();
+            Velocity = _pingPong.GetVelocity(Position);
 
             base.Update();
         }

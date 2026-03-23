@@ -51,9 +51,6 @@
 
         public override void Update()
         {
-            if (Owner.IsDead)
-                return;
-
             _stateTimer -= Time.DeltaTime;
             if (_stateTimer <= 0f)
             {
