@@ -164,7 +164,7 @@ namespace Mario2
 
         public void TakeDamage()
         {
-            if (IsInvincible)
+            if (IsInvincible || IsStarman)
                 return;
 
             if (State == PlayerState.Small)
@@ -865,6 +865,10 @@ namespace Mario2
                             StartCutscene(new PipeEnterDownCutscene(this, pipe));
                         }
                     }
+                }
+                else if (other is FirebarChild)
+                {
+                    TakeDamage();
                 }
             }
         }
