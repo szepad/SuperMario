@@ -8,6 +8,7 @@
             TileObjectDefs.Block,
             TileObjectDefs.QuestionTile,
             TileObjectDefs.QuestionTile_Empty,
+            TileObjectDefs.QuestionTile_Empty_Castle,
             TileObjectDefs.Brick,
             TileObjectDefs.Pipe,
             TileObjectDefs.GrassDecor,
@@ -18,6 +19,18 @@
             TileObjectDefs.BlockUg,
             TileObjectDefs.Tree,
             TileObjectDefs.TreeTrunk,
+            TileObjectDefs.CastleFloor,
+            TileObjectDefs.CastleFloorInnerLeft,
+            TileObjectDefs.CastleFloorInnerRight,
+            TileObjectDefs.CastleStair1,
+            TileObjectDefs.CastleStair2,
+            TileObjectDefs.CastleStair3,
+            TileObjectDefs.CastleStair4,
+            TileObjectDefs.CastleCeiling,
+            TileObjectDefs.CastleCeilingSingle,
+            TileObjectDefs.CastleBridge,
+            TileObjectDefs.Chain,
+            TileObjectDefs.Lava,
         ];
 
         public override void Update() { }
@@ -28,10 +41,26 @@
         public static readonly BasicTile Block = new(16, true, 0, 2);
         public static readonly BasicTile BlockUg = new(20, true, 4, 2);
         public static readonly BasicTile QuestionTile_Empty = new(18, true, 2, 2);
+        public static readonly BasicTile QuestionTile_Empty_Castle = new(31, true, 7, 3);
+        public static readonly BasicTile CastleCeilingSingle = new(126, true, 6, 15);
+        public static readonly BasicTile CastleBridge = new(118, true, 6, 14);
+        public static readonly BasicTile Chain = new(110, false, 6, 13);
+        public static readonly BasicTile CastleFloorInnerLeft = new(120, true, 0, 15);
+        public static readonly BasicTile CastleFloorInnerRight = new(112, true, 0, 14);
+        public static readonly BasicTile CastleStair1 = new(108, true, 4, 13);
+        public static readonly BasicTile CastleStair2 = new(109, true, 5, 13);
+        public static readonly BasicTile CastleStair3 = new(116, true, 4, 14);
+        public static readonly BasicTile CastleStair4 = new(117, true, 5, 14);
 
         public static readonly InstanceTile<QuestionTile> QuestionTile = new(1, 2);
         public static readonly InstanceTile<BrickTile> Brick = new(3, 2);
         public static readonly InstanceTile<CoinTile> Coin = new(7, 2);
+
+        public static readonly PrefabTile Lava = new(false, 0, 13,
+        [
+            new PrefabActionTile(0, 0, new LavaTile()),
+            new PrefabActionRecurse(0, 1, new LavaTileBottom(), 0, 1)
+        ]);
 
         public static readonly PrefabTile Pipe = new(true, 0, 3,
         [
@@ -82,6 +111,12 @@
             new PrefabActionTile(5, 4, new SimpleTile(53 + 32, false), OnlyOnAir: false),
 
             new PrefabActionEntity(40, 64, typeof(CastleEntrance))
+        ]);
+
+        public static readonly PrefabTile CastleCeiling = new(true, 4, 15,
+        [
+            new PrefabActionTile(0, 0, new SimpleTile(124, true)),
+            new PrefabActionTile(1, 0, new SimpleTile(125, true)),
         ]);
 
         // 0bNESW = Id
@@ -198,6 +233,27 @@
             [0b_1101] = new BasicTile(45, false, 0, 0),
             [0b_1111] = new BasicTile(45, false, 0, 0),
             [0b_0111] = new BasicTile(45, false, 0, 0),
+        });
+
+        public static readonly RuleTile CastleFloor = new(true, 2, 13, new()
+        {
+            [0b_0000] = new BasicTile(106, true, 0, 0),
+            [0b_0101] = new BasicTile(106, true, 0, 0),
+            [0b_0111] = new BasicTile(106, true, 0, 0),
+            [0b_0100] = new BasicTile(105, true, 0, 0),
+            [0b_0110] = new BasicTile(105, true, 0, 0),
+            [0b_0001] = new BasicTile(107, true, 0, 0),
+            [0b_0011] = new BasicTile(107, true, 0, 0),
+            [0b_1000] = new BasicTile(114, true, 0, 0),
+            [0b_1010] = new BasicTile(114, true, 0, 0),
+            [0b_1111] = new BasicTile(114, true, 0, 0),
+            [0b_1101] = new BasicTile(114, true, 0, 0),
+            [0b_1110] = new BasicTile(113, true, 0, 0),
+            [0b_1011] = new BasicTile(115, true, 0, 0),
+
+            [0b_0010] = new BasicTile(106, true, 0, 0),
+            [0b_1001] = new BasicTile(115, true, 0, 0),
+            [0b_1100] = new BasicTile(113, true, 0, 0),
         });
     }
 }

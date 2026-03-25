@@ -17,6 +17,9 @@
         public static readonly Sprite CoinSprite = new("items", new Animation(3, 16, 16, 0, 0.15f));
         public static readonly Sprite HudCoinSprite = new("hud_coin", new Animation(3, 16, 8, 0, 0.15f));
 
+        public static readonly Sprite LavaTopSprite = new("lava", new Animation(8, 16, 16, 0, 0.15f));
+        public static readonly Sprite LavaBottomSprite = new("lava", new Animation(1, 16, 16, 16, 0.15f));
+
         public Vector2 SpriteOffset;
 
         public Sprite? DrawSprite { private get; set; }
@@ -37,6 +40,9 @@
 
             CoinSprite.Update();
             HudCoinSprite.Update();
+
+            LavaTopSprite.Update();
+            LavaBottomSprite.Update();
         }
 
         public override void Update() { }

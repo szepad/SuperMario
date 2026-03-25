@@ -53,6 +53,12 @@
 
                 parallax.AddLayer(new WaterfallSteamParallaxLayer(new Vector2(0f, -152f).Scale(), 0.5f, 2));
             }
+            else if (background == WorldBackground.Castle)
+            {
+                parallax = new ParallaxBackground(Color.Black);
+                parallax.AddLayer(new ParallaxLayer(
+                    Assets.GetTex("bg_castle"), new Vector2(0f, -16f).Scale(), 0.5f));
+            }
 
             return parallax;
         }
