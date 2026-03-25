@@ -154,7 +154,10 @@
                 if (Raylib.IsKeyPressed(KeyboardKey.Down)) SelectedEntity.Position.Y += MoveOffset;
 
                 if (prevPos != SelectedEntity.Position)
+                {
+                    SelectedEntity.OnEditorMove(prevPos);
                     Editor.Dirty();
+                }
             }
         }
 
@@ -267,8 +270,10 @@
                 }
                 else if (entityUnderMouse is not Player)
                 {
+                    entityUnderMouse.OnEditorDelete(Editor);
                     Editor.World.RemoveEntity(entityUnderMouse);
                     _disableRightClickTemporarily = true;
+                    Editor.Dirty();
                 }
 
                 DeselectEntity();
@@ -342,6 +347,9 @@
 
             foreach (Entity entity in Editor.World.Entities)
             {
+                if (!entity.IsEditorInteractable)
+                    continue;
+
                 if (Raylib.CheckCollisionPointRec(mousePos, entity.Rect))
                 {
                     return entity;

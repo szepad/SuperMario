@@ -30,6 +30,7 @@
         public bool IsHittable { get; set; } = true;
         public bool IsSolid { get; set; } = false;
         public bool IsEditorSaveable { get; set; } = true;
+        public bool IsEditorInteractable { get; set; } = true;
         public bool IsGrounded { get; private set; }
         public bool IsSpawned { get; private set; }
         public bool CanBeDestroyed { get; set; } = true;
@@ -375,6 +376,9 @@
         protected virtual void OnTileOverlap(Tile tile) { }
         protected virtual void OnEntityOverlap(Entity other) { }
         protected virtual void OnSolidEntityCollision(Entity other, CollisionSide side) { }
+
+        public virtual void OnEditorMove(Vector2 prev) { }
+        public virtual void OnEditorDelete(EditorScene editor) { }
 
         public virtual string SaveCustomData() => string.Empty;
         public virtual void LoadCustomData(string data) { }

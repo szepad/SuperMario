@@ -28,6 +28,7 @@
                 [typeof(ConstantPlatform)] = new EditPropertyGroup<ConstantPlatform>("Platform - Constant", Editor),
                 [typeof(PingPongPlatform)] = new EditPropertyGroup<PingPongPlatform>("Platform - Ping Pong", Editor),
                 [typeof(RedFlyingKoopa)] = new EditPropertyGroup<RedFlyingKoopa>("Red Koopa", Editor),
+                [typeof(Firebar)] = new EditPropertyGroup<Firebar>("Firebar", Editor),
             };
 
             AddWorldProps();
@@ -36,6 +37,7 @@
             AddConstantPlatformProps();
             AddPingPongPlatformProps();
             AddRedFlyingKoopaProps();
+            AddFirebarProps();
         }
 
         private void AddWorldProps()
@@ -111,6 +113,18 @@
             _entityPropsByType[typeof(RedFlyingKoopa)].Add(
                 new InputFloatEditProperty<RedFlyingKoopa>("Tile Offset",
                 k => k.TileOffset, (k, o) => k.TileOffset = o));
+        }
+
+        private void AddFirebarProps()
+        {
+            IEditPropertyGroup bar = _entityPropsByType[typeof(Firebar)];
+            bar.Add(new ComboEditProperty<Firebar, FirebarLength>("Length",
+                b => b.Length,
+                (b, len) => b.SetLength(len)));
+
+            bar.Add(new CheckboxEditProperty<Firebar>("Go Right",
+                b => b.IsGoingRight,
+                (b, val) => b.IsGoingRight = val));
         }
 
         public override void Update()

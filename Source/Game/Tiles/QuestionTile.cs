@@ -9,7 +9,13 @@
 
         protected override void OnHitFirstFrame(Entity entity)
         {
-            DrawSprite = BlockSpriteOw;
+            DrawSprite = entity.World.Background switch
+            {
+                WorldBackground.Underground => BlockSpriteUg,
+                WorldBackground.Castle => BlockSpriteCastle,
+                _ => BlockSpriteOw,
+            };
+
             base.OnHitFirstFrame(entity);
         }
     }

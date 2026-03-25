@@ -54,5 +54,6 @@ namespace Mario2.Editor
         public static readonly EntityObject<Midway> Midway = new(2, 1, unique: true);
         public static readonly EntityObject<NoPlant> NoPlant = new(3, 1);
         public static readonly EntityObject<RedFlyingKoopa> RedFlyingKoopa = new(4, 1);
+        public static readonly EntityObject<Firebar> Firebar = new(5, 1);
     }
 }

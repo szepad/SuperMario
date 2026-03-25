@@ -113,19 +113,21 @@
 [x] Parakoopa
 [x] PropertyWindow cleanup
 [-] Star flag on big castle (Turns out there isn't a star flag on the big castle lol)
-[ ] Question Tile hit palette should change based on (background maybe or music? or set inside editor idk yet)
-[ ] Castle
+[x] Question Tile hit palette should change based on (background maybe or music? or set inside editor idk yet)
+[x] Castle
 	[x] Top part - Prefab tile (long brick)
 	[x] Bottom part - Rule tile
 	[x] Stairs - Rule tile
 	[x] Lava - Foreground layer
 	[x] Background
-	[ ] Firebar
+	[x] Firebar
 [ ] Bowser fight
 	[ ] Bowser Entity
 	[ ] Axe Entity
 	[ ] Bridge tiles
 	[ ] Bridge falling
+	[ ] Toad
+[ ] MVP
 [ ] Lava foreground layer
 [ ] Big mario peace sign when going inside castle bugged (also check small)
 [ ] Warp Zone
