@@ -187,7 +187,11 @@
 
         private void PlaceTile(TileWindow tileWindow, int tx, int ty)
         {
-            Tile? tile = Editor.World.SetTile(tx, ty, tileWindow.PlaceSelected(Editor.World, tx, ty));
+            Tile selectedTile = tileWindow.PlaceSelected(Editor.World, tx, ty);
+            if (selectedTile == SimpleTile.Air)
+                return;
+
+            Tile? tile = Editor.World.SetTile(tx, ty, selectedTile);
             if (tile is ContainerTile ct)
             {
                 ct.SetItem(Editor.PropertyWindow.ContainerTileItem);

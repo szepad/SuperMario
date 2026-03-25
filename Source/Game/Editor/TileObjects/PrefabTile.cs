@@ -24,7 +24,17 @@
                 if (action is PrefabActionTile tileAction)
                 {
                     if (tileAction.Col == 0 && tileAction.Row == 0)
-                        retTile = tileAction.Tile;
+                    {
+                        if (!tileAction.OnlyOnAir)
+                        {
+                            retTile = tileAction.Tile;
+                        }
+                        else if (world.GetTile(col, row, out Tile tile)
+                            && tile == SimpleTile.Air)
+                        {
+                            retTile = tileAction.Tile;
+                        }
+                    }
 
                     if (action is PrefabActionRecurse recurse)
                     {
