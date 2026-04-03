@@ -3,11 +3,15 @@
     public record Animation(int FrameCount, int FrameWidth, int FrameHeight, 
         int Y, float[] FrameTimes, bool IsLooped = true)
     {
+        public event Action<Animation>? OnAnimEnd;
+
         public Animation(int frameCount, int width, int height,
             int y, float frameTime, bool isLooped = true)
-            : this(frameCount, width, height, y, 
-                  Enumerable.Repeat(frameTime, frameCount).ToArray(), isLooped)
+            : this(frameCount, width, height, y,
+                  [.. Enumerable.Repeat(frameTime, frameCount)], isLooped)
         { }
+
+        public void InvokeAnimEnd() => OnAnimEnd?.Invoke(this);
     }
 
     public class Sprite
@@ -46,7 +50,7 @@
             SpriteSheet = Assets.GetTex(name);
         }
 
-        public void Add(string name, Animation animation)
+        public Animation Add(string name, Animation animation)
         {
             _anims.Add(name, animation);
             
@@ -54,6 +58,8 @@
             {
                 Play(name);
             }
+
+            return animation;
         }
 
         public void ChangeAnim(string name, Animation animation)
@@ -98,6 +104,8 @@
             {
                 if (CurrentAnimation.IsLooped) frame = 0;
                 else frame--;
+
+                CurrentAnimation.InvokeAnimEnd();
             }
 
             CurrentFrame = frame;

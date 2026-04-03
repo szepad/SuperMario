@@ -50,6 +50,10 @@
                 world => world.Music,
                 (world, val) => world.SetMusic(val), 7));
 
+            _worldProps.Add(new InputIntEditProperty<World>("Time",
+                world => world.TimeLeft,
+                (world, val) => world.TimeLeft = val));
+
             _worldProps.Add(new CheckboxEditProperty<World>("Pipe Intro",
                 world => world.IsPipeIntro,
                 (world, val) => world.IsPipeIntro = val));

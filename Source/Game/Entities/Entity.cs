@@ -36,6 +36,7 @@
         public bool CanBeDestroyed { get; set; } = true;
         public bool IsDestroyed { get; private set; }
         public bool IsActive { get; private set; }
+        public bool HasLeftCamera { get; private set; }
 
         public void SetPosition(float x, float y) => SetPosition(new Vector2(x, y));
         public void SetPosition(Vector2 pos)
@@ -51,6 +52,8 @@
                 pos.Y + SizeOffset.Y - Size.Y
             );
         }
+
+        public List<Entity> SolidEntityCollisionExceptions { get; } = [];
 
         private readonly List<Entity> _overlapDisabled = [];
 
@@ -151,7 +154,9 @@
 
             foreach (Entity other in World.Entities)
             {
-                if (!other.IsSolid || other == this)
+                if (!other.IsSolid 
+                    || other == this
+                    || SolidEntityCollisionExceptions.Contains(other))
                     continue;
 
                 // Broad phase
@@ -364,9 +369,15 @@
             }
         }
 
+        public void CameraLeaveX()
+        {
+            HasLeftCamera = true;
+            OnCameraLeaveX();
+        }
+
         public virtual void TileBounceHit(Entity bouncer, Tile tile) { }
 
-        public virtual void OnCameraLeaveX() { }
+        protected virtual void OnCameraLeaveX() { }
 
         protected abstract void OnSpawn();
         protected virtual void OnActivate() { }

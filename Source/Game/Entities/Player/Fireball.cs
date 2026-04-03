@@ -99,6 +99,10 @@
                     SessionManager.GetScore(World, ScoreRewards.Fireball, enemy.Head,
                         ScoreRewards.ShorterLifeTime, ScoreRewards.FasterSpeed);
                 }
+                else if (enemy is Bowser bowser)
+                {
+                    bowser.TakeDamage(this);
+                }
             }
             else if (other is Flagpole)
             {
@@ -106,7 +110,7 @@
             }
         }
 
-        public override void OnCameraLeaveX()
+        protected override void OnCameraLeaveX()
         {
             Destroy();
         }

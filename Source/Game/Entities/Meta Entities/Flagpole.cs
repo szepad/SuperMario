@@ -28,10 +28,15 @@
 
             for (int i = World.Entities.Count - 1; i >= 0; i--)
             {
-                if (World.Entities[i] is Enemy enemy)
+                if (World.Entities[i] is Enemy enemy 
+                    && enemy.IsActive)
                 {
                     enemy.Destroy();
-                    World.SpawnEntity(new CoinPickup(World), enemy.Feet);
+
+                    if (!enemy.HasLeftCamera)
+                    {
+                        World.SpawnEntity(new CoinPickup(World), enemy.Feet);
+                    }
                 }
             }    
         }
