@@ -111,7 +111,7 @@
                 Player.Sprite.FlipX = true;
                 Player.Position.X = Player.OldPosition.X = _flagpole.Position.X + 4f.Scale();
                 Player.PlayAnim(PlayerAnim.ClimbStop);
-                SoundManager.PlayMusic(MusicName.LevelClear, isLooped: false);
+                Player.World.RequestMusic(MusicName.LevelClear, isLooped: false);
                 _score.Speed = 0f;
             }
         }

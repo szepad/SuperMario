@@ -55,5 +55,7 @@ namespace Mario2.Editor
         public static readonly EntityObject<NoPlant> NoPlant = new(3, 1);
         public static readonly EntityObject<RedFlyingKoopa> RedFlyingKoopa = new(4, 1);
         public static readonly EntityObject<Firebar> Firebar = new(5, 1);
+        public static readonly EntityObject<Bowser> Bowser = new(6, 1);
+        public static readonly EntityObject<Axe> Axe = new(7, 1);
     }
 }

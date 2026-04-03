@@ -19,6 +19,8 @@ namespace Mario2
         public CameraStyle CameraStyle { get; set; } = CameraStyle.Follow;
         public float CameraAutoScrollSpeed { get; set; } = Tile.Size * 4f;
 
+        public event Action<MusicName, bool>? RequestMusicEvent;
+
         public event Action? OnPlayerDeath;
         private bool _playerDeathInvoked;
 
@@ -68,6 +70,10 @@ namespace Mario2
 
         private bool _spawnedPiranhaPlants;
 
+        private MusicName _musicForHurry = MusicName.None;
+
+        private Axe? _axe = null;
+
         public World()
         {
             ResetPlayer();
@@ -100,12 +106,12 @@ namespace Mario2
 
         public void Start()
         {
-            PlayMusic();
+            PlayerLevelMusic();
             TryTeleportToMidway();
             TrySpawnPiranhaPlants();
         }
 
-        public void PlayMusic()
+        public void PlayerLevelMusic()
         {
             if (TimeLeft < HurryTime)
             {
@@ -114,8 +120,13 @@ namespace Mario2
             }
             else
             {
-                SoundManager.PlayMusic(Music);
+                RequestMusic(Music);
             }
+        }
+
+        public void RequestMusic(MusicName music, bool isLooped = true)
+        {
+            RequestMusicEvent?.Invoke(music, isLooped);
         }
 
         private void TrySpawnPiranhaPlants()
@@ -172,9 +183,17 @@ namespace Mario2
 
         private void PlayHurryMusic()
         {
-            if (Enum.TryParse($"{Music}Hurry", out MusicName hurry))
+            MusicName baseMusic = _musicForHurry != MusicName.None
+                ? _musicForHurry : Music;
+
+            if (Enum.TryParse($"{baseMusic}Hurry", 
+                out MusicName hurry))
             {
-                SoundManager.PlayMusic(hurry);
+                RequestMusic(hurry);
+            }
+            else
+            {
+                RequestMusic(baseMusic);
             }
         }
 
@@ -272,12 +291,21 @@ namespace Mario2
                 FireballCount++;
                 fireball.OnImpact += _ => FireballCount--;
             }
+            else if (entity is Axe axe)
+            {
+                _axe = axe;
+            }
 
             return entity;
         }
 
         public void RemoveEntity(Entity entity)
-            => _entities.Remove(entity);
+        {
+            _entities.Remove(entity);
+
+            if (entity is Axe)
+                _axe = null;
+        }
 
         public void Freeze(float time)
         {
@@ -412,7 +440,7 @@ namespace Mario2
                     else if (entity.Rect.X + entity.Rect.Width < cameraLeft
                         || entity.Rect.X > cameraRight)
                     {
-                        entity.OnCameraLeaveX();
+                        entity.CameraLeaveX();
                     }
                 }
                 else if (entity.Rect.X <= cameraRight)
@@ -486,6 +514,7 @@ namespace Mario2
 
             if (SoundManager.CurrentMusic != MusicName.Invincible)
             {
+                _musicForHurry = SoundManager.CurrentMusic;
                 SoundManager.StopMusic();
             }
 
@@ -554,6 +583,13 @@ namespace Mario2
         {
             const float HalfX = Game.Width / 2f;
             camera.Target.X = Helper.Clamp(camera.Target.X, HalfX, Cols * Tile.Size - HalfX);
+
+            if (_axe is not null)
+            {
+                float targetX = _axe.Rect.X + _axe.Size.X + Tile.Size;
+                if (camera.Target.X + HalfX > targetX)
+                    camera.Target.X = targetX - HalfX;
+            }
         }
 
         public void UpdateParallax(Camera2D camera)
@@ -568,6 +604,8 @@ namespace Mario2
 
         public void Draw(Camera2D camera, bool editor = false, bool tileCulling = true)
         {
+            _effectPool.Draw(isBackground: true);
+
             if (DrawStarFlag)
             {
                 _starFlag.Draw(StarFlagPosition);
@@ -597,7 +635,7 @@ namespace Mario2
                 drawList[i].Draw();
             }
 
-            _effectPool.Draw();
+            _effectPool.Draw(isBackground: false);
         }
 
         private (int, int) GetTileXBoundsOnCamera(Camera2D camera)

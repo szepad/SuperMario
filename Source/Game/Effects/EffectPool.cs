@@ -37,11 +37,11 @@
             }
         }
 
-        public void Draw()
+        public void Draw(bool isBackground)
         {
             foreach (Effect effect in _effects)
             {
-                if (effect.IsInUse)
+                if (effect.IsInUse && effect.IsBackground == isBackground)
                 {
                     effect.Draw();
                 }

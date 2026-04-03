@@ -102,6 +102,7 @@
             _world.OnPlayerDeath += () => _playerDeathTimer = PlayerDeathReloadTime;
             _world.OnLevelEnd += World_OnLevelEnd;
             _world.OnPipeLoadSublevel += World_OnPipeLoadSublevel;
+            _world.RequestMusicEvent += SoundManager.PlayMusic;
         }
 
         private void StartWorld()

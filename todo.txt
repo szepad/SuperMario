@@ -122,13 +122,17 @@
 	[x] Background
 	[x] Firebar
 [ ] Bowser fight
-	[ ] Bowser Entity
-	[ ] Axe Entity
-	[ ] Bridge tiles
-	[ ] Bridge falling
-	[ ] Toad
-[ ] MVP
+	[x] Bowser Entity
+	[x] Bowser fire
+	[x] Bowser fire particle
+	[x] Axe Entity
+	[x] Bridge tiles
+	[x] Bridge falling
+	[ ] Sounds 
+[ ] Toad
+[ ] Bowser fire after half of castle level
 [ ] Lava foreground layer
+[ ] MVP
 [ ] Big mario peace sign when going inside castle bugged (also check small)
 [ ] Warp Zone
 [ ] Reverb? on underground sfx

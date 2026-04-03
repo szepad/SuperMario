@@ -310,7 +310,7 @@ namespace Mario2
         {
             _useStarVisuals = true;
             _starmanTimer = StarmanTime;
-            SoundManager.PlayMusic(MusicName.Invincible);
+            World.RequestMusic(MusicName.Invincible);
         }
 
         private void EndStar(bool checkIfStarman, bool music = true)
@@ -321,7 +321,7 @@ namespace Mario2
             _useStarVisuals = false;
             ChangePalette(State == PlayerState.Fire ? PlayerPalette.Fire : PlayerPalette.Normal);
 
-            if (music) World.PlayMusic();
+            if (music) World.PlayerLevelMusic();
             else SoundManager.StopMusic();
         }
 
@@ -866,9 +866,14 @@ namespace Mario2
                         }
                     }
                 }
-                else if (other is FirebarChild)
+                else if (other is FirebarChild || other is BowserFire)
                 {
                     TakeDamage();
+                }
+                else if (other is Axe axe)
+                {
+                    World.RemoveEntity(axe);
+                    StartCutscene(new AxeCutscene(this, axe));
                 }
             }
         }
