@@ -121,14 +121,16 @@
 	[x] Lava - Foreground layer
 	[x] Background
 	[x] Firebar
-[ ] Bowser fight
+[x] Bowser fight
 	[x] Bowser Entity
 	[x] Bowser fire
 	[x] Bowser fire particle
 	[x] Axe Entity
 	[x] Bridge tiles
 	[x] Bridge falling
-	[ ] Sounds 
+	[x] Sounds 
+[ ] Bowser die anim bubbles?
+[ ] Bowser die sprites
 [ ] Toad
 [ ] Bowser fire after half of castle level
 [ ] Lava foreground layer
