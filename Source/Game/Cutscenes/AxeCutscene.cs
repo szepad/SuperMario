@@ -13,24 +13,24 @@
         private readonly Axe _axe = axe;
         private Bowser? _bowser;
 
-        private const int StopTileCount = 10;
+        private const int StopTileCount = 11;
         private const float WalkVel = 69f * Game.TextureScale;
 
         private int _bridgeStartX;
         private int _bridgeStartY;
 
-        private const float BridgeFallTime = 0.05f;
+        private const float BridgeFallTime = 0.0625f;
         private float _bridgeFallTimer = 0.5f;
         
         private const int BridgeTileCount = 13;
         private int _currentBridgeTileIndex = 0;
 
-        private const float BowserFallTime = 1.75f;
-
         private bool _lavaSplashFxSpawned;
         private float _lavaSplashSpawnTimer;
         private const float LavaSplashSpawnTime = 0.075f;
         private int _lavaSplashCount = 3;
+
+        private bool _splashSoundPlayed;
 
         public override Action GetFunction(AxeCutsceneState state) => state switch
         {
@@ -41,17 +41,19 @@
 
         public override void Start()
         {
+            Player.World.RequestMusic(MusicName.None);
+            Player.World.CameraStyle = CameraStyle.Stopped;
+            Player.Gravity = 0f;
+            Player.Velocity = Vector2.Zero;
+
             _bowser = (Bowser?)Player.World.Entities.FirstOrDefault(e => e is Bowser);
             if (_bowser is null)
             {
                 EnterWalkState();
                 return;
             }
-         
-            Player.World.CameraStyle = CameraStyle.Stopped;
+
             Player.SetRunAnimFrameTimes(float.PositiveInfinity);
-            Player.Gravity = 0f;
-            Player.Velocity = Vector2.Zero;
 
             _bowser.SetAi(new DummyAi(_bowser));
             _bowser.Gravity = 0f;
@@ -67,15 +69,16 @@
             _bridgeFallTimer -= Time.DeltaTime;
             if (_bridgeFallTimer <= 0f && _currentBridgeTileIndex < BridgeTileCount)
             {
+                // Chain
+                if (_currentBridgeTileIndex == 0)
+                {
+                    Player.World.SetTile(_bridgeStartX, _bridgeStartY - 1, SimpleTile.Air);
+                    SoundManager.PlaySound(Sounds.Bridge);
+                }
+
                 Player.World.SetTile(_bridgeStartX - _currentBridgeTileIndex, _bridgeStartY, SimpleTile.Air);
                 Player.World.SpawnEffect(new Vector2(_bridgeStartX - _currentBridgeTileIndex, _bridgeStartY) * Tile.Size,
                     EffectData.BridgeDebris);
-
-                if (_currentBridgeTileIndex == 0)
-                {
-                    // Chain
-                    Player.World.SetTile(_bridgeStartX, _bridgeStartY - 1, SimpleTile.Air);
-                }
 
                 _bridgeFallTimer = BridgeFallTime;
                 _currentBridgeTileIndex++;
@@ -117,11 +120,16 @@
                     _lavaSplashCount--;
                     _bowser.World.SpawnEffect(new Vector2(_bowser.Feet.X, World.Rows * Tile.Size - Tile.Size * 1.5f),
                         EffectData.BowserLavaSplash);
+
+                    if (!_splashSoundPlayed)
+                    {
+                        _splashSoundPlayed = true;
+                        SoundManager.PlaySound(Sounds.BowserLava);
+                    }
                 }
             }
 
-            StateTimer += Time.DeltaTime;
-            if (StateTimer >= BowserFallTime)
+            if (_bowser.Feet.Y >= World.Rows * Tile.Size)
             {
                 EnterWalkState();
             }
@@ -138,6 +146,7 @@
             Player.World.CameraStyle = CameraStyle.AutoScroll;
             Player.PlayAnim(PlayerAnim.Run);
             Player.SetRunAnimFrameTimes(0.15f);
+            Player.World.RequestMusic(MusicName.WorldClear, false);
         }
 
         private void WalkState()

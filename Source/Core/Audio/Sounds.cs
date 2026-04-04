@@ -6,7 +6,10 @@
 
         AppearItem,
         AppearVine,
+        BowserFire,
+        BowserLava,
         BrickBreak,
+        Bridge,
         BulletShoot,
         Climb,
         CoinCollect,

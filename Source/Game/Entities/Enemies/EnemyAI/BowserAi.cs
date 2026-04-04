@@ -157,6 +157,7 @@ namespace Mario2
                         new BowserFire(Bowser.World, targetY));
 
                     fire.SetPosition(Bowser.Head + new Vector2(-14f, 11f).Scale());
+                    SoundManager.PlaySound(Sounds.BowserFire);
                 }
             }
         }

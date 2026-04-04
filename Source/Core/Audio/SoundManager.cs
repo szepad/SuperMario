@@ -124,14 +124,23 @@
 
         public static void PlaySound(Sounds name, float pitch = 1f, float volume = 1f)
         {
+            if (CreateSoundAlias(name, out Sound alias, pitch, volume))
+            {
+                Raylib.PlaySound(alias);
+            }
+        }
+
+        public static bool CreateSoundAlias(Sounds name, out Sound alias, float pitch = 1f, float volume = 1f)
+        {
+            alias = default;
             string stringName = GetSoundName(name);
             if (stringName == string.Empty || !Assets.TryGetSound(stringName, out Sound sound))
-                return;
+                return false;
 
-            Sound alias = Raylib.LoadSoundAlias(sound);
+            alias = Raylib.LoadSoundAlias(sound);
             Raylib.SetSoundPitch(alias, pitch);
             Raylib.SetSoundVolume(alias, volume * Game.Instance.Settings.SoundVolume);
-            Raylib.PlaySound(alias);
+            return true;
         }
     }
 }
