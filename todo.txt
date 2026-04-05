@@ -129,13 +129,15 @@
 	[x] Bridge tiles
 	[x] Bridge falling
 	[x] Sounds 
+[x] Pause menu
+[x] Toad
+[x] End screen
+[x] MVP
 [ ] Bowser die anim bubbles?
 [ ] Bowser die sprites
-[ ] Toad
 [ ] Bowser fire after half of castle level
 [ ] Lava foreground layer
-[ ] MVP
 [ ] Big mario peace sign when going inside castle bugged (also check small)
 [ ] Warp Zone
-[ ] Reverb? on underground sfx
+[ ] Reverb(?) on underground sfx
 [ ] Luigi

@@ -3,7 +3,6 @@
     public class SettingsScene : Scene
     {
         private readonly UIWidgetHandler _buttons = new();
-        private readonly TitleScene _title;
 
         private readonly GameSettings _settings = Game.Instance.Settings;
 
@@ -19,10 +18,8 @@
             0, 10, 20, 30, 60, 75, 100, 120, 144, 165, 200, 240, 360
         ];
 
-        public SettingsScene(TitleScene parent)
+        public SettingsScene()
         {
-            _title = parent;
-
             _buttons.Add(new UIPressButton(Label_Fullscreen, Button_Fullscreen));
             _buttons.Add(new UIPressButton(Label_VSync, Button_VSync));
             _fpsButton = (UISelectionButton<int>)_buttons.Add(

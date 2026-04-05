@@ -77,6 +77,14 @@
                 MoveCursorDown();
         }
 
+        public void ResetCursor()
+        {
+            _selectedIndex = 0;
+            if (Selected is not null && Selected.IsGreyedOut
+                && _widgets.Any(w => !w.IsGreyedOut))
+                MoveCursorDown();
+        }
+
         public void Draw()
         {
             for (int i = 0; i < _widgets.Count; i++)

@@ -4,6 +4,7 @@
 
     public interface ICutscene
     {
+        public Player Player { get; }
         public bool IsFinished { get; }
 
         public void Start();
