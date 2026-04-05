@@ -24,7 +24,7 @@
         protected override void OnDraw()
         {
             Raylib.ClearBackground(Color.Black);
-            Text.Draw("Game Over", Game.Width / 2, Game.Height * 0.4f, Pivot.Center);
+            Text.Draw("Game Over", Game.Width / 2, Game.Height * 0.45f, Pivot.Center);
         }
     }
 }

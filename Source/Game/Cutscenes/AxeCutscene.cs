@@ -5,15 +5,17 @@
         Wait,
         BowserFalls,
         WalkToRight,
+        Message,
+        TimerCountdown,
+        EndWait,
     }
 
-    public class AxeCutscene(Player player, Axe axe)
-        : Cutscene<AxeCutsceneState>(player)
+    public class AxeCutscene : Cutscene<AxeCutsceneState>
     {
-        private readonly Axe _axe = axe;
+        private readonly Axe _axe;
         private Bowser? _bowser;
 
-        private const int StopTileCount = 11;
+        private const float StopTileCount = 10.75f;
         private const float WalkVel = 69f * Game.TextureScale;
 
         private int _bridgeStartX;
@@ -32,10 +34,28 @@
 
         private bool _splashSoundPlayed;
 
+        private const float TimeAfterMessage = 6f;
+        private const float TimeAfterEnd = 3f;
+
+        private TimerCountdownObject _timerCountdown;
+
+        public AxeCutscene(Player player, Axe axe) : base(player)
+        {
+            _axe = axe;
+            _timerCountdown = new(this, () =>
+            {
+                State++;
+                StateTimer = 0f;
+            });
+        }
+
         public override Action GetFunction(AxeCutsceneState state) => state switch
         {
-            AxeCutsceneState.WalkToRight => WalkState,
             AxeCutsceneState.BowserFalls => BowserFallState,
+            AxeCutsceneState.WalkToRight => WalkState,
+            AxeCutsceneState.Message => MessageState,
+            AxeCutsceneState.TimerCountdown => _timerCountdown.Update,
+            AxeCutsceneState.EndWait => EndWaitState,
             _ => WaitState,
         };
 
@@ -158,12 +178,33 @@
                 float t = Helper.Clamp01(Player.Velocity.X / WalkVel);
                 float frameTime = Raymath.Lerp(0.15f, 0.25f, 1f - t);
                 Player.SetRunAnimFrameTimes(frameTime);
-                
+
                 if (Player.Velocity.X <= 0f)
                 {
                     Player.Velocity.X = 0f;
                     Player.PlayAnim(PlayerAnim.Idle);
+                    State++;
+                    Player.World.DisplayCastleMessage();
+                    StateTimer = 0f;
                 }
+            }
+        }
+
+        private void MessageState()
+        {
+            StateTimer += Time.DeltaTime;
+            if (StateTimer >= TimeAfterMessage)
+            {
+                State++;
+            }
+        }
+
+        private void EndWaitState()
+        {
+            StateTimer += Time.DeltaTime;
+            if (StateTimer >= TimeAfterEnd)
+            {
+                Player.World.ReachLevelEnd();
             }
         }
     }

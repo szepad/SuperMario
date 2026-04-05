@@ -7,7 +7,8 @@
         private enum State
         {
             Loading,
-            Gameplay
+            Gameplay,
+            Paused
         }
 
         private World _world = null!;
@@ -26,6 +27,11 @@
 
         private readonly Dictionary<string, World> _loadedSubWorlds = new();
 
+        private readonly UIWidgetHandler _buttons = new();
+
+        private bool _showCastleMessage;
+        private float _messageDisplayTimer;
+
         protected override void OnLoad()
         {
             SoundManager.StopMusic();
@@ -40,6 +46,29 @@
             {
                 LoadNext();
             }
+
+            _buttons.Add(new UIPressButton("Resume", _ => Resume()));
+            _buttons.Add(new UIPressButton("Settings", _ => LoadSubScene(new SettingsScene())));
+            _buttons.Add(new UIPressButton("Quit", _ => LoadSubScene(new TitleScene())));
+            _buttons.PlaceVertically(new Vector2(Game.Width / 2f, Game.Height * 0.45f));
+        }
+
+        private void Pause()
+        {
+            if (_state != State.Gameplay) return;
+            _state = State.Paused;
+
+            SoundManager.PlaySound(Sounds.Pause);
+            SoundManager.PauseMusic();
+            _buttons.ResetCursor();
+        }
+
+        private void Resume()
+        {
+            if (_state != State.Paused) return;
+            _state = State.Gameplay;
+
+            SoundManager.ResumeMusic();
         }
 
         private void ResetCamera()
@@ -103,6 +132,7 @@
             _world.OnLevelEnd += World_OnLevelEnd;
             _world.OnPipeLoadSublevel += World_OnPipeLoadSublevel;
             _world.RequestMusicEvent += SoundManager.PlayMusic;
+            _world.OnDisplayCastleMessage += () => _showCastleMessage = true;
         }
 
         private void StartWorld()
@@ -133,6 +163,9 @@
                 _world.Start();
                 ResetCamera();
             }
+
+            _showCastleMessage = false;
+            _messageDisplayTimer = 0f;
         }
 
         private void World_OnLevelEnd()
@@ -220,6 +253,7 @@
             {
                 case State.Loading: UpdateLoadState(); break;
                 case State.Gameplay: UpdateGameplayState(); break;
+                case State.Paused: UpdatePauseState(); break;
             }
         }
 
@@ -249,9 +283,26 @@
             }
             else if (Input.IsKeyPressed(KeyboardKey.Escape))
             {
-                if (ParentScene is null) Game.Instance.LoadScene(new TitleScene());
-                else ParentScene.UnloadSubScene();
+                if (ParentScene is null)
+                {
+                    Pause();
+                }
+                else
+                {
+                    ParentScene.UnloadSubScene();
+                }
             }
+
+            if (_showCastleMessage)
+                _messageDisplayTimer += Time.DeltaTime;
+        }
+
+        private void UpdatePauseState()
+        {
+            _buttons.Update();
+
+            if (Input.IsKeyPressed(KeyboardKey.Escape))
+                Resume();
         }
 
         protected override void OnDraw()
@@ -260,6 +311,7 @@
             {
                 case State.Loading: DrawLoadState(); break;
                 case State.Gameplay: DrawGameplayState(); break;
+                case State.Paused: DrawPauseState(); break;
             }
         }
 
@@ -287,6 +339,35 @@
             Raylib.BeginMode2D(_camera);
             _world.Draw(_camera);
             Raylib.EndMode2D();
+
+            if (_showCastleMessage)
+            {
+                const string LongestLine = "BUT OUR PRINCESS IS IN";
+                const float y = Game.Height * 0.4f;
+                float x = Game.Width / 2f - Text.GetWidth(LongestLine) / 2f;
+
+                if (_messageDisplayTimer > 0.5f) 
+                {
+                    Text.Draw("THANK YOU MARIO!", new Vector2(Game.Width / 2f, y), Pivot.Center);
+                }
+                
+                if (_messageDisplayTimer > 2.5f)
+                {
+                    Text.Draw(LongestLine, new Vector2(x, y + 24f.Scale()), Pivot.Left);
+                    Text.Draw("ANOTHER CASTLE!", new Vector2(x, y + 36f.Scale()), Pivot.Left);
+                }
+            }
+        }
+
+        private void DrawPauseState()
+        {
+            DrawGameplayState();
+
+            Raylib.DrawRectangle(Game.Width / 4, (int)(Game.Height * 0.3f), Game.Width / 4 * 2, (int)(Game.Height / 2.8f),
+                new Color(40, 40, 40));
+
+            Text.Draw("Paused", new Vector2(Game.Width / 2f, Game.Height * 0.365f), Pivot.Center);
+            _buttons.Draw();
         }
 
         private void DrawHud()

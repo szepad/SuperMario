@@ -33,7 +33,7 @@
 
         private void Button_Settings(UIPressButton self)
         {
-            LoadSubScene(new SettingsScene(this));
+            LoadSubScene(new SettingsScene());
         }
 
         private void Button_Exit(UIPressButton self)

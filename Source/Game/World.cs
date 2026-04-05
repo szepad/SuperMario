@@ -27,6 +27,8 @@ namespace Mario2
         public event Action? OnLevelEnd;
         private bool _levelEndInvoked;
 
+        public event Action? OnDisplayCastleMessage;
+
         public event Action<WarpPipe>? OnPipeLoadSublevel;
 
         public string LoadedPath { get; init; } = string.Empty;
@@ -208,6 +210,8 @@ namespace Mario2
         {
             Music = music;
         }
+
+        public void DisplayCastleMessage() => OnDisplayCastleMessage?.Invoke();
 
         public void Clear() => Clear(Tiles);
         public static void Clear(Tile[,] tiles)

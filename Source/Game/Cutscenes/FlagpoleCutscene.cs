@@ -11,10 +11,9 @@
         StarFlag
     }
 
-    public class FlagpoleCutscene(Player player, Flagpole flagpole)
-        : Cutscene<FlagpoleCutsceneState>(player)
+    public class FlagpoleCutscene : Cutscene<FlagpoleCutsceneState>
     {
-        private readonly Flagpole _flagpole = flagpole;
+        private readonly Flagpole _flagpole;
         private CastleEntrance? _entrance;
 
         private const float SlideSpeed = Tile.Size * 5f;
@@ -22,21 +21,30 @@
         private const float TurnAroundTime = 0.5f;
         private const float EmoteTime = 1f;
         private const float DisappearTime = 0.35f;
-        private const float TimerSoundInterval = 0.0355f;
-        private const float TimerCountdownInterval = 0.015f;
-        private const float TimerCountdownIntervalFaster = 0.005f;
-        private float _timerCountdownTimer;
-        private float _timerSoundIntervalTimer;
+        private TimerCountdownObject _timerCountdown;
 
         private float _flagYEnd;
         private const float StarFlagSpeed = 5f * Tile.Size;
 
         private const float AfterFlagWaitTime = 1.5f;
 
-        private readonly ScoreText _score = new(player.World,
+        private readonly ScoreText _score;
+
+        public FlagpoleCutscene(Player player, Flagpole flagpole) : base(player)
+        {
+            _flagpole = flagpole;
+            _score = new(player.World,
             ScoreRewards.GetFlagpoleScore(player, flagpole),
-            flagpole.Position + new Vector2(13f, 130f).Scale(), 
-            float.PositiveInfinity, SlideSpeed);
+                flagpole.Position + new Vector2(13f, 130f).Scale(), 
+                float.PositiveInfinity, SlideSpeed);
+
+            _timerCountdown = new(this, () =>
+            {
+                State++;
+                Player.World.DrawStarFlag = true;
+                StateTimer = 0f;
+            });
+        }
 
         public override Action GetFunction(FlagpoleCutsceneState state) => state switch
         { 
@@ -45,7 +53,7 @@
             FlagpoleCutsceneState.WalkToCastle => WalkToCastle,
             FlagpoleCutsceneState.Emote => Emote,
             FlagpoleCutsceneState.Disappear => Disappear,
-            FlagpoleCutsceneState.TimerCountdown => TimerCountdown,
+            FlagpoleCutsceneState.TimerCountdown => _timerCountdown.Update,
             FlagpoleCutsceneState.StarFlag => StarFlag,
             _ => () => { }
         };
@@ -166,41 +174,6 @@
                 Player.Sprite.IsVisible = false;
                 Player.Velocity.X = 0f;
                 StateTimer = 0f;
-            }
-        }
-
-        private void TimerCountdown()
-        {
-            StateTimer += Time.DeltaTime;
-            _timerSoundIntervalTimer += Time.DeltaTime;
-            _timerCountdownTimer += Time.DeltaTime;
-
-            if (_timerCountdownTimer >= (SoundManager.IsCurrentMusicFinished()
-                ? TimerCountdownIntervalFaster : TimerCountdownInterval))
-            {
-                _timerCountdownTimer = 0f;
-                if (Player.World.TimeLeft > 0)
-                {
-                    Player.World.TimeLeft--;
-                    SessionManager.GetScoreWithoutText(ScoreRewards.Time);
-                }
-            }
-
-            if (_timerSoundIntervalTimer >= TimerSoundInterval)
-            {
-                _timerSoundIntervalTimer = 0f;
-                
-                if (Player.World.TimeLeft > 0)
-                {
-                    SoundManager.PlaySound(Sounds.Score);
-                }
-                else
-                {
-                    SoundManager.PlaySound(Sounds.ScoreEnd);
-                    State++;
-                    Player.World.DrawStarFlag = true;
-                    StateTimer = 0f;
-                }
             }
         }
 
