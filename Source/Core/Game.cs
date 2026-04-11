@@ -13,7 +13,7 @@ namespace Mario2
         public const int Height = 224 * TextureScale;
 
         // If you change this, existing levels will break
-        public const int TextureScale = 4;
+        public const int TextureScale = 3;
 
         public bool AllowDevMode { get; private set; }
         public bool IsDevModeOn { get; private set; }
