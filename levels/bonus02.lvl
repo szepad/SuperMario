@@ -1,4 +1,4 @@
-16;1;112;72;2;False;400
+16;1;28;18;2;False;400
 simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;
 anim,Mario2.BrickTile,0,False,1;simple,-1,False,;simple,-1,False,;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;simple,32,True,;
 anim,Mario2.BrickTile,0,False,1;simple,-1,False,;simple,-1,False,;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;simple,32,True,;
@@ -13,4 +13,4 @@ anim,Mario2.BrickTile,0,False,1;simple,-1,False,;simple,-1,False,;simple,-1,Fals
 anim,Mario2.BrickTile,0,False,1;simple,-1,False,;simple,-1,False,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;simple,-1,False,;simple,34,True,;simple,35,True,;simple,36,True,;
 simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;
 simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;
-Mario2.WarpPipe;768;704;,bonus02,1,True
+Mario2.WarpPipe;192;176;,bonus02,1,True
