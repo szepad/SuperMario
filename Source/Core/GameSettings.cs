@@ -11,8 +11,13 @@
 
         public void SetFullscreen(bool fullscreen)
         {
-            IsFullscreen = fullscreen;
+            if (!Game.IsPlatformWindows)
+            {
+                IsFullscreen = false;
+                return;
+            }
 
+            IsFullscreen = fullscreen;
             int monitor = Raylib.GetCurrentMonitor();
             int monitorWidth = Raylib.GetMonitorWidth(monitor);
             int monitorHeight = Raylib.GetMonitorHeight(monitor);
@@ -21,12 +26,14 @@
             if (fullscreen)
             {
                 Raylib.SetWindowState(ConfigFlags.UndecoratedWindow);
+                Raylib.SetWindowState(ConfigFlags.TopmostWindow);
                 Raylib.SetWindowSize(monitorWidth, monitorHeight);
                 Raylib.SetWindowPosition((int)pos.X, (int)pos.Y);
             }
             else
             {
                 Raylib.ClearWindowState(ConfigFlags.UndecoratedWindow);
+                Raylib.ClearWindowState(ConfigFlags.TopmostWindow);
                 Raylib.SetWindowSize(Game.Width, Game.Height);
                 Raylib.SetWindowPosition(
                     (int)pos.X + (monitorWidth - Game.Width) / 2, 

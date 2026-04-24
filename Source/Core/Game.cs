@@ -11,8 +11,7 @@ namespace Mario2
         public const string Title = "Mario 2";
         public const int Width = 256 * TextureScale;
         public const int Height = 224 * TextureScale;
-
-        // If you change this, existing levels will break
+        
         public const int TextureScale = 3;
 
         public bool AllowDevMode { get; private set; }
@@ -24,6 +23,15 @@ namespace Mario2
         public GameSettings Settings { get; } = new();
         public Scene? ActiveScene { get; private set; }
 
+        public static bool IsPlatformWindows => Environment.OSVersion.Platform switch
+        {
+            PlatformID.WinCE => true,
+            PlatformID.Win32NT => true,
+            PlatformID.Win32S => true,
+            PlatformID.Win32Windows => true,
+            _ => false
+        };
+        
         private bool _hasExited;
 
         private RenderTexture2D _virtualScreen;

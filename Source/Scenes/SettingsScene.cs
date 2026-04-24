@@ -20,7 +20,10 @@
 
         public SettingsScene()
         {
-            _buttons.Add(new UIPressButton(Label_Fullscreen, Button_Fullscreen));
+            _buttons.Add(new UIPressButton(Label_Fullscreen, Button_Fullscreen)
+            {
+                IsGreyedOut = !Game.IsPlatformWindows
+            });
             _buttons.Add(new UIPressButton(Label_VSync, Button_VSync));
             _fpsButton = (UISelectionButton<int>)_buttons.Add(
                 new UISelectionButton<int>(Label_Fps, _fpsSelection, Button_Fps,
