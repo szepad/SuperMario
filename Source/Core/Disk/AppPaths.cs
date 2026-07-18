@@ -18,7 +18,7 @@ public static class AppPaths
 
     public static readonly string ImGuiIniFilePath = Path.Combine(DataFolder, "imgui.ini");
 
-    public static readonly string DefaultLayout = Path.Combine(AppContext.BaseDirectory, "default.ini");
+    public static readonly string DefaultLayout = Path.Combine(ResFolder, "default.ini");
 
     static AppPaths()
     {
