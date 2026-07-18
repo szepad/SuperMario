@@ -2,14 +2,13 @@
 {
     public static class GameSettingsLoader
     {
-        public static string SettingsFilePath { get; set; } = "settings.cfg";
         public const string SettingsFileVersion = "ver 1.0";
 
         public static void Save(GameSettings settings)
         {
             try
             {
-                using StreamWriter writer = new(SettingsFilePath);
+                using StreamWriter writer = new(AppPaths.SettingsFilePath);
 
                 writer.WriteLine(SettingsFileVersion);
                 writer.WriteLine(settings.IsFullscreen);
@@ -30,9 +29,9 @@
 
         public static void Load(GameSettings settings)
         {
-            if (!File.Exists(SettingsFilePath))
+            if (!File.Exists(AppPaths.SettingsFilePath))
             {
-                string path = Path.GetFullPath(SettingsFilePath);
+                string path = Path.GetFullPath(AppPaths.SettingsFilePath);
                 Raylib.TraceLog(TraceLogLevel.Warning, $"[Load] Settings file does not exist at '{path}'");
 
                 UseDefaultSettings(settings);
@@ -42,7 +41,7 @@
 
             try
             {
-                using StreamReader reader = new(SettingsFilePath);
+                using StreamReader reader = new(AppPaths.SettingsFilePath);
 
                 string version = reader.ReadLine()!;
                 if (version != SettingsFileVersion)
@@ -74,8 +73,8 @@
             Raylib.TraceLog(TraceLogLevel.Trace, "[Load] Using default settings.");
 
             settings.SetFullscreen(false);
-            settings.SetVsync(true);
-            settings.SetFps(Raylib.GetMonitorRefreshRate(Raylib.GetCurrentMonitor()));
+            settings.SetVsync(false);
+            settings.SetFps(360);
             Raylib.SetMasterVolume(1f);
             settings.SetIntegerScale(false);
             settings.SetSoundVolume(1f);

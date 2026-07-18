@@ -30,7 +30,7 @@
             Item("Show Grid", ref Editor.Options.ShowGrid);
 
             Gui.SeparatorText("Layout Presets");
-            Item("Default", () => Editor.QueueLoadLayout(EditorScene.DefaultLayout));
+            Item("Default", () => Editor.QueueLoadLayout(AppPaths.DefaultLayout));
         }
 
         private static void Menu(string label, Action items)

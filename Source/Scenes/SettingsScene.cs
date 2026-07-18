@@ -15,14 +15,14 @@
         private bool FpsButtonGreyedOut => _settings.IsVsync;
 
         private static readonly int[] _fpsSelection = [
-            0, 10, 20, 30, 60, 75, 100, 120, 144, 165, 200, 240, 360
+            0, 30, 60, 75, 100, 120, 144, 165, 200, 240, 360
         ];
 
         public SettingsScene()
         {
             _buttons.Add(new UIPressButton(Label_Fullscreen, Button_Fullscreen)
             {
-                IsGreyedOut = !Game.IsPlatformWindows
+                IsGreyedOut = OperatingSystem.IsMacOS()
             });
             _buttons.Add(new UIPressButton(Label_VSync, Button_VSync));
             _fpsButton = (UISelectionButton<int>)_buttons.Add(
@@ -38,6 +38,9 @@
             _buttons.Add(new UIPressButton("Back", _ => Button_Back()));
             _buttons.PlaceVertically(new Vector2(Game.Width / 2f, Game.Height * 0.4f));
             _buttons[^1]?.Position.Y += 8f.Scale() + UIWidget.DefaultGap;
+            
+            if (OperatingSystem.IsMacOS())
+                _buttons.MoveCursorDown();
         }
 
         private void Button_Fullscreen(UIPressButton self)

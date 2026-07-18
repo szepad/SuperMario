@@ -3,9 +3,7 @@
 namespace Mario2
 {
     public static class Assets
-    {
-        public static readonly string MusicFolder = Path.Combine("res", "music");
-
+    { 
         public static Font Font { get; private set; }
 
         private static readonly Dictionary<string, Texture2D> _texByName = [];
@@ -18,11 +16,11 @@ namespace Mario2
         private static readonly string[] ImageFormats = [".png"];
         private static readonly string[] SoundFormats = [".wav"];
         private static readonly string[] ShaderFormats = [".fs"];
-        private const string IgnoreFolder = ".ignore";
+        private const string IgnoreFolder = "ignore";
 
-        public static void Load(string root)
+        public static void Load()
         {
-            Font = Raylib.LoadFont(Path.Combine("res", "hud", "font.png"));
+            Font = Raylib.LoadFont(Path.Combine(AppPaths.ResFolder, "hud", "font.png"));
 
             // Create placeholder texture
             Image img = Raylib.GenImageColor(16, 16, Color.Pink);
@@ -30,13 +28,13 @@ namespace Mario2
             Raylib.UnloadImage(img);
 
             // Load entries in root
-            if (!Directory.Exists(root))
+            if (!Directory.Exists(AppPaths.ResFolder))
             {
-                Console.Error.WriteLine($"Asset loading failed. Root folder does not exist: '{Path.GetFullPath(root)}'");
+                Console.Error.WriteLine($"Asset loading failed. Root folder does not exist: '{Path.GetFullPath(AppPaths.ResFolder)}'");
                 return;
             }
 
-            List<string> assetFiles = SearchDir(root);
+            List<string> assetFiles = SearchDir(AppPaths.ResFolder);
             foreach (string file in assetFiles)
             {
                 string name = Path.GetFileNameWithoutExtension(file);
@@ -49,7 +47,7 @@ namespace Mario2
                 else if (SoundFormats.Contains(ext))
                 {
                     string? dir = Path.GetDirectoryName(file);
-                    if (dir == MusicFolder)
+                    if (dir == AppPaths.MusicFolder)
                     {
                         _musicByName[name] = File.ReadAllBytes(file);
                     }

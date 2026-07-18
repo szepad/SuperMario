@@ -12,7 +12,7 @@ namespace Mario2
         public const int Width = 256 * TextureScale;
         public const int Height = 224 * TextureScale;
         
-        public const int TextureScale = 3;
+        public const int TextureScale = 4;
 
         public bool AllowDevMode { get; private set; }
         public bool IsDevModeOn { get; private set; }
@@ -22,15 +22,6 @@ namespace Mario2
 
         public GameSettings Settings { get; } = new();
         public Scene? ActiveScene { get; private set; }
-
-        public static bool IsPlatformWindows => Environment.OSVersion.Platform switch
-        {
-            PlatformID.WinCE => true,
-            PlatformID.Win32NT => true,
-            PlatformID.Win32S => true,
-            PlatformID.Win32Windows => true,
-            _ => false
-        };
         
         private bool _hasExited;
 
@@ -79,9 +70,16 @@ namespace Mario2
             Raylib.InitWindow(Width, Height, Title);
             Raylib.InitAudioDevice();
             Raylib.SetExitKey(KeyboardKey.Null);
-
+            
             Raylib.SetWindowState(ConfigFlags.VSyncHint);
             Raylib.SetTargetFPS(0);
+
+            if (!OperatingSystem.IsMacOS())
+            {
+                Image icon = Raylib.LoadImage(Path.Combine(AppPaths.ResFolder, "icon.png"));
+                Raylib.SetWindowIcon(icon);
+                Raylib.UnloadImage(icon);
+            }
 
             StretchMode = StretchMode.LetterBox;
 
@@ -92,7 +90,7 @@ namespace Mario2
 
         private void Load()
         {
-            Assets.Load("res");
+            Assets.Load();
             _virtualScreen = Raylib.LoadRenderTexture(Width, Height);
 
             GameSettingsLoader.Load(Settings);
@@ -113,6 +111,11 @@ namespace Mario2
             Raylib.CloseWindow();
         }
 
+        private void OnResize()
+        {
+            
+        }
+        
         private void Update()
         {
             if (AllowDevMode)
@@ -141,6 +144,11 @@ namespace Mario2
             if (Raylib.IsKeyPressed(KeyboardKey.F11))
             {
                 Settings.SetFullscreen(!Settings.IsFullscreen);
+            }
+
+            if (Raylib.IsWindowResized())
+            {
+                OnResize();
             }
         }
 

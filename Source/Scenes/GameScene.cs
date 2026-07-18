@@ -141,7 +141,7 @@
             {
                 _world.IsPipeIntro = false;
                 string dest = _world.LoadedPath;
-                if (!LoadSublevel(Path.Combine("levels", "pipe_intro.lvl")))
+                if (!LoadSublevel(Path.Combine(AppPaths.DefaultLevelsFolder, "pipe_intro.lvl")))
                 {
                     StartWorld();
                     return;
@@ -269,8 +269,8 @@
 
         private void UpdateGameplayState()
         {
-            _world.HandleCameraFollow(ref _camera);
             _world.Update(_camera);
+            _world.HandleCameraFollow(ref _camera);
             _world.UpdateParallax(_camera);
 
             if (_playerDeathTimer > 0f)

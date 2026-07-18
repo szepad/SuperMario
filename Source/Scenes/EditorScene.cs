@@ -25,8 +25,7 @@ namespace Mario2
         private readonly List<EditorWindow> _windowRenderQueue = [];
 
         private bool _exitToTitle;
-
-        public const string DefaultLayout = "default.ini";
+        
         private bool _loadLayout;
         private string _nextLayoutPath = string.Empty;
 
@@ -39,6 +38,8 @@ namespace Mario2
         private string _errorMessage = string.Empty;
 
         private const MusicName EditorMusic = MusicName.None;
+        
+        private static IntPtr _imguiIniPointer = IntPtr.Zero;
 
         public EditorScene()
         {
@@ -70,11 +71,12 @@ namespace Mario2
                 Raylib.GetMonitorHeight(Raylib.GetCurrentMonitor()));
 
             RlImGui.Setup(enableDocking: true);
+            SetupIniFileSaveLocation();
             EditorThemeManager.ApplyDefault();
 
-            if (!File.Exists("imgui.ini"))
+            if (!File.Exists(AppPaths.ImGuiIniFilePath))
             {
-                QueueLoadLayout(DefaultLayout);
+                QueueLoadLayout(AppPaths.DefaultLayout);
             }
 
             if (RecentlyOpened != string.Empty)
@@ -82,11 +84,31 @@ namespace Mario2
                 FileManager.Open(RecentlyOpened);
             }
         }
-
+        
         protected override void OnUnload()
         {
             Raylib.UnloadRenderTexture(WorldWindow.WorldContentTex);
+            FreeIniFileSaveLocation();
             RlImGui.Shutdown();
+        }
+
+        private static void SetupIniFileSaveLocation()
+        {
+            _imguiIniPointer = System.Runtime.InteropServices.Marshal.StringToHGlobalAnsi(AppPaths.ImGuiIniFilePath);
+            
+            unsafe
+            {
+                Gui.GetIO().NativePtr->IniFilename = (byte*)_imguiIniPointer;
+            }
+        }
+
+        private static void FreeIniFileSaveLocation()
+        {
+            if (_imguiIniPointer != IntPtr.Zero)
+            {
+                System.Runtime.InteropServices.Marshal.FreeHGlobal(_imguiIniPointer);
+                _imguiIniPointer = IntPtr.Zero;
+            }
         }
 
         protected override void OnSubSceneUnload()

@@ -505,7 +505,7 @@ namespace Mario2
 
             float stopFriction = IsGrounded ? StopFriction : StopFriction * 0.5f;
 
-            // You should only be able to move if you are not crouching
+            // You should only be able to move if you are not crouching,
             // or you're crouching but are in the air
             if (!_isCrouching || (_isCrouching && !IsGrounded))
             {
@@ -600,26 +600,58 @@ namespace Mario2
                 SoundManager.PlaySound(Sounds.PlayerJump);
             }
 
-            _jumpTimer += Time.DeltaTime;
-            if (_jumpTimer >= MaxJumpTime || !Input.IsKeyDown(KeyboardKey.A))
+            // _jumpTimer += Time.DeltaTime;
+            // if (_jumpTimer >= MaxJumpTime || !Input.IsKeyDown(KeyboardKey.A))
+            // {
+            //     StopJump();
+            // }
+            //
+            // Gravity = _isJumping ? 0f : DefaultGravity;
+            // if (_jumpTimer >= MaxJumpTime && _jumpTimer < MaxJumpTime + 0.02f)
+            // {
+            //     Gravity *= 4f;
+            // }
+            
+            if (_isJumping)
             {
-                StopJump();
+                _jumpTimer += Time.DeltaTime;
+                
+                if (_jumpTimer >= MaxJumpTime)
+                {
+                    float overshoot = _jumpTimer - MaxJumpTime;
+                    StopJump(overshoot);
+                }
+                else if (!Input.IsKeyDown(KeyboardKey.A))
+                {
+                    StopJump();
+                }
             }
 
             Gravity = _isJumping ? 0f : DefaultGravity;
-            if (_jumpTimer >= MaxJumpTime && _jumpTimer < MaxJumpTime + 0.02f)
-            {
-                Gravity *= 4f;
-            }
         }
 
-        private void StopJump()
+        private void StopJump() => StopJump(overshoot: Time.DeltaTime);
+        private void StopJump(float overshoot)
         {
             if (!_isJumping)
                 return;
 
-            _jumpTimer = MaxJumpTime;
+            // _jumpTimer = MaxJumpTime;
+            // _isJumping = false;
+            
             _isJumping = false;
+            
+            const float HeavyImpulse = (DefaultGravity * 4f) * 0.015f;
+            Velocity.Y += HeavyImpulse;
+
+            float excessGravityTime = Time.DeltaTime - overshoot;
+    
+            if (excessGravityTime > 0f)
+            {
+                Velocity.Y -= DefaultGravity * excessGravityTime;
+                float positionError = (HeavyImpulse + DefaultGravity * overshoot) * excessGravityTime;
+                PositionCorrection.Y -= positionError; 
+            }
         }
 
         private void HandleFireballThrowing()
