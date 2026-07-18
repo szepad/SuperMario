@@ -10,12 +10,10 @@
 
         private int _selectedIndex;
 
-        public UIWidget? this[Index index]
-        {
-            get => (index.Value >= 0 && index.Value < _widgets.Count)
+        public UIWidget? this[Index index] =>
+            (index.Value >= 0 && index.Value < _widgets.Count)
                 ? _widgets[index]
                 : null;
-        }
 
         public UIWidget Add(UIWidget button)
         {

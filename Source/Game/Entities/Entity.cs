@@ -12,7 +12,8 @@
         public Vector2 SpriteOffset;
         public Vector2 HitboxSize;
         public Vector2 HitboxOffset;
-
+        public Vector2 PositionCorrection;
+        
         public const float DefaultGravity = 650f * Game.TextureScale;
         public float Gravity { get; set; } = DefaultGravity;
 
@@ -118,10 +119,16 @@
             _steppedUpFromHorizontalCollision = false;
 
             OldPosition = Position;
-            Position.X += (Velocity.X + _platformInertiaX) * Time.DeltaTime;
+
+            // X-Axis Movement & Correction
+            Position.X += (Velocity.X + _platformInertiaX) * Time.DeltaTime + PositionCorrection.X;
             _platformInertiaX = 0f;
+            PositionCorrection.X = 0f;
             HandleCollisions(horizontal: true);
-            Position.Y += Velocity.Y * Time.DeltaTime;
+
+            // Y-Axis Movement & Correction
+            Position.Y += Velocity.Y * Time.DeltaTime + PositionCorrection.Y;
+            PositionCorrection.Y = 0f;
             HandleCollisions(horizontal: false);
 
             Sprite.Update();

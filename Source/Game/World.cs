@@ -1,6 +1,4 @@
-﻿using Raylib_cs;
-using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace Mario2
 {
@@ -608,6 +606,9 @@ namespace Mario2
 
         public void Draw(Camera2D camera, bool editor = false, bool tileCulling = true)
         {
+            camera.Target.X = (int)camera.Target.X;
+            camera.Target.Y = (int)camera.Target.Y;
+            
             _effectPool.Draw(isBackground: true);
 
             if (DrawStarFlag)

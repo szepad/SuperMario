@@ -11,18 +11,18 @@
 
         public void SetFullscreen(bool fullscreen)
         {
-            if (!Game.IsPlatformWindows)
+            if (OperatingSystem.IsMacOS())
             {
                 IsFullscreen = false;
                 return;
             }
-
+            
             IsFullscreen = fullscreen;
             int monitor = Raylib.GetCurrentMonitor();
             int monitorWidth = Raylib.GetMonitorWidth(monitor);
             int monitorHeight = Raylib.GetMonitorHeight(monitor);
             Vector2 pos = Raylib.GetMonitorPosition(monitor);
-
+            
             if (fullscreen)
             {
                 Raylib.SetWindowState(ConfigFlags.UndecoratedWindow);
