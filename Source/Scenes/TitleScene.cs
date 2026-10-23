@@ -12,7 +12,7 @@
             Raylib.HideCursor();
             SessionManager.Reset();
 
-            _world = WorldLoader.Deserialize(Path.Combine(AppPaths.DefaultLevelsFolder, "01.lvl"), out _);
+            _world = LevelLoader.Load(Path.Combine(AppPaths.DefaultLevelsFolder, "01.lvl"), out _);
 
             _buttons.Add(new UIPressButton("Play", Button_Play));
             _buttons.Add(new UIPressButton("Editor", Button_Editor));

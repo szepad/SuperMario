@@ -4,8 +4,9 @@
     {
         private static void Main(string[] args)
         {
+            args = CommandLine.ResolvePaths(args);
             Directory.SetCurrentDirectory(AppContext.BaseDirectory);
-            Game.Instance.Run();
+            Game.Instance.Run(args);
         }
     }
 }

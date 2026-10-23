@@ -1,6 +1,4 @@
-﻿using Mario2.Editor;
-
-namespace Mario2
+﻿namespace Mario2
 {
     public abstract class Tile(bool isCollidable)
     {
@@ -12,7 +10,6 @@ namespace Mario2
 
         public bool IsCollidable { get; set; } = isCollidable;
         public bool IsDestroyed { get; private set; }
-        public RuleTile? Rule { get; set; } = null;
         
         public List<CollisionSide> CollisionExclude { get; } = [];
 

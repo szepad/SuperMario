@@ -65,15 +65,5 @@
 
             base.Update();
         }
-
-        public override string SaveCustomData()
-        {
-            return $"{(int)(TileOffset * 10f)}";
-        }
-
-        public override void LoadCustomData(string data)
-        {
-            TileOffset = int.Parse(data) / 10f;
-        }
     }
 }

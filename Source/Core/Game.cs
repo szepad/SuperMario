@@ -1,8 +1,5 @@
-﻿global using ImGuiNET;
-global using Raylib_cs;
+﻿global using Raylib_cs;
 global using System.Numerics;
-global using Gui = ImGuiNET.ImGui;
-global using RlImGui = rlImGui_cs.rlImGui;
 
 namespace Mario2
 {
@@ -38,10 +35,22 @@ namespace Mario2
 
         private Game() { }
 
-        public void Run()
+        public void Run(string[] args)
         {
-            Init();
+            bool isCommand = CommandLine.HasCommand(args);
+
+            Init(hidden: isCommand);
             Load();
+
+            if (isCommand)
+            {
+                CommandLine.TryRun(args);
+                Unload();
+                return;
+            }
+
+            LoadScene(new TitleScene());
+
             while (!Raylib.WindowShouldClose() && !_hasExited)
             {
                 Update();
@@ -63,10 +72,10 @@ namespace Mario2
             ActiveScene?.Load();
         }
 
-        private void Init()
+        private void Init(bool hidden)
         {
             Raylib.SetTraceLogLevel(TraceLogLevel.Warning);
-            Raylib.SetConfigFlags(ConfigFlags.ResizableWindow);
+            Raylib.SetConfigFlags(hidden ? ConfigFlags.HiddenWindow : ConfigFlags.ResizableWindow);
             Raylib.InitWindow(Width, Height, Title);
             Raylib.InitAudioDevice();
             Raylib.SetExitKey(KeyboardKey.Null);
@@ -94,8 +103,6 @@ namespace Mario2
             _virtualScreen = Raylib.LoadRenderTexture(Width, Height);
 
             GameSettingsLoader.Load(Settings);
-
-            LoadScene(new TitleScene());
         }
 
         private void Unload()
@@ -154,7 +161,8 @@ namespace Mario2
 
         private void Draw()
         {
-            if (ActiveScene is EditorScene && ActiveScene.SubScene is null)
+            // Scenes like the editor render at window resolution instead of the virtual screen
+            if (ActiveScene?.ActiveLeaf.DrawsToWindow == true)
             {
                 ActiveScene.PreDraw();
                 ActiveScene.Draw();

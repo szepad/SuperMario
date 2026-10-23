@@ -20,20 +20,5 @@
 
             base.Update();
         }
-
-        public override string SaveCustomData()
-        {
-            return $"{Type},{IsHorizontal},{(int)(TileOffset * 10f)}";
-        }
-
-        public override void LoadCustomData(string data)
-        {
-            string[] split = data.Split(',');
-            if (Enum.TryParse(split[0], out PlatformType type))
-                Resize(type);
-
-            IsHorizontal = Convert.ToBoolean(split[1]);
-            TileOffset = int.Parse(split[2]) / 10f;
-        }
     }
 }

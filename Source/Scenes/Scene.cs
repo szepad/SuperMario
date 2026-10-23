@@ -5,6 +5,15 @@
         public Scene? ParentScene { get; private set; }
         public Scene? SubScene { get; private set; }
 
+        /// <summary>The innermost scene, i.e. the one that's actually updated and drawn.</summary>
+        public Scene ActiveLeaf => SubScene?.ActiveLeaf ?? this;
+
+        /// <summary>
+        /// When true, the scene draws straight to the window (managing Begin/EndDrawing itself)
+        /// instead of to the scaled virtual screen.
+        /// </summary>
+        public virtual bool DrawsToWindow => false;
+
         private bool _isLoaded;
 
         public void Load()

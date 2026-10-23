@@ -61,7 +61,7 @@
             world = new World();
             string name = $"{CurrentLevel.ToString().PadLeft(2, '0')}.lvl";
 
-            World? loaded = WorldLoader.Deserialize(Path.Combine(AppPaths.DefaultLevelsFolder, name), out _);
+            World? loaded = LevelLoader.Load(Path.Combine(AppPaths.DefaultLevelsFolder, name), out _);
             if (loaded is null)
             {
                 return SessionLoadResult.Fail;

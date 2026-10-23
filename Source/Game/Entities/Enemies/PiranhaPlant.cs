@@ -14,7 +14,6 @@
             HitboxSize = new Vector2(12f, 22f).Scale();
             HitboxOffset = new Vector2(2f, 2f).Scale();
 
-            IsEditorSaveable = false;
             IsStompable = false;
             IsCollidable = false;
             Gravity = 0f;

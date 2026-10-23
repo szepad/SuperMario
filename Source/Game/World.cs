@@ -32,6 +32,9 @@ namespace Mario2
         public string LoadedPath { get; init; } = string.Empty;
         public string ParentWorldPath { get; set; } = string.Empty;
 
+        /// <summary>Set on the editor's preview world, which is drawn but never updated.</summary>
+        public bool IsEditorPreview { get; init; }
+
         public int TimeLeft { get; set; } = 400;
         public int Cols { get; private set; } = 100;
         public Vector2 PlayerSpawnPosition { get; set; }
@@ -319,7 +322,7 @@ namespace Mario2
             if (pipe.ReturnToSubworld)
                 pipe.Destination = ParentWorldPath;
 
-            if (pipe.Destination == string.Empty || Path.GetFullPath(pipe.Destination) == Path.GetFullPath(LoadedPath))
+            if (pipe.Destination == string.Empty || LevelPaths.Same(pipe.Destination, LoadedPath))
             {
                 WarpExit? exit = (WarpExit?)_entities.FirstOrDefault(
                 ent => ent is WarpExit exit && ent != pipe
@@ -604,7 +607,7 @@ namespace Mario2
             Parallax.Draw();
         }
 
-        public void Draw(Camera2D camera, bool editor = false, bool tileCulling = true)
+        public void Draw(Camera2D camera, bool tileCulling = true)
         {
             camera.Target.X = (int)camera.Target.X;
             camera.Target.Y = (int)camera.Target.Y;
@@ -633,7 +636,7 @@ namespace Mario2
                 }
             }
 
-            DrawTiles(camera, editor, tileCulling);
+            DrawTiles(camera, tileCulling);
 
             for (int i = lastBg + 1; i < drawList.Count; i++)
             {
@@ -654,9 +657,9 @@ namespace Mario2
             return (minX, maxX);
         }
 
-        private void DrawTiles(Camera2D camera, bool editor, bool tileCulling)
+        private void DrawTiles(Camera2D camera, bool tileCulling)
         {
-            (int minX, int maxX) = (editor || !tileCulling) ? (0, Cols) : GetTileXBoundsOnCamera(camera);
+            (int minX, int maxX) = tileCulling ? GetTileXBoundsOnCamera(camera) : (0, Cols);
 
             for (int y = 0; y < Rows; y++)
             {
@@ -666,41 +669,8 @@ namespace Mario2
                     if (tile == SimpleTile.Air)
                         continue;
 
-                    DrawTile(tile, x, y, editor);
+                    tile.Draw(x, y, (tile is ContainerTile ct && ct.IsHidden) ? 0f : 1f);
                 }
-            }
-        }
-
-        private void DrawTile(Tile tile, int x, int y, bool editor)
-        {
-            if (!editor)
-            {
-                tile.Draw(x, y, (tile is ContainerTile ct && ct.IsHidden) ? 0f : 1f);
-                return;
-            }
-
-            if (tile is ContainerTile ct2)
-            {
-                if (ct2.IsHidden)
-                {
-                    ct2.Draw(x, y, 0.5f);
-                }
-                else
-                {
-                    ct2.Draw(x, y, tile.IsCollidable ? 1f : 0.5f);
-                }
-
-                if (ct2.ItemInside != ItemType.None)
-                {
-                    Raylib.DrawTexturePro(Assets.GetTex("items"),
-                        new Rectangle(0, ((int)ct2.ItemInside - 1) * 16, 16, 16),
-                        new Rectangle(x * Tile.Size, (y - 1) * Tile.Size, new Vector2(Tile.Size)),
-                        Vector2.Zero, 0f, Color.White.Alpha(0.5f));
-                }
-            }
-            else
-            {
-                tile.Draw(x, y, tile.IsCollidable ? 1f : 0.5f);
             }
         }
     }

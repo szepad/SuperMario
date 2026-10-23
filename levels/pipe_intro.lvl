@@ -1,17 +1,64 @@
-16;0;44;178;6;False;400
-simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;
-simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;
-simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;
-simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;
-simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;
-simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;
-simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;
-simple,-1,False,;simple,49,False,;simple,50,False,;simple,51,False,;simple,52,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;
-simple,-1,False,;simple,57,False,;simple,58,False,;simple,59,False,;simple,60,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,24,True,;simple,25,True,;simple,-1,False,;simple,-1,False,;
-simple,64,False,;simple,65,False,;simple,66,False,;simple,67,False,;simple,68,False,;simple,69,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,32,True,;simple,33,True,;simple,-1,False,;simple,-1,False,;
-simple,72,False,;simple,73,False,;simple,74,False,;simple,75,False,;simple,76,False,;simple,77,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,26,True,;simple,27,True,;simple,28,True,;simple,33,True,;simple,-1,False,;simple,-1,False,;
-simple,80,False,;simple,81,False,;simple,82,False,;simple,83,False,;simple,84,False,;simple,85,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,34,True,;simple,35,True,;simple,36,True,;simple,33,True,;simple,-1,False,;simple,-1,False,;
-simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;simple,1,True,;
-simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;simple,9,True,;
-Mario2.WarpPipe;144;176;,,1,False
-Mario2.NoPlant;200;112;
+MARIOLVL 2
+size 16 14
+background Sky
+music UndergroundIntro
+time 400
+pipe_intro false
+spawn 48 192
+
+def a tile 49 passable
+def b tile 50 passable
+def c tile 51 passable
+def d tile 52 passable
+def e tile 57 passable
+def f tile 58 passable
+def g tile 59 passable
+def h tile 60 passable
+def i tile 24 solid
+def j tile 25 solid
+def k tile 64 passable
+def l tile 65 passable
+def m tile 66 passable
+def n tile 67 passable
+def o tile 68 passable
+def p tile 69 passable
+def q tile 32 solid
+def r tile 33 solid
+def s tile 72 passable
+def t tile 73 passable
+def u tile 74 passable
+def v tile 75 passable
+def w tile 76 passable
+def x tile 77 passable
+def y tile 26 solid
+def z tile 27 solid
+def A tile 28 solid
+def B tile 80 passable
+def C tile 81 passable
+def D tile 82 passable
+def E tile 83 passable
+def F tile 84 passable
+def G tile 85 passable
+def H tile 34 solid
+def I tile 35 solid
+def J tile 36 solid
+def K auto grass
+grid
+.*16
+.*16
+.*16
+.*16
+.*16
+.*16
+.*16
+. a b c d .*11
+. e f g h .*7 i j .*2
+k l m n o p .*6 q r .*2
+s t u v w x .*4 y z A r .*2
+B C D E F G .*4 H I J r .*2
+K*16
+K*16
+end
+
+entity warp_pipe 152 192 dest="" tag="" dir=Right return_to_parent=false
+entity no_plant 208 128

@@ -1,6 +1,6 @@
 ﻿namespace Mario2
 {
-    public class GameScene(string path = "") : Scene
+    public class GameScene : Scene
     {
         public const int CameraOffsetY = Tile.Size;
 
@@ -14,8 +14,9 @@
         private World _world = null!;
         private Camera2D _camera;
 
-        private readonly bool _insideEditor = path != string.Empty;
-        private readonly string _editorFilePath = path;
+        // Set when playing a single in-memory level from the editor
+        private readonly World? _playtestWorld;
+        private bool IsPlaytest => _playtestWorld is not null;
 
         private State _state = State.Loading;
 
@@ -32,15 +33,26 @@
         private bool _showCastleMessage;
         private float _messageDisplayTimer;
 
+        /// <summary>Plays the campaign from the first level.</summary>
+        public GameScene() { }
+
+        /// <summary>
+        /// Plays a single level that only exists in memory (an editor playtest).
+        /// Finishing the level, dying or pressing escape returns to the parent scene.
+        /// </summary>
+        public GameScene(World playtestWorld)
+        {
+            _playtestWorld = playtestWorld;
+        }
+
         protected override void OnLoad()
         {
             SoundManager.StopMusic();
             Raylib.HideCursor();
 
-            if (_insideEditor)
+            if (IsPlaytest)
             {
-                HandleEditorPlaytest();
-                _state = State.Gameplay;
+                StartPlaytest();
             }
             else
             {
@@ -85,24 +97,22 @@
 
         }
 
-        private void HandleEditorPlaytest()
+        private void StartPlaytest()
         {
-            World? loaded = WorldLoader.Deserialize(_editorFilePath, out _);
-            if (loaded is not null)
-            {
-                _world = loaded;
-                _loadedSubWorlds[Path.GetFullPath(_world.LoadedPath)] = _world;
-                AssignWorldEvents();
-                StartWorld();
-            }
-            else if (ParentScene is null)
-            {
-                Game.Instance.LoadScene(new TitleScene());
-            }
-            else
-            {
+            _world = _playtestWorld!;
+            _loadedSubWorlds[LevelPaths.Key(_world.LoadedPath)] = _world;
+            AssignWorldEvents();
+
+            _state = State.Gameplay;
+            StartWorld();
+        }
+
+        private void LeavePlaytest()
+        {
+            if (ParentScene is not null)
                 ParentScene.UnloadSubScene();
-            }
+            else
+                Game.Instance.LoadScene(new TitleScene());
         }
 
         private void Load(Func<SessionLoadResult> loader)
@@ -118,7 +128,7 @@
             }
             else
             {
-                _loadedSubWorlds[Path.GetFullPath(_world.LoadedPath)] = _world;
+                _loadedSubWorlds[LevelPaths.Key(_world.LoadedPath)] = _world;
                 AssignWorldEvents();
             }
         }
@@ -170,6 +180,12 @@
 
         private void World_OnLevelEnd()
         {
+            if (IsPlaytest)
+            {
+                LeavePlaytest();
+                return;
+            }
+
             PlayerState playerState = _world.Player.State;
             LoadNext();
             _world.Player.SetStateInstantNoSideFx(playerState);
@@ -188,22 +204,22 @@
 
         private bool LoadSublevel(string path)
         {
-            path = Path.GetFullPath(path);
+            string key = LevelPaths.Key(path);
 
             World prev = _world;
-            if (_loadedSubWorlds.TryGetValue(path, out World? loaded))
+            if (_loadedSubWorlds.TryGetValue(key, out World? loaded))
             {
                 _world = loaded;
             }
             else
             {
-                World? world = WorldLoader.Deserialize(path, out _);
+                World? world = LevelLoader.Load(path, out _);
                 if (world is null)
                 {
                     return false;
                 }
 
-                _loadedSubWorlds[Path.GetFullPath(world.LoadedPath)] = world;
+                _loadedSubWorlds[key] = world;
                 world.ParentWorldPath = _world.LoadedPath;
                 _world = world;
                 AssignWorldEvents();
@@ -220,9 +236,9 @@
 
         private void OnPlayerDeath()
         {
-            if (_insideEditor)
+            if (IsPlaytest)
             {
-                ParentScene?.UnloadSubScene();
+                LeavePlaytest();
                 return;
             }
 

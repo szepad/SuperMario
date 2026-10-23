@@ -93,30 +93,6 @@
             
             base.Update();
         }
-
-        public override void OnEditorMove(Vector2 prev)
-        {
-            SetChildrenPositions();
-        }
-
-        public override void OnEditorDelete(EditorScene editor)
-        {
-            ClearChildren();
-        }
-
-        public override string SaveCustomData()
-        {
-            return $"{Length},{IsGoingRight}";
-        }
-
-        public override void LoadCustomData(string data)
-        {
-            string[] split = data.Split(',');
-            if (Enum.TryParse(split[0], out FirebarLength len))
-                SetLength(len);
-
-            IsGoingRight = Convert.ToBoolean(split[1]);
-        }
     }
 
     public class FirebarChild : Entity
@@ -128,8 +104,6 @@
         {
             Parent = parent;
 
-            IsEditorInteractable = false;
-            IsEditorSaveable = false;
             Gravity = 0f;
             IsCollidable = false;
             LayerDepth = LayerDepth.Foreground;

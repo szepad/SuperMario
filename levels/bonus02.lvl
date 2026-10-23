@@ -1,16 +1,37 @@
-16;1;28;18;2;False;400
-simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;
-anim,Mario2.BrickTile,0,False,1;simple,-1,False,;simple,-1,False,;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;simple,32,True,;
-anim,Mario2.BrickTile,0,False,1;simple,-1,False,;simple,-1,False,;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;simple,32,True,;
-anim,Mario2.BrickTile,0,False,1;simple,-1,False,;simple,-1,False,;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;simple,32,True,;
-anim,Mario2.BrickTile,0,False,1;simple,-1,False,;simple,-1,False,;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;simple,32,True,;
-anim,Mario2.BrickTile,0,False,1;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;simple,32,True,;
-anim,Mario2.BrickTile,0,False,1;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;simple,32,True,;
-anim,Mario2.BrickTile,0,False,1;simple,-1,False,;simple,-1,False,;simple,-1,False,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;simple,-1,False,;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;simple,32,True,;
-anim,Mario2.BrickTile,0,False,1;simple,-1,False,;simple,-1,False,;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,6,False,1;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;simple,32,True,;
-anim,Mario2.BrickTile,0,False,1;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;anim,Mario2.BrickTile,0,False,1;anim,Mario2.BrickTile,0,False,1;simple,32,True,;
-anim,Mario2.BrickTile,0,False,1;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,-1,False,;simple,26,True,;simple,27,True,;simple,28,True,;
-anim,Mario2.BrickTile,0,False,1;simple,-1,False,;simple,-1,False,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;anim,Mario2.CoinTile,;simple,-1,False,;simple,34,True,;simple,35,True,;simple,36,True,;
-simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;simple,5,True,;
-simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;simple,13,True,;
-Mario2.WarpPipe;192;176;,bonus02,1,True
+MARIOLVL 2
+size 16 14
+background Underground
+music Underground
+time 400
+pipe_intro false
+spawn 32 32
+
+def a brick item=None hidden=false palette=Underground
+def b tile 32 solid
+def c coin
+def d brick item=CoinStash hidden=false palette=Underground
+def e tile 26 solid
+def f tile 27 solid
+def g tile 28 solid
+def h tile 34 solid
+def i tile 35 solid
+def j tile 36 solid
+def k auto underground
+grid
+.*16
+a .*2 a*12 b
+a .*2 a*12 b
+a .*2 a*12 b
+a .*2 a*12 b
+a .*12 a*2 b
+a .*12 a*2 b
+a .*3 c*8 . a*2 b
+a .*2 a*9 d a*2 b
+a .*12 a*2 b
+a .*12 e f g
+a .*2 c*9 . h i j
+k*16
+k*16
+end
+
+entity warp_pipe 200 192 dest="" tag=bonus02 dir=Right return_to_parent=true

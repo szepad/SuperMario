@@ -38,19 +38,5 @@
                 Raylib.DrawTextureEx(Assets.GetTex("editor_pipe"), Position, 0f, Game.TextureScale, Color.White);
             }
         }
-
-        public override string SaveCustomData()
-        {
-            return $"{Destination},{Tag},{(int)Dir},{ReturnToSubworld}";
-        }
-
-        public override void LoadCustomData(string data)
-        {
-            string[] split = data.Split(',');
-            Destination = split[0];
-            Tag = split[1];
-            Dir = (PipeDirection)int.Parse(split[2]);
-            ReturnToSubworld = Convert.ToBoolean(split[3]);
-        }
     }
 }

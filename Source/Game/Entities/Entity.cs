@@ -30,8 +30,6 @@
         public bool IsCollidable { get; set; } = true;
         public bool IsHittable { get; set; } = true;
         public bool IsSolid { get; set; } = false;
-        public bool IsEditorSaveable { get; set; } = true;
-        public bool IsEditorInteractable { get; set; } = true;
         public bool IsGrounded { get; private set; }
         public bool IsSpawned { get; private set; }
         public bool CanBeDestroyed { get; set; } = true;
@@ -351,12 +349,13 @@
 
             Sprite.Draw(Position - SpriteOffset);
 
-            if (Game.Instance.ActiveScene is EditorScene editor && editor.SubScene is null)
+            if (World.IsEditorPreview)
                 DrawEditor();
 
             DrawDebug();
         }
 
+        /// <summary>Extra visuals only shown in the level editor (e.g. icons of invisible markers).</summary>
         protected virtual void DrawEditor() { }
 
         protected virtual void DrawDebug()
@@ -394,11 +393,5 @@
         protected virtual void OnTileOverlap(Tile tile) { }
         protected virtual void OnEntityOverlap(Entity other) { }
         protected virtual void OnSolidEntityCollision(Entity other, CollisionSide side) { }
-
-        public virtual void OnEditorMove(Vector2 prev) { }
-        public virtual void OnEditorDelete(EditorScene editor) { }
-
-        public virtual string SaveCustomData() => string.Empty;
-        public virtual void LoadCustomData(string data) { }
     }
 }

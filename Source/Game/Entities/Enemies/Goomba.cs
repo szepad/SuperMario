@@ -52,18 +52,5 @@
 
             base.Update();
         }
-
-        public override string SaveCustomData()
-        {
-            return Palette.ToString();
-        }
-
-        public override void LoadCustomData(string data)
-        {
-            if (Enum.TryParse(data, out Palette palette))
-            {
-                SetPalette(palette);
-            }
-        }
     }
 }

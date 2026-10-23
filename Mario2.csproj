@@ -10,9 +10,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Gum.raylib" Version="2026.10.1.1" />
+        <PackageReference Include="Gum.Themes.Editor.Raylib" Version="2026.10.1.1" />
         <PackageReference Include="NativeFileDialogSharp" Version="0.6.0-alpha" />
-        <PackageReference Include="Raylib-cs" Version="7.0.2" />
-        <PackageReference Include="rlImgui-cs" Version="3.2.0" />
+        <PackageReference Include="Raylib-cs" Version="8.1.0" />
     </ItemGroup>
 
     <ItemGroup>

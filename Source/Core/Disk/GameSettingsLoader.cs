@@ -1,4 +1,6 @@
-﻿namespace Mario2
+﻿using Mario2.Editor;
+
+namespace Mario2
 {
     public static class GameSettingsLoader
     {
@@ -18,7 +20,10 @@
                 writer.WriteLine(settings.IsIntegerScale);
                 writer.WriteLine((int)(settings.SoundVolume * 100f));
                 writer.WriteLine((int)(settings.MusicVolume * 100f));
-                writer.WriteLine(EditorScene.RecentlyOpened);
+                // One path per line, most recent first. The first one is where older builds
+                // kept their single "recently opened" level, so they still read it fine.
+                foreach (string path in EditorPrefs.RecentFiles)
+                    writer.WriteLine(path);
             }
             catch (Exception error)
             {
@@ -56,7 +61,14 @@
                 settings.SetIntegerScale(Convert.ToBoolean(reader.ReadLine()));
                 settings.SetSoundVolume(Convert.ToInt32(reader.ReadLine()) / 100f);
                 settings.SetMusicVolume(Convert.ToInt32(reader.ReadLine()) / 100f);
-                EditorScene.RecentlyOpened = reader.ReadLine() ?? string.Empty;
+                List<string> recent = [];
+                while (reader.ReadLine() is { } line)
+                {
+                    if (!string.IsNullOrWhiteSpace(line))
+                        recent.Add(line);
+                }
+
+                EditorPrefs.LoadRecent(recent);
             }
             catch (Exception error)
             {

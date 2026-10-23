@@ -33,14 +33,6 @@
             return sqr / (2f * (sqr - t) + 1f);
         }
 
-        public static bool GuiDisabledButton(string label, bool disabled)
-        {
-            if (disabled) Gui.BeginDisabled();
-            bool result = Gui.Button(label);
-            if (disabled) Gui.EndDisabled();
-            return result;
-        }
-        
         public static Color Alpha(this Color color, float opacity)
         {
             return new Color(color.R, color.G, color.B, (byte)(255f * opacity));

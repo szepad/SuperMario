@@ -22,15 +22,5 @@
         {
             Raylib.DrawTextureEx(Assets.GetTex("editor_pipe_exit"), Position, 0f, Game.TextureScale, Color.White);
         }
-
-        public override string SaveCustomData()
-        {
-            return Tag;
-        }
-
-        public override void LoadCustomData(string data)
-        {
-            Tag = data;
-        }
     }
 }

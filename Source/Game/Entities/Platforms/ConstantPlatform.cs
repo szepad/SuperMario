@@ -33,17 +33,5 @@
 
             base.Update();
         }
-
-        public override string SaveCustomData()
-        {
-            return $"{Type},{Dir}";
-        }
-
-        public override void LoadCustomData(string data)
-        {
-            string[] split = data.Split(',');
-            if (Enum.TryParse(split[0], out PlatformType type)) Resize(type);
-            if (Enum.TryParse(split[1], out PlatformDirection dir)) Dir = dir;
-        }
     }
 }
