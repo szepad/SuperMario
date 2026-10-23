@@ -28,3 +28,4 @@ entity warp_pipe 152 192 dest="" tag="" dir=Down return_to_parent=true
 entity warp_exit 192 192 tag=""
 entity platform_constant 256 152 size=Long direction=Up
 entity platform_pingpong 336 192 size=Short tile_offset=-4 horizontal=false
+entity bowser 168 112

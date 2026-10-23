@@ -22,8 +22,7 @@ This project was built from the ground up as a portfolio piece to showcase clean
 ### Integrated Level Editor
 
 <p align="center">
-  <img src="gallery/editor1.png" width="45%" alt="Editor Screenshot 1">
-  <img src="gallery/editor2.png" width="45%" alt="Editor Screenshot 2">
+  <img src="gallery/editor.png" width="90%" alt="Editor Screenshot">
 </p>
 
 ---
